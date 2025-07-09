@@ -21,7 +21,7 @@ SRCS = ft_atoi.c ft_isalpha.c ft_itoa.c ft_memmove.c ft_putnbr_fd.c  ft_strdup.c
 	   ft_lstsize_bonus.c ft_lstlast_bonus.c ft_lstdelone_bonus.c \
 	   ft_lstclear_bonus.c ft_lstiter_bonus.c ft_strtod.c ft_strcmp.c
 
-OBJDIR = .obj
+OBJDIR = .build
 OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
 .SECONDARY : $(OBJS)
 CC = cc
@@ -35,7 +35,7 @@ $(OBJDIR)/%.o: %.c | $(OBJDIR)
 	@$(CC) $(CFLAGS) -I. -c $< -o $@
 
 $(OBJDIR):
-	@mkdir -p .obj
+	@mkdir -p .build
 
 $(NAME): $(OBJS) libft.h
 	@ar rcs $(NAME) $(OBJS)

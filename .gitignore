@@ -1,5 +1,4 @@
-*.obj
-.obj/
+.build/
 build/
 cub3d
 libft.a

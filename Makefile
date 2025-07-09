@@ -24,7 +24,7 @@ INCLUDES := -Iincl -Iassets/libft -Iassets/MLX42/include
 SRCS    := \
 	src/main.c \
 
-OBJ    := $(SRCS:src/%.c=.obj/%.o)
+OBJ    := $(SRCS:src/%.c=.build/%.o)
 
 LIBFT_DIR := assets/libft
 LIBFT_A   := $(LIBFT_DIR)/libft.a
@@ -42,19 +42,19 @@ $(NAME): $(OBJ) assets/libft/libft.a $(MLX42)
 	@$(CC) $(CFLAGS) $(INCLUDES) $(OBJ) assets/libft/libft.a $(MLX42) -ldl -lglfw -pthread -lm -o $(NAME)
 	@echo "🎉 Build complete!"
 
-.obj/main.o: src/main.c $(HEADERS) | .obj
-	@$(CC) $(CFLAGS) $(INCLUDES) -c src/main.c -o .obj/main.o
+.build/main.o: src/main.c $(HEADERS) | .build
+	@$(CC) $(CFLAGS) $(INCLUDES) -c src/main.c -o .build/main.o
 
 $(LIBFT_A):
 	@echo "📚 Building libft..."
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR)
 
-.obj:
-	@mkdir -p .obj
+.build:
+	@mkdir -p .build
 
 clean:
 	@echo "🧹 Cleaning..."
-	@rm -rf .obj
+	@rm -rf .build
 	@rm -rf assets/MLX42/build
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
 
