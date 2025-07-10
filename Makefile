@@ -6,11 +6,11 @@
 #    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/05/16 16:13:18 by maoliiny         ###   ########.fr        #
+#    Updated: 2025/07/10 17:22:12 by maoliiny         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME    := cub3d
+NAME    := miniRT
 
 INCLUDES = -Iincl -Iassets/libft -Iassets/MLX42/include
 MLX42 = assets/MLX42/build/libmlx42.a 
@@ -69,4 +69,3 @@ re:
 	@$(MAKE) --no-print-directory all
 
 .PHONY: all clean fclean re
-.SECONDARY : $(OBJ)
