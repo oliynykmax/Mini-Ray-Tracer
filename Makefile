@@ -12,8 +12,8 @@
 
 NAME    := miniRT
 
-INCLUDES = -Iincl -Iassets/libft -Iassets/MLX42/include
-MLX42 = assets/MLX42/build/libmlx42.a 
+INCLUDES := -Iincl -Iassets/libft -Iassets/MLX42/include
+MLX42 := assets/MLX42/build/libmlx42.a 
 HEADERS := assets/libft/libft.h
 
 CC      := cc
@@ -54,8 +54,7 @@ $(LIBFT_A):
 
 clean:
 	@echo "🧹 Cleaning..."
-	@rm -rf .build
-	@rm -rf assets/MLX42/build
+	@rm -rf .build assets/MLX42/build
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
 
 fclean: clean
