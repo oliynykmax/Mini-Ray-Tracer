@@ -1,6 +1,9 @@
-#include <stdio.h>
+#include "minirt.h"
 
-int main()
+int	main(int ac, char **av)
 {
-  printf("Hello world!");
+	const t_scene	*scene = validate_input_and_parse_map(ac, av);
+
+	if (!scene)
+		exit(EXIT_FAILURE);
 }

@@ -6,23 +6,22 @@
 #    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/07/10 17:22:12 by maoliiny         ###   ########.fr        #
+#    Updated: 2025/07/11 22:56:31 by maoliiny         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME    := miniRT
 
-INCLUDES := -Iincl -Iassets/libft -Iassets/MLX42/include
+INCLUDES := -Iassets/libft -Iassets/MLX42/include
 MLX42 := assets/MLX42/build/libmlx42.a 
-HEADERS := assets/libft/libft.h
+HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := cc
 CFLAGS  := -Wall -Wextra -Werror -O3 -march=native -ffast-math
 
-INCLUDES := -Iincl -Iassets/libft -Iassets/MLX42/include
+INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS    := \
-	src/main.c \
+SRCS    := src/input.c src/main.c 
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
@@ -42,12 +41,13 @@ $(NAME): $(OBJ) assets/libft/libft.a $(MLX42)
 	@$(CC) $(CFLAGS) $(INCLUDES) $(OBJ) assets/libft/libft.a $(MLX42) -ldl -lglfw -pthread -lm -o $(NAME)
 	@echo "🎉 Build complete!"
 
-.build/main.o: src/main.c $(HEADERS) | .build
-	@$(CC) $(CFLAGS) $(INCLUDES) -c src/main.c -o .build/main.o
+.build/%.o: src/%.c $(HEADERS) | .build
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(LIBFT_A):
 	@echo "📚 Building libft..."
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR)
+
 
 .build:
 	@mkdir -p .build
