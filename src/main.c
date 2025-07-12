@@ -23,7 +23,7 @@ void	parse_scene(t_scene *scene, char *filename)
 	scene->camera_pos = vec3(3.0f, 0.0f, +3.0f);
 	scene->camera_dir = vec3(0.0f, 0.0f, -1.0f);
 	scene->camera_fov = 90.0f;
-	scene->ambient = vec3(0.0f, 0.1f, 0.2f);
+	scene->ambient = vec3(0.0f, 0.3f, 0.5f);
 }
 
 // parse_scene should call exit() if anything goes wrong during parsing.
@@ -39,5 +39,6 @@ int	main(int ac, char **av)
 		return (1);
 	parse_scene(&scene, av[1]);
 	render_scene(&scene);
+	free(scene.objects);
 	return (0);
 }
