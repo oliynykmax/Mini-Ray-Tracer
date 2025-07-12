@@ -10,6 +10,9 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
+# include <errno.h>
+
+# define OBJECT_MAX 32
 
 typedef union u_vec3		t_vec3;
 typedef struct s_scene		t_scene;
@@ -63,6 +66,9 @@ struct						s_scene
 };
 
 /* parsing of the map and validating the input input.c */
-t_scene	*validate_input_and_parse_map(int ac, char **av);
+bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+/* asserting function, worth thinking if we want to builtin
+ * the exiting and cleaning into it*/
+bool	mrt_assert(bool condition, char *msg);
 
 #endif
