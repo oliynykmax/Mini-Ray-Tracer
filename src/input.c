@@ -23,6 +23,7 @@ void	process_map(t_scene *sc, char **buff)
 	(void)buff;
 	while (i < sc->object_count)
 	{
+		printf("%s", buff[i]);
 		// parse shape
 		// parse light
 		// parse camera
@@ -41,7 +42,7 @@ void	read_map_into_scene(int fd, t_scene *sc)
 		buff[i] = get_next_line(fd);
 		if (buff[i] == NULL)
 			break ;
-		if (ft_strcmp(buff[i], "\n"))
+		if (ft_str_is_whitespace(buff[i]))
 			continue ;
 		i++;
 	}
@@ -69,7 +70,7 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 {
 	int	fd;
 
-	if (!mrt_assert(ac != 2 || !ends_with_rt(av[1]),
+	if (!mrt_assert(ac == 2 && ends_with_rt(av[1]),
 			"usage: ./miniRT <path_to_the_file.rt>\n"))
 		return (false);
 	fd = open(av[1], O_RDONLY);
