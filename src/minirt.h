@@ -67,7 +67,6 @@ float	vec3_dot(t_vec3 a, t_vec3 b);
 float	vec3_length(t_vec3 v);
 t_vec3	vec3_normalize(t_vec3 v);
 t_vec3	vec3_cross(t_vec3 a, t_vec3 b);
-=======
 struct						s_object
 {
 	t_object_type	type; // Object type (one of OBJECT_xxx)
