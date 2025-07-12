@@ -46,27 +46,6 @@ union						u_vec3
 	float	a[3]; // Array access to components.
 };
 
-
-
-// loop.c
-void	render_scene(t_scene *scene);
-
-// main.c
-void	parse_scene(t_scene *scene, char *filename);
-
-// vec3_arithmetic.c
-t_vec3	vec3(float x, float y, float z);
-t_vec3	vec3_add(t_vec3 a, t_vec3 b);
-t_vec3	vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3	vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3	vec3_div(t_vec3 a, t_vec3 b);
-
-// vec3_geometric.c
-t_vec3	vec3_scale(t_vec3 v, float s);
-float	vec3_dot(t_vec3 a, t_vec3 b);
-float	vec3_length(t_vec3 v);
-t_vec3	vec3_normalize(t_vec3 v);
-t_vec3	vec3_cross(t_vec3 a, t_vec3 b);
 struct						s_object
 {
 	t_object_type	type; // Object type (one of OBJECT_xxx)
@@ -93,11 +72,30 @@ struct s_render
 	mlx_t		*mlx;	// MLX state
 	mlx_image_t	*image;	// MLX image
 };
+
+// loop.c
+void	render_scene(t_scene *scene);
+
+// main.c
+void	parse_scene(t_scene *scene, char *filename);
+
+// vec3_arithmetic.c
+t_vec3	vec3(float x, float y, float z);
+t_vec3	vec3_add(t_vec3 a, t_vec3 b);
+t_vec3	vec3_sub(t_vec3 a, t_vec3 b);
+t_vec3	vec3_mul(t_vec3 a, t_vec3 b);
+t_vec3	vec3_div(t_vec3 a, t_vec3 b);
+
+// vec3_geometric.c
+t_vec3	vec3_scale(t_vec3 v, float s);
+float	vec3_dot(t_vec3 a, t_vec3 b);
+float	vec3_length(t_vec3 v);
+t_vec3	vec3_normalize(t_vec3 v);
+t_vec3	vec3_cross(t_vec3 a, t_vec3 b);
 /* parsing of the map and validating the input input.c */
 bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 /* asserting function, worth thinking if we want to builtin
  * the exiting and cleaning into it*/
 bool	mrt_assert(bool condition, char *msg);
-
 
 #endif
