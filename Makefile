@@ -6,7 +6,7 @@
 #    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/07/11 22:56:31 by maoliiny         ###   ########.fr        #
+#    Updated: 2025/07/12 23:04:26 by abostrom         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,13 +23,15 @@ LDFLAGS := -ldl -lglfw -pthread -lm
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS    := \
-		src/assert.c \
-		src/input.c \
-		src/main.c \
-       	src/loop.c \
-        src/vec3_arithmetic.c \
-        src/vec3_geometric.c \
+SRCS := \
+	src/assert.c \
+	src/input.c \
+	src/loop.c \
+	src/main.c \
+	src/trace.c \
+	src/vec3_arithmetic.c \
+	src/vec3_geometric.c \
+	src/vec3_utility.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
