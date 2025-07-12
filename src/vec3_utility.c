@@ -11,12 +11,15 @@ t_vec3	vec3_lerp(t_vec3 a, t_vec3 b, float t)
 }
 
 // Convert a color vector with components in [0, 1] to a 32-bit MLX pixel value.
+// Applies an approximation of an sRGB gamma curve before converting to 8-bit
+// range.
 
 uint32_t	vec3_to_color(t_vec3 color)
 {
-	const uint32_t	r = (uint32_t)(color.r * 255.5f);
-	const uint32_t	g = (uint32_t)(color.g * 255.5f);
-	const uint32_t	b = (uint32_t)(color.b * 255.5f);
+	const float		gamma = 2.3f;
+	const uint32_t	r = (uint32_t)(powf(color.r, gamma) * 255.5f);
+	const uint32_t	g = (uint32_t)(powf(color.g, gamma) * 255.5f);
+	const uint32_t	b = (uint32_t)(powf(color.b, gamma) * 255.5f);
 
 	return ((r << 24) | (g << 16) | (b << 8) | 255);
 }
