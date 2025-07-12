@@ -30,20 +30,17 @@ void	parse_scene(t_scene *scene, char *filename)
 // Eventually main should also free any resources in the scene, but right now
 // there aren't any. FIXME: The argc should be fixed when we have files to test.
 
-int	main(int argc, char **argv)
+int	main(int ac, char **av)
 {
 	t_scene			scene;
 
-	if (argc > 0)
+	if (ac > 0)
 	{
-		parse_scene(&scene, argv[1]);
+		parse_scene(&scene, av[1]);
 		render_scene(&scene);
 	}
-//{
-//	t_scene	scene;
-//
-//	ft_bzero(&scene, sizeof(t_scene));
-//	if (!validate_input_and_parse_map(ac, av, &scene))
-//	return (1);
-//return (0);
+	ft_bzero(&scene, sizeof(t_scene));
+	if (!validate_input_and_parse_map(ac, av, &scene))
+		return (1);
+	return (0);
 }
