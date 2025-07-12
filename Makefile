@@ -21,7 +21,9 @@ CFLAGS  := -Wall -Wextra -Werror -O3 -march=native -ffast-math
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS    := src/input.c src/main.c 
+SRCS    := src/input.c \
+		   src/main.c \
+		   src/assert.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
