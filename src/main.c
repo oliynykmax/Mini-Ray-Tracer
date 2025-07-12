@@ -34,13 +34,10 @@ int	main(int ac, char **av)
 {
 	t_scene			scene;
 
-	if (ac > 0)
-	{
-		parse_scene(&scene, av[1]);
-		render_scene(&scene);
-	}
 	ft_bzero(&scene, sizeof(t_scene));
 	if (!validate_input_and_parse_map(ac, av, &scene))
 		return (1);
+	parse_scene(&scene, av[1]);
+	render_scene(&scene);
 	return (0);
 }
