@@ -19,7 +19,7 @@ SRCS = ft_atoi.c ft_isalpha.c ft_itoa.c ft_memmove.c ft_putnbr_fd.c  ft_strdup.c
 	   ft_putendl_fd.c  ft_strchr.c     ft_strlcat.c   ft_strncmp.c  ft_substr.c   get_next_line.c \
 	   get_next_line_utils.c printf_fd.c printf_fd_utils.c \
 	   ft_lstsize_bonus.c ft_lstlast_bonus.c ft_lstdelone_bonus.c \
-	   ft_lstclear_bonus.c ft_lstiter_bonus.c ft_strtod.c ft_strcmp.c
+	   ft_lstclear_bonus.c ft_lstiter_bonus.c ft_strtod.c ft_strcmp.c ft_str_is_whitespace.c
 
 OBJDIR = .build
 OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
