@@ -23,9 +23,10 @@ LDFLAGS := -ldl -lglfw -pthread -lm
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS    := src/input.c \
-		   src/main.c \
-		   src/assert.c \
+SRCS    := \
+		src/assert.c \
+		src/input.c \
+		src/main.c \
        	src/loop.c \
         src/vec3_arithmetic.c \
         src/vec3_geometric.c \
