@@ -63,6 +63,7 @@ char				*ft_strjoin(char const *s1, char const *s2);
 char				*ft_strtrim(char const *s1, char const *set);
 char				*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 void				ft_striteri(char *s, void (*f)(unsigned int, char *));
+int					ft_str_is_whitespace(const char *str);
 
 long				ft_atoi(const char *nptr);
 int					ft_atoi_safe(const char *nptr, long *result);

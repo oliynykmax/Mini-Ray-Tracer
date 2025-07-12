@@ -39,4 +39,11 @@ int	main(int argc, char **argv)
 		parse_scene(&scene, argv[1]);
 		render_scene(&scene);
 	}
+//{
+//	t_scene	scene;
+//
+//	ft_bzero(&scene, sizeof(t_scene));
+//	if (!validate_input_and_parse_map(ac, av, &scene))
+//	return (1);
+//return (0);
 }

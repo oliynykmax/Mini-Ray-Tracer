@@ -1,16 +1,34 @@
-SRCS := \
-	src/loop.c \
-	src/main.c \
-	src/vec3_arithmetic.c \
-	src/vec3_geometric.c \
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
+#    Updated: 2025/07/11 22:56:31 by maoliiny         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-NAME  := miniRT
+NAME    := miniRT
+
+INCLUDES := -Iassets/libft -Iassets/MLX42/include
 MLX42 := assets/MLX42/build/libmlx42.a 
+HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := cc
 CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -march=native -ffast-math
 CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include
 LDFLAGS := -ldl -lglfw -pthread -lm
+
+INCLUDES := -Iassets/libft -Iassets/MLX42/include
+
+SRCS    := src/input.c \
+		   src/main.c \
+		   src/assert.c \
+       	src/loop.c \
+        src/vec3_arithmetic.c \
+        src/vec3_geometric.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
@@ -30,11 +48,12 @@ $(NAME): $(OBJ) assets/libft/libft.a $(MLX42)
 	echo "🎉 Build complete!"
 
 .build/%.o: src/%.c | .build
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(LIBFT_A):
 	echo "📚 Building libft..."
 	$(MAKE) --no-print-directory -C $(LIBFT_DIR)
+
 
 .build:
 	mkdir -p .build
