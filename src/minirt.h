@@ -75,6 +75,12 @@ struct s_render
 	t_vec3		camera_y;		// Camera "down" vector
 	t_vec3		camera_z;		// Camera "out" vector
 	t_vec3		viewport[4];	// The four corners of the viewport
+	int			key_forward;
+	int			key_back;
+	int			key_left;
+	int			key_right;
+	int			key_up;
+	int			key_down;
 };
 
 // loop.c

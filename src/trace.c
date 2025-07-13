@@ -61,7 +61,8 @@ static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 		}
 	}
 	diffuse = saturate(vec3_dot(light, normal));
-	return (vec3_to_color(vec3_scale(color, diffuse)));
+	color = vec3_lerp(s->ambient, color, diffuse);
+	return (vec3_to_color(color));
 }
 
 // Trace the color of the pixel at (x, y) in the image.
