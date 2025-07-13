@@ -1,13 +1,5 @@
 #include "minirt.h"
 
-// Scale a 3D vector by some value. (Multiply all of its components by some
-// scalar.)
-
-t_vec3	vec3_scale(t_vec3 v, float s)
-{
-	return (vec3(v.x * s, v.y * s, v.z * s));
-}
-
 // Get the dot product (scalar product) of two 3D vectors. The resulting value
 // is proportional to the product of the lengths of the two vectors, and to the
 // cosine of the angle between them.
