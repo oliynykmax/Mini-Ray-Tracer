@@ -6,7 +6,7 @@
 /*   By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 14:31:16 by maoliiny          #+#    #+#             */
-/*   Updated: 2025/05/05 14:28:05 by maoliiny         ###   LAUSANNE.ch       */
+/*   Updated: 2025/07/13 19:25:37 by maoliiny         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,23 +55,29 @@ char	*extract_line(char **res)
 
 char	*get_next_line(int fd)
 {
-	static char	*res[FD_NUM];
-	char		*line;
+	static char	*res;
 	int			bytes;
 
+	if (fd == -1)
+	{
+		if (res)
+		{
+			free(res);
+			res = NULL;
+		}
+	}
 	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FD_NUM)
 		return (NULL);
-	if (!res[fd])
-		res[fd] = ft_strncpy("", 0);
+	if (!res)
+		res = ft_strncpy("", 0);
 	bytes = 1;
-	while (ft_fnl(res[fd], '\n') == -1 && bytes > 0)
-		bytes = ft_strcat(&res[fd], fd);
-	if ((bytes <= 0) && *res[fd] == '\0')
+	while (ft_fnl(res, '\n') == -1 && bytes > 0)
+		bytes = ft_strcat(&res, fd);
+	if ((bytes <= 0) && *res == '\0')
 	{
-		free(res[fd]);
-		res[fd] = NULL;
+		free(res);
+		res = NULL;
 		return (NULL);
 	}
-	line = extract_line(&res[fd]);
-	return (line);
+	return (extract_line(&res));
 }
