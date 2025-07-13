@@ -83,27 +83,27 @@ void		render_scene(t_scene *scene);
 // main.c
 void		parse_scene(t_scene *scene, char *filename);
 
-// vec3_arithmetic.c
-t_vec3		vec3(float x, float y, float z);
-t_vec3		vec3_add(t_vec3 a, t_vec3 b);
-t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3		vec3_div(t_vec3 a, t_vec3 b);
-
-// vec3_geometric.c
-t_vec3		vec3_scale(t_vec3 v, float s);
-float		vec3_dot(t_vec3 a, t_vec3 b);
-float		vec3_length(t_vec3 v);
-t_vec3		vec3_normalize(t_vec3 v);
-t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
-
 // title.c
 void	show_stats_in_window_title(t_render *r);
 
 // trace.c
 uint32_t	trace_pixel(t_render *r, float x, float y);
 
+// vec3_arithmetic.c
+t_vec3		vec3_add(t_vec3 a, t_vec3 b);
+t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
+t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
+t_vec3		vec3_div(t_vec3 a, t_vec3 b);
+t_vec3		vec3_scale(t_vec3 v, float s);
+
+// vec3_geometric.c
+float		vec3_dot(t_vec3 a, t_vec3 b);
+float		vec3_length(t_vec3 v);
+t_vec3		vec3_normalize(t_vec3 v);
+t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
+
 // vec3_utility.c
+t_vec3		vec3(float x, float y, float z);
 t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
 uint32_t	vec3_to_color(t_vec3 color);
 
