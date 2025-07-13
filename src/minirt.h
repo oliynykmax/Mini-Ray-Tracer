@@ -97,6 +97,9 @@ float		vec3_length(t_vec3 v);
 t_vec3		vec3_normalize(t_vec3 v);
 t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
 
+// title.c
+void	show_stats_in_window_title(t_render *r);
+
 // trace.c
 uint32_t	trace_pixel(t_render *r, float x, float y);
 
