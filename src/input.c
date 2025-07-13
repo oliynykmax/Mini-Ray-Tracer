@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-void	free_array(char **array, bool is_heap)
+void	free_array(char **array)
 {
 	int	i;
 
@@ -9,8 +9,7 @@ void	free_array(char **array, bool is_heap)
 		return ;
 	while (array[i] != NULL)
 		free(array[i++]);
-	if (is_heap)
-		free(array);
+	free(array);
 }
 
 double	ft_atof(const char *str)
@@ -57,87 +56,136 @@ t_object_type	parse_type(char *s)
 	return (-1);
 }
 
-int array_len(char **array)
+int	array_len(char **array)
 {
-	int i = 0;
+	int	i;
+
+	if (!array)
+		return (0);
+	i = 0;
 	while (array[i])
 		i++;
 	return (i);
 }
 
-void			parse_shape(char **line, t_scene *sc);
-void			parse_light(char **line, t_scene *sc);
-void	parse_camera(char **line, t_scene *sc, bool *error)
+int	objects_malloc_manager(t_scene *sc)
+{
+	static int	is_malloced = 0;
+	static int	capacity = 64;
+	t_object	*new_objects;
+
+	if (!is_malloced)
+	{
+		sc->objects = malloc(capacity * sizeof(t_object));
+		if (!sc->objects)
+			return (1);
+		is_malloced = 1;
+	}
+	else if (sc->object_count >= (size_t)capacity)
+	{
+		capacity *= 2;
+		new_objects = malloc(capacity * sizeof(t_object));
+		if (!new_objects)
+			return (1);
+		memcpy(new_objects, sc->objects, sc->object_count * sizeof(t_object));
+		free(sc->objects);
+		sc->objects = new_objects;
+	}
+	return (0);
+}
+
+bool	parse_shape(char **line, t_scene *sc)
+{
+	(void)line;
+	(void)sc;
+	return (false);
+}
+
+bool	parse_light(char **line, t_scene *sc)
+{
+	(void)line;
+	(void)sc;
+	return (false);
+}
+/*
+ * the command is going through array of strings that was passed to it
+ * it will take the positions, split them, check if the length is 3,
+	error if it is not
+ * convert it to floats, check if it is within the limits
+ * error if it is not
+ * do the same with fov but without spliting
+ *
+ */
+
+bool	parse_camera(char **line, t_scene *sc)
 {
 	static int	exist = 0;
 	char		**pos;
 	char		**dir;
 
-	if (exist == 1)
-	{
-		*error = true;
-		return ;
-	}
+	if (exist == 1 || array_len(line) != 4)
+		return (true);
 	pos = ft_split(line[1], ',');
 	dir = ft_split(line[2], ',');
+	if (array_len(pos) != 3 || array_len(dir) != 3)
+		return (true);
+	sc->camera_pos = vec3(ft_atof(pos[0]), ft_atof(pos[1]), ft_atof(pos[2]));
+	sc->camera_dir = vec3(ft_atof(dir[0]), ft_atof(dir[1]), ft_atof(dir[2]));
 	sc->camera_fov = ft_atof(line[3]);
-	*error = !(mrt_assert_array(pos, 3, 0, 0) || mrt_assert_array(dir, 3, -1, 1)); sc->
-	free_array(position, 1);
-	free_array(direction, 1);
+	free_array(pos);
+	free_array(dir);
 	exist = 1;
+	return (false);
 }
 
-int	process_map(t_scene *sc, char **buff)
+int	process_line(t_scene *sc, char *buff)
 {
-	const char	**original_buff = (const char **)buff;
-	char		**line;
-	static bool	*error = false;
+	char	**line;
+	bool	error;
 
-	while (*buff)
+	line = ft_split(buff, ' ');
+	if (line == NULL)
+		return (1);
+	if (ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
+		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
+		error = parse_shape(line, sc);
+	else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0)
+		error = parse_light(line, sc);
+	else if (ft_strcmp(line[0], "C") == 0)
+		error = parse_camera(line, sc);
+	else
+		error = true;
+	free_array(line);
+	return (error);
+}
+
+void	read_map_into_scene(int fd, t_scene *sc)
+{
+	char	*buff;
+
+	while (1)
 	{
-		line = ft_split(*buff++, ' ');
-		if (line == NULL)
+		if (objects_malloc_manager(sc))
 		{
-			free_array((char **)original_buff, 0);
-			return (1);
+			sc->object_count = 0;
+			return ;
 		}
-		if (ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
-			|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
-			parse_shape(line, sc, error);
-		else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0)
-			parse_light(line, sc, error);
-		else if (ft_strcmp(line[0], "C") == 0)
-			parse_camera(line, sc, error);
-		free_array(line, 1);
-	}
-	free_array((char **)original_buff, 0);
-	return (0);
-}
-
-int	read_map_into_scene(int fd, t_scene *sc)
-{
-	char	*buff[OBJECT_MAX + 1];
-	int		i;
-
-	i = 0;
-	while (i < OBJECT_MAX)
-	{
-		buff[i] = get_next_line(fd);
-		if (buff[i] == NULL)
+		buff = get_next_line(fd);
+		if (buff == NULL)
 			break ;
-		else if (ft_str_is_whitespace(buff[i]))
+		else if (ft_str_is_whitespace(buff))
 			continue ;
-		i++;
+		if (process_line(sc, buff))
+		{
+			write(2, "Error\n", 6);
+			free(buff);
+			free(sc->objects);
+			sc->object_count = 0;
+			return ;
+		}
+		free(buff);
+		sc->object_count++;
 	}
-	buff[i] = NULL;
-	while (get_next_line(fd) != NULL)
-		;
-	sc->object_count = i;
-	if (sc->object_count == 0)
-		return (1);
-	if (process_map(sc, buff))
-		return (1);
-	return (0);
 }
 
 static bool	ends_with_rt(const char *path)
@@ -153,8 +201,10 @@ static bool	ends_with_rt(const char *path)
 
 bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 {
-	int	fd;
+	int		fd;
+	bool	status;
 
+	status = true;
 	if (!mrt_assert(ac == 2 && ends_with_rt(av[1]),
 			"usage: ./miniRT <path_to_the_file.rt>\n"))
 		return (false);
@@ -165,6 +215,8 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 		return (false);
 	}
 	read_map_into_scene(fd, scene);
+	if (scene->object_count == 0)
+		status = false;
 	close(fd);
-	return (true);
+	return (status);
 }
