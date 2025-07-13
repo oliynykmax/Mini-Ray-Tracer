@@ -27,6 +27,7 @@ static void	loop_hook(void *param)
 	uint32_t		i;
 
 	init_camera(r);
+	show_stats_in_window_title(r);
 	i = -1;
 	while (++i < w * h)
 		mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
