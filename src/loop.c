@@ -1,36 +1,72 @@
 #include "minirt.h"
 
-static void	init_camera(t_render *r)
+static void	camera_init(t_render *r)
 {
-	const float		aspect = (float) r->image->width / (float) r->image->height;
-	const t_vec3	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
-	const t_vec3	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
-	const t_vec3	y0 = vec3_scale(r->camera_y, -0.5f);
-	const t_vec3	y1 = vec3_scale(r->camera_y, +0.5f);
+	const float	aspect = (float) r->image->width / (float) r->image->height;
+	t_vec3		x0;
+	t_vec3		x1;
+	t_vec3		y0;
+	t_vec3		y1;
 
-	r->camera_z = vec3_normalize(r->scene->camera_pos);
-	r->camera_x = vec3_cross(vec3(0.0f, 1.0f, 0.0f), r->camera_z);
-	r->camera_y = vec3_cross(r->camera_x, r->camera_z);
+	r->camera_z = vec3_normalize(r->scene->camera_dir);
+	r->camera_x = vec3_cross(r->camera_z, vec3(0.0f, -1.0f, 0.0f));
+	r->camera_y = vec3_cross(r->camera_z, r->camera_x);
+	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
+	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
+	y0 = vec3_scale(r->camera_y, -0.5f);
+	y1 = vec3_scale(r->camera_y, +0.5f);
 	r->viewport[0] = vec3_sub(vec3_add(x0, y0), r->camera_z);
 	r->viewport[1] = vec3_sub(vec3_add(x1, y0), r->camera_z);
 	r->viewport[2] = vec3_sub(vec3_add(x0, y1), r->camera_z);
 	r->viewport[3] = vec3_sub(vec3_add(x1, y1), r->camera_z);
 }
 
+static int	dither(int x, int y)
+{
+	const int	p = y % 8 * 8 + x % 8;
+	const int	q = p ^ (p >> 3);
+
+	return (((p & 4) >> 2) | ((q & 4) >> 1)
+		| ((p & 2) << 1) | ((q & 2) << 2)
+		| ((p & 1) << 4) | ((q & 1) << 5));
+}
+
+static void	camera_move(t_render *r)
+{
+	t_vec3		vec;
+
+	r->key_forward = mlx_is_key_down(r->mlx, MLX_KEY_W);
+	r->key_left = mlx_is_key_down(r->mlx, MLX_KEY_A);
+	r->key_back = mlx_is_key_down(r->mlx, MLX_KEY_S);
+	r->key_right = mlx_is_key_down(r->mlx, MLX_KEY_D);
+	r->key_up = mlx_is_key_down(r->mlx, MLX_KEY_SPACE);
+	r->key_down = mlx_is_key_down(r->mlx, MLX_KEY_C);
+	vec = vec3(0.0f, 0.0f, 0.0f);
+	vec = vec3_add(vec, vec3_scale(r->camera_x, r->key_right - r->key_left));
+	vec = vec3_add(vec, vec3_scale(r->camera_y, r->key_down - r->key_up));
+	vec = vec3_add(vec, vec3_scale(r->camera_z, r->key_forward - r->key_back));
+	vec = vec3_scale(vec, 3.0f * r->mlx->delta_time);
+	r->scene->camera_pos = vec3_add(r->scene->camera_pos, vec);
+}
+
 // MLX loop hook. Runs every frame to render the next image.
 
 static void	loop_hook(void *param)
 {
+	static int		dither_index;
 	t_render *const	r = (t_render*) param;
 	const uint32_t	w = r->image->width;
 	const uint32_t	h = r->image->height;
 	uint32_t		i;
 
-	init_camera(r);
+	camera_move(r);
+	camera_init(r);
 	show_stats_in_window_title(r);
 	i = -1;
 	while (++i < w * h)
-		mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
+		if (dither(i % w, i / w) == dither_index)
+			mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
+	dither_index = (dither_index + 1) % 64;
 }
 
 // MLX key hook. Used to quit when the escape key is pressed.
