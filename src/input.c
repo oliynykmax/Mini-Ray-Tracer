@@ -1,5 +1,21 @@
 #include "minirt.h"
 
+void	cleanup_scene(t_scene *sc)
+{
+	if (!sc)
+		return ;
+	if (sc->objects)
+	{
+		free(sc->objects);
+		sc->objects = NULL;
+	}
+	sc->object_count = 0;
+	sc->camera_fov = 0;
+	sc->camera_pos = vec3(0, 0, 0);
+	sc->camera_dir = vec3(0, 0, 0);
+	sc->ambient = vec3(0, 0, 0);
+}
+
 void	free_array(char **array)
 {
 	int	i;
@@ -107,6 +123,8 @@ bool	parse_light(char **line, t_scene *sc)
 	(void)sc;
 	return (false);
 }
+
+// Then in read_map_into_scene, when errors occur:
 /*
  * the command is going through array of strings that was passed to it
  * it will take the positions, split them, check if the length is 3,
@@ -125,10 +143,16 @@ bool	parse_camera(char **line, t_scene *sc)
 
 	if (exist == 1 || array_len(line) != 4)
 		return (true);
+	pos = NULL;
+	dir = NULL;
 	pos = ft_split(line[1], ',');
 	dir = ft_split(line[2], ',');
 	if (array_len(pos) != 3 || array_len(dir) != 3)
+	{
+		free_array(pos);
+		free_array(dir);
 		return (true);
+	}
 	sc->camera_pos = vec3(ft_atof(pos[0]), ft_atof(pos[1]), ft_atof(pos[2]));
 	sc->camera_dir = vec3(ft_atof(dir[0]), ft_atof(dir[1]), ft_atof(dir[2]));
 	sc->camera_fov = ft_atof(line[3]);
@@ -146,6 +170,11 @@ int	process_line(t_scene *sc, char *buff)
 	line = ft_split(buff, ' ');
 	if (line == NULL)
 		return (1);
+	if (!line[0])
+	{
+		free_array(line);
+		return (1);
+	}
 	if (ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
 		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
 		error = parse_shape(line, sc);
@@ -159,33 +188,28 @@ int	process_line(t_scene *sc, char *buff)
 	return (error);
 }
 
-void	read_map_into_scene(int fd, t_scene *sc)
+bool	read_map_into_scene(int fd, t_scene *sc)
 {
 	char	*buff;
 
 	while (1)
 	{
-		if (objects_malloc_manager(sc))
-		{
-			sc->object_count = 0;
-			return ;
-		}
 		buff = get_next_line(fd);
-		if (buff == NULL)
+		if (!buff)
 			break ;
-		else if (ft_str_is_whitespace(buff))
-			continue ;
-		if (process_line(sc, buff))
+		if (!ft_str_is_whitespace(buff))
 		{
-			write(2, "Error\n", 6);
-			free(buff);
-			free(sc->objects);
-			sc->object_count = 0;
-			return ;
+			if (objects_malloc_manager(sc) || process_line(sc, buff))
+			{
+				free(buff);
+				cleanup_scene(sc);
+				return (false);
+			}
+			sc->object_count++;
 		}
 		free(buff);
-		sc->object_count++;
 	}
+	return (sc->object_count > 0);
 }
 
 static bool	ends_with_rt(const char *path)
@@ -201,10 +225,8 @@ static bool	ends_with_rt(const char *path)
 
 bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 {
-	int		fd;
-	bool	status;
+	int	fd;
 
-	status = true;
 	if (!mrt_assert(ac == 2 && ends_with_rt(av[1]),
 			"usage: ./miniRT <path_to_the_file.rt>\n"))
 		return (false);
@@ -214,9 +236,9 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 		ft_fprintf(2, "Error\nCould not open file %s\n", av[1]);
 		return (false);
 	}
-	read_map_into_scene(fd, scene);
-	if (scene->object_count == 0)
-		status = false;
+	if (!read_map_into_scene(fd, scene))
+		write(2, "Error\n", 6);
+	get_next_line(-1);
 	close(fd);
-	return (status);
+	return (scene->object_count > 0);
 }

@@ -89,7 +89,7 @@ int					write_reverse_fd(const char *buffer, int len, int fd);
 int					ft_strcmp(const char *s1, const char *s2);
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 32
+#  define BUFFER_SIZE 9000
 # endif
 
 # ifndef FD_NUM
