@@ -43,6 +43,10 @@ static void	update_window_title(t_render *r)
 	buffer = add_string(buffer, " ms");
 	buffer = add_string(buffer, " | fps: ");
 	buffer = add_int(buffer, 1.0 / r->mlx->delta_time);
+	buffer = add_string(buffer, " | resolution: ");
+	buffer = add_int(buffer, r->image->width);
+	buffer = add_string(buffer, " x ");
+	buffer = add_int(buffer, r->image->height);
 	mlx_set_window_title(r->mlx, title);
 }
 
@@ -56,7 +60,7 @@ void	show_stats_in_window_title(t_render *r)
 
 	update_timer += r->mlx->delta_time;
 	if (update_timer < update_rate)
-		return;
+		return ;
 	update_timer = fmod(update_timer, update_rate);
 	update_window_title(r);
 }
