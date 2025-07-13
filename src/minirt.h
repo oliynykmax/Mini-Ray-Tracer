@@ -97,5 +97,6 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 /* asserting function, worth thinking if we want to builtin
  * the exiting and cleaning into it*/
 bool	mrt_assert(bool condition, char *msg);
+void	cleanup_scene(t_scene *sc);
 
 #endif
