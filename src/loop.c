@@ -15,10 +15,10 @@ static void	camera_init(t_render *r)
 	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
 	y0 = vec3_scale(r->camera_y, -0.5f);
 	y1 = vec3_scale(r->camera_y, +0.5f);
-	r->viewport[0] = vec3_sub(vec3_add(x0, y0), r->camera_z);
-	r->viewport[1] = vec3_sub(vec3_add(x1, y0), r->camera_z);
-	r->viewport[2] = vec3_sub(vec3_add(x0, y1), r->camera_z);
-	r->viewport[3] = vec3_sub(vec3_add(x1, y1), r->camera_z);
+	r->viewport[0] = vec3_add(vec3_add(x0, y0), r->camera_z);
+	r->viewport[1] = vec3_add(vec3_add(x1, y0), r->camera_z);
+	r->viewport[2] = vec3_add(vec3_add(x0, y1), r->camera_z);
+	r->viewport[3] = vec3_add(vec3_add(x1, y1), r->camera_z);
 }
 
 static int	dither(int x, int y)
@@ -39,7 +39,7 @@ static void	camera_move(t_render *r)
 	r->key_back = mlx_is_key_down(r->mlx, MLX_KEY_S);
 	r->key_right = mlx_is_key_down(r->mlx, MLX_KEY_D);
 	r->key_up = mlx_is_key_down(r->mlx, MLX_KEY_SPACE);
-	r->key_down = mlx_is_key_down(r->mlx, MLX_KEY_C);
+	r->key_down = mlx_is_key_down(r->mlx, MLX_KEY_LEFT_SHIFT);
 	vec = vec3(0.0f, 0.0f, 0.0f);
 	vec = vec3_add(vec, vec3_scale(r->camera_x, r->key_right - r->key_left));
 	vec = vec3_add(vec, vec3_scale(r->camera_y, r->key_down - r->key_up));
