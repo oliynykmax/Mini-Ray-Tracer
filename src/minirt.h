@@ -74,7 +74,7 @@ struct s_render
 	mlx_image_t	*image;			// MLX image
 	t_vec3		camera_x;		// Camera "right" vector
 	t_vec3		camera_y;		// Camera "down" vector
-	t_vec3		camera_z;		// Camera "out" vector
+	t_vec3		camera_z;		// Camera "forward" vector
 	t_vec3		viewport[4];	// The four corners of the viewport
 	int			key_forward;
 	int			key_back;

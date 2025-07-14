@@ -48,7 +48,7 @@ static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 		depth = INFINITY;
 		if (s->objects[i].type == OBJECT_SPHERE)
 			depth = trace_sphere(&s->objects[i], ro, rd);
-		if (depth < ray.depth)
+		if (depth >= 0.0f && depth < ray.depth)
 		{
 			ray.depth = depth;
 			ray.color = s->objects[i].color;
