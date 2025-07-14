@@ -14,11 +14,12 @@
 
 # define OBJECT_MAX 32
 
-typedef struct s_render		t_render;
-typedef union u_vec3		t_vec3;
-typedef struct s_scene		t_scene;
-typedef struct s_object		t_object;
 typedef enum e_object_type	t_object_type;
+typedef struct s_object		t_object;
+typedef struct s_ray		t_ray;
+typedef struct s_render		t_render;
+typedef struct s_scene		t_scene;
+typedef union u_vec3		t_vec3;
 
 enum						e_object_type
 {
@@ -83,6 +84,14 @@ struct s_render
 	int			key_down;
 };
 
+struct s_ray
+{
+	float		depth;	// Distance to closest point
+	t_vec3		point;	// Closest point of intersection
+	t_vec3		color;	// Color at that point
+	t_vec3		normal;	// Surface normal at that point
+};
+
 // loop.c
 void		render_scene(t_scene *scene);
 
@@ -90,7 +99,7 @@ void		render_scene(t_scene *scene);
 void		parse_scene(t_scene *scene, char *filename);
 
 // title.c
-void	show_stats_in_window_title(t_render *r);
+void		show_stats_in_window_title(t_render *r);
 
 // trace.c
 uint32_t	trace_pixel(t_render *r, float x, float y);
