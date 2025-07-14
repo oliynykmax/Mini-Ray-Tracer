@@ -23,12 +23,11 @@ static void	camera_init(t_render *r)
 
 static int	dither(int x, int y)
 {
-	const int	p = y % 8 * 8 + x % 8;
-	const int	q = p ^ (p >> 3);
+	static const unsigned char	blue_noise[] = {
+		#include "../assets/blue-noise.inc"
+	};
 
-	return (((p & 4) >> 2) | ((q & 4) >> 1)
-		| ((p & 2) << 1) | ((q & 2) << 2)
-		| ((p & 1) << 4) | ((q & 1) << 5));
+	return (blue_noise[(y % 64) * 64 + (x % 64)]);
 }
 
 static void	camera_move(t_render *r)
@@ -53,7 +52,7 @@ static void	camera_move(t_render *r)
 
 static void	loop_hook(void *param)
 {
-	static int		dither_index;
+	static uint8_t	dither_index;
 	t_render *const	r = (t_render*) param;
 	const uint32_t	w = r->image->width;
 	const uint32_t	h = r->image->height;
@@ -66,7 +65,7 @@ static void	loop_hook(void *param)
 	while (++i < w * h)
 		if (dither(i % w, i / w) == dither_index)
 			mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
-	dither_index = (dither_index + 1) % 64;
+	dither_index++;
 }
 
 // MLX key hook. Used to quit when the escape key is pressed.

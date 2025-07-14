@@ -35,34 +35,33 @@ static float	saturate(float value)
 static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
 	const t_vec3	light = vec3_normalize(vec3(1.0f, 0.0f, 0.0f));
-	size_t			i;
-	float			t;
-	float			t_min;
+	float			depth;
 	float			diffuse;
-	t_vec3			color;
-	t_vec3			normal;
-	t_vec3			point;
+	t_ray			ray;
+	size_t			i;
 
 	i = -1;
-	t_min = INFINITY;
-	color = s->ambient;
-	normal = light;
+	ray.depth = INFINITY;
+	ray.color = s->ambient;
 	while (++i < s->object_count)
 	{
-		t = INFINITY;
+		depth = INFINITY;
 		if (s->objects[i].type == OBJECT_SPHERE)
-			t = trace_sphere(&s->objects[i], ro, rd);
-		if (t < t_min)
+			depth = trace_sphere(&s->objects[i], ro, rd);
+		if (depth < ray.depth)
 		{
-			t_min = t;
-			color = s->objects[i].color;
-			point = vec3_add(ro, vec3_scale(rd, t));
-			normal = sphere_normal(&s->objects[i], point);
+			ray.depth = depth;
+			ray.color = s->objects[i].color;
+			ray.point = vec3_add(ro, vec3_scale(rd, depth));
+			ray.normal = sphere_normal(&s->objects[i], ray.point);
 		}
 	}
-	diffuse = saturate(vec3_dot(light, normal));
-	color = vec3_lerp(s->ambient, color, diffuse);
-	return (vec3_to_color(color));
+	if (ray.depth < INFINITY)
+	{
+		diffuse = saturate(vec3_dot(light, ray.normal));
+		ray.color = vec3_lerp(s->ambient, ray.color, diffuse);
+	}
+	return (vec3_to_color(ray.color));
 }
 
 // Trace the color of the pixel at (x, y) in the image.
