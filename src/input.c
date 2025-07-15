@@ -143,8 +143,6 @@ bool	parse_camera(char **line, t_scene *sc)
 
 	if (exist == 1 || array_len(line) != 4)
 		return (true);
-	pos = NULL;
-	dir = NULL;
 	pos = ft_split(line[1], ',');
 	dir = ft_split(line[2], ',');
 	if (array_len(pos) != 3 || array_len(dir) != 3)
@@ -158,8 +156,12 @@ bool	parse_camera(char **line, t_scene *sc)
 	sc->camera_fov = ft_atof(line[3]);
 	free_array(pos);
 	free_array(dir);
-	exist = 1;
-	return (false);
+	return (!mrt_assert(sc->camera_dir.x >= -1.0f && sc->camera_dir.x <= 1.0f
+			&& sc->camera_dir.y >= -1.0f && sc->camera_dir.y <= 1.0f
+			&& sc->camera_dir.z >= -1.0f && sc->camera_dir.z <= 1.0f,
+			"Camera direction components must be between -1 and 1\n")
+		|| !mrt_assert(sc->camera_fov >= 0.0f && sc->camera_fov <= 180.0f,
+			"Camera FOV must be between 0 and 180 degrees\n"));
 }
 
 int	process_line(t_scene *sc, char *buff)
@@ -236,8 +238,7 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 		ft_fprintf(2, "Error\nCould not open file %s\n", av[1]);
 		return (false);
 	}
-	if (!read_map_into_scene(fd, scene))
-		write(2, "Error\n", 6);
+	read_map_into_scene(fd, scene);
 	get_next_line(-1);
 	close(fd);
 	return (scene->object_count > 0);
