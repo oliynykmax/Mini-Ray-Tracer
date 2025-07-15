@@ -28,6 +28,23 @@ void	free_array(char **array)
 	free(array);
 }
 
+/*
+ * Checks if all components of a vector are within given boundaries
+ * @param v The vector to check
+ * @param lower Lower boundary (inclusive)
+ * @param upper Upper boundary (inclusive)
+ * @return true if all components are within boundaries, false otherwise
+ */
+bool	vec3_in_range(t_vec3 v, float lower, float upper)
+{
+	float	epsilon;
+
+	epsilon = 0.001f;
+	return ((v.x >= lower - epsilon) && (v.x <= upper + epsilon)
+		&& (v.y >= lower - epsilon) && (v.y <= upper + epsilon) && (v.z >= lower
+			- epsilon) && (v.z <= upper + epsilon));
+}
+
 double	ft_atof(const char *str)
 {
 	double	result;
@@ -117,11 +134,46 @@ bool	parse_shape(char **line, t_scene *sc)
 	return (false);
 }
 
-bool	parse_light(char **line, t_scene *sc)
+bool	parse_ambient_light(char **line, t_scene *sc)
+{
+	static bool	ambient_exists = false;
+	char		**color;
+	double		ratio;
+
+	if (ambient_exists || array_len(line) != 3)
+		return (true);
+	color = ft_split(line[2], ',');
+	if (array_len(color) != 3)
+	{
+		free_array(color);
+		return (true);
+	}
+	sc->ambient = vec3(ft_atof(color[0]), ft_atof(color[1]), ft_atof(color[2]));
+	free_array(color);
+	ratio = ft_atof(line[1]);
+	if (!mrt_assert(vec3_in_range(sc->ambient, 0, 255) && ratio >= 0.0f
+			&& ratio <= 1.0f, "Ambient: colors must be [0-255]"
+			"ratio [0.0-1.0]"))
+		return (true);
+	sc->ambient = vec3_scale(vec3_scale(sc->ambient, 1.0 / 255.0), ratio);
+	ambient_exists = true;
+	return (false);
+}
+
+bool	parse_point_light(char **line, t_scene *sc)
 {
 	(void)line;
 	(void)sc;
 	return (false);
+}
+
+bool	parse_light(char **line, t_scene *sc)
+{
+	if (ft_strcmp(line[0], "A") == 0)
+		return (parse_ambient_light(line, sc));
+	else if (ft_strcmp(line[0], "L") == 0)
+		return (parse_point_light(line, sc));
+	return (true);
 }
 
 // Then in read_map_into_scene, when errors occur:
@@ -157,8 +209,8 @@ bool	parse_camera(char **line, t_scene *sc)
 	free_array(pos);
 	free_array(dir);
 	exist = 1;
-	return (!mrt_assert(fabsf(vec3_length(sc->camera_dir) - 1.0f) < 0.001f,
-			"Camera direction must be a unit vector")
+	return (!mrt_assert(vec3_in_range(sc->camera_dir, -1, 1),
+			"Camera direction components must be between -1 and 1")
 		|| !mrt_assert(sc->camera_fov >= 0.0f && sc->camera_fov <= 180.0f,
 			"Camera FOV must be between 0 and 180 degrees"));
 }
@@ -169,20 +221,21 @@ int	process_line(t_scene *sc, char *buff)
 	bool	error;
 
 	line = ft_split(buff, ' ');
-	if (line == NULL)
-		return (1);
-	if (!line[0])
+	if (line == NULL || !line[0])
 	{
 		free_array(line);
 		return (1);
 	}
-	if (ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
-		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
-		error = parse_shape(line, sc);
+	if (ft_strcmp(line[0], "C") == 0)
+	{
+		sc->object_count--;
+		error = parse_camera(line, sc);
+	}
 	else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0)
 		error = parse_light(line, sc);
-	else if (ft_strcmp(line[0], "C") == 0)
-		error = parse_camera(line, sc);
+	else if (ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
+		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
+		error = parse_shape(line, sc);
 	else
 		error = !mrt_assert(false, "Not a valid object type");
 	free_array(line);
