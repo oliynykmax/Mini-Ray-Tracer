@@ -32,11 +32,15 @@ void	parse_scene(t_scene *scene, char *filename)
 
 int	main(int ac, char **av)
 {
-	t_scene			scene;
+	t_scene	scene;
 
 	ft_bzero(&scene, sizeof(t_scene));
 	if (!validate_input_and_parse_map(ac, av, &scene))
+	{
+		cleanup_scene(&scene);
 		return (1);
+	}
+	cleanup_scene(&scene);
 	parse_scene(&scene, av[1]);
 	render_scene(&scene);
 	free(scene.objects);

@@ -1,58 +1,75 @@
 #include "minirt.h"
 
-t_object_type	parse_type(char *s)
+int	objects_malloc_manager(t_scene *sc)
 {
-	if (ft_strcmp(s, "L") == 0)
-		return (OBJECT_LIGHT);
-	if (ft_strcmp(s, "sp") == 0)
-		return (OBJECT_SPHERE);
-	if (ft_strcmp(s, "pl") == 0)
-		return (OBJECT_PLANE);
-	if (ft_strcmp(s, "cy") == 0)
-		return (OBJECT_CYLINDER);
-	if (ft_strcmp(s, "cn") == 0)
-		return (OBJECT_CONE);
-	return (-1);
-}
+	static int	is_malloced = 0;
+	static int	capacity = 64;
+	t_object	*new_objects;
 
-void	process_map(t_scene *sc, char **buff)
-{
-	size_t	i;
-
-	i = 0;
-	(void)buff;
-	while (i < sc->object_count)
+	if (!is_malloced)
 	{
-		printf("%s", buff[i]);
-		// parse shape
-		// parse light
-		// parse camera
-		i++;
+		sc->objects = malloc(capacity * sizeof(t_object));
+		if (!sc->objects)
+			return (1);
+		is_malloced = 1;
 	}
+	else if (sc->object_count >= (size_t)capacity)
+	{
+		capacity *= 2;
+		new_objects = malloc(capacity * sizeof(t_object));
+		if (!new_objects)
+			return (1);
+		memcpy(new_objects, sc->objects, sc->object_count * sizeof(t_object));
+		free(sc->objects);
+		sc->objects = new_objects;
+	}
+	return (0);
 }
 
-void	read_map_into_scene(int fd, t_scene *sc)
+int	process_line(t_scene *sc, char *buff)
 {
-	char	*buff[OBJECT_MAX + 1];
-	int		i;
+	char	**line;
+	bool	error;
 
-	i = 0;
-	while (i < OBJECT_MAX)
+	line = ft_split(buff, ' ');
+	if (line == NULL || !line[0])
 	{
-		buff[i] = get_next_line(fd);
-		if (buff[i] == NULL)
+		free_array(line);
+		return (1);
+	}
+	if (ft_strcmp(line[0], "C") == 0)
+		error = parse_camera(line, sc);
+	else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0
+		|| ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
+		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
+		error = parse_object(line, sc);
+	else
+		error = !mrt_assert(false, "Not a valid object type");
+	free_array(line);
+	return (error);
+}
+
+bool	read_map_into_scene(int fd, t_scene *sc)
+{
+	char	*buff;
+
+	while (1)
+	{
+		buff = get_next_line(fd);
+		if (!buff)
 			break ;
-		if (ft_str_is_whitespace(buff[i]))
-			continue ;
-		i++;
+		if (!ft_str_is_whitespace(buff))
+		{
+			if (process_line(sc, buff))
+			{
+				free(buff);
+				cleanup_scene(sc);
+				return (false);
+			}
+		}
+		free(buff);
 	}
-	buff[i] = NULL;
-	while (get_next_line(fd) != NULL)
-		;
-	sc->object_count = i;
-	if (sc->object_count == 0)
-		return ;
-	process_map(sc, buff);
+	return (sc->object_count > 0);
 }
 
 static bool	ends_with_rt(const char *path)
@@ -80,6 +97,8 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 		return (false);
 	}
 	read_map_into_scene(fd, scene);
+	get_next_line(-1);
 	close(fd);
-	return (true);
+	debug_print_scene(scene);
+	return (scene->object_count > 0);
 }
