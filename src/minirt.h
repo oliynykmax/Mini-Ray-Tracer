@@ -54,6 +54,7 @@ struct						s_object
 	float			radius; // Radius (sphere/cylinder/cone)
 	float			height; // Height (cylinder/cone)
 	t_vec3			normal; // Normal/axis (plane/cylinder/cone)
+	float			angle; // Angle (cone)
 };
 
 struct						s_scene
@@ -94,9 +95,27 @@ t_vec3	vec3_normalize(t_vec3 v);
 t_vec3	vec3_cross(t_vec3 a, t_vec3 b);
 /* parsing of the map and validating the input input.c */
 bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+bool	parse_sphere(char **line, t_scene *sc);
+bool	parse_plane(char **line, t_scene *sc);
+bool	parse_cone(char **line, t_scene *sc);
+bool	parse_cylinder(char **line, t_scene *sc);
+bool	parse_amb_light(char **line, t_scene *sc);
+bool	parse_point_light(char **line, t_scene *sc);
+bool	parse_object(char **line, t_scene *sc);
+bool	parse_camera(char **line, t_scene *sc);
+int		objects_malloc_manager(t_scene *sc);
+/* debug printing functions */
+void	debug_print_scene(t_scene *sc);
 /* asserting function, worth thinking if we want to builtin
  * the exiting and cleaning into it*/
 bool	mrt_assert(bool condition, char *format, ...);
 void	cleanup_scene(t_scene *sc);
+/* array utils */
+int		array_len(char **array);
+void	free_array(char **array);
+/* vector parsing utils */
+double	ft_atof(const char *str);
+bool	vec3_in_range(t_vec3 v, float lower, float upper);
+bool	parse_vec3(char *str, t_vec3 *out, float min, float max);
 
 #endif
