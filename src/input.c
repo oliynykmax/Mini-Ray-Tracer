@@ -156,12 +156,11 @@ bool	parse_camera(char **line, t_scene *sc)
 	sc->camera_fov = ft_atof(line[3]);
 	free_array(pos);
 	free_array(dir);
-	return (!mrt_assert(sc->camera_dir.x >= -1.0f && sc->camera_dir.x <= 1.0f
-			&& sc->camera_dir.y >= -1.0f && sc->camera_dir.y <= 1.0f
-			&& sc->camera_dir.z >= -1.0f && sc->camera_dir.z <= 1.0f,
-			"Camera direction components must be between -1 and 1\n")
+	exist = 1;
+	return (!mrt_assert(fabsf(vec3_length(sc->camera_dir) - 1.0f) < 0.001f,
+			"Camera direction must be a unit vector")
 		|| !mrt_assert(sc->camera_fov >= 0.0f && sc->camera_fov <= 180.0f,
-			"Camera FOV must be between 0 and 180 degrees\n"));
+			"Camera FOV must be between 0 and 180 degrees"));
 }
 
 int	process_line(t_scene *sc, char *buff)
@@ -185,7 +184,7 @@ int	process_line(t_scene *sc, char *buff)
 	else if (ft_strcmp(line[0], "C") == 0)
 		error = parse_camera(line, sc);
 	else
-		error = true;
+		error = !mrt_assert(false, "Not a valid object type");
 	free_array(line);
 	return (error);
 }
