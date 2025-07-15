@@ -41,7 +41,7 @@ int	main(int ac, char **av)
 		return (1);
 	}
 	cleanup_scene(&scene);
-	//parse_scene(&scene, av[1]);
-	//render_scene(&scene);
+	parse_scene(&scene, av[1]);
+	render_scene(&scene);
 	return (0);
 }
