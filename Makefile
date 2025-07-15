@@ -13,7 +13,7 @@
 NAME    := miniRT
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
-MLX42 := assets/MLX42/build/libmlx42.a 
+MLX42 := assets/MLX42/build/libmlx42.a
 HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := cc
@@ -23,16 +23,22 @@ LDFLAGS := -ldl -lglfw -pthread -lm
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS := \
-	src/assert.c \
-	src/input.c \
-	src/loop.c \
-	src/main.c \
-	src/title.c \
-	src/trace.c \
-	src/vec3_arithmetic.c \
-	src/vec3_geometric.c \
-	src/vec3_utility.c \
+SRCS    := \
+		src/array_utils.c \
+		src/assert.c \
+		src/cleanup.c \
+		src/debug.c \
+		src/input.c \
+		src/main.c \
+		src/parse_light_camera.c \
+		src/parsing_objects.c \
+    src/title.c \
+    src/trace.c \
+		src/vec_parse_utils.c \
+    src/loop.c \
+    src/vec3_arithmetic.c \
+    src/vec3_geometric.c \
+    src/vec3_utility.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
