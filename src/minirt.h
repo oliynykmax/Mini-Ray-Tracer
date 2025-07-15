@@ -57,7 +57,7 @@ struct						s_object
 	float			angle; // Angle (cone)
 };
 
-struct						s_scene
+struct s_scene
 {
 	t_object	*objects; // Array of objects in the scene
 	size_t		object_count; // Length of the objects array
@@ -69,30 +69,45 @@ struct						s_scene
 
 struct s_render
 {
-	t_scene		*scene;	// The scene to render
-	mlx_t		*mlx;	// MLX state
-	mlx_image_t	*image;	// MLX image
+	t_scene		*scene;			// The scene to render
+	mlx_t		*mlx;			// MLX state
+	mlx_image_t	*image;			// MLX image
+	t_vec3		camera_x;		// Camera "right" vector
+	t_vec3		camera_y;		// Camera "down" vector
+	t_vec3		camera_z;		// Camera "out" vector
+	t_vec3		viewport[4];	// The four corners of the viewport
 };
 
 // loop.c
-void	render_scene(t_scene *scene);
+void		render_scene(t_scene *scene);
 
 // main.c
-void	parse_scene(t_scene *scene, char *filename);
+void		parse_scene(t_scene *scene, char *filename);
+
+// title.c
+void	show_stats_in_window_title(t_render *r);
+
+// trace.c
+uint32_t	trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
-t_vec3	vec3(float x, float y, float z);
-t_vec3	vec3_add(t_vec3 a, t_vec3 b);
-t_vec3	vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3	vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3	vec3_div(t_vec3 a, t_vec3 b);
+t_vec3		vec3_add(t_vec3 a, t_vec3 b);
+t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
+t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
+t_vec3		vec3_div(t_vec3 a, t_vec3 b);
+t_vec3		vec3_scale(t_vec3 v, float s);
 
 // vec3_geometric.c
-t_vec3	vec3_scale(t_vec3 v, float s);
-float	vec3_dot(t_vec3 a, t_vec3 b);
-float	vec3_length(t_vec3 v);
-t_vec3	vec3_normalize(t_vec3 v);
-t_vec3	vec3_cross(t_vec3 a, t_vec3 b);
+float		vec3_dot(t_vec3 a, t_vec3 b);
+float		vec3_length(t_vec3 v);
+t_vec3		vec3_normalize(t_vec3 v);
+t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
+
+// vec3_utility.c
+t_vec3		vec3(float x, float y, float z);
+t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
+uint32_t	vec3_to_color(t_vec3 color);
+
 /* parsing of the map and validating the input input.c */
 bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 bool	parse_sphere(char **line, t_scene *sc);
@@ -117,5 +132,10 @@ void	free_array(char **array);
 double	ft_atof(const char *str);
 bool	vec3_in_range(t_vec3 v, float lower, float upper);
 bool	parse_vec3(char *str, t_vec3 *out, float min, float max);
+=======
+bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+/* asserting function, worth thinking if we want to builtin
+ * the exiting and cleaning into it*/
+bool		mrt_assert(bool condition, char *msg);
 
 #endif

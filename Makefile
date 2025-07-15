@@ -6,7 +6,7 @@
 #    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/07/11 22:56:31 by maoliiny         ###   ########.fr        #
+#    Updated: 2025/07/13 12:29:50 by abostrom         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,10 +32,13 @@ SRCS    := \
 		src/main.c \
 		src/parse_light_camera.c \
 		src/parsing_objects.c \
+    src/title.c \
+    src/trace.c \
 		src/vec_parse_utils.c \
-       	src/loop.c \
-        src/vec3_arithmetic.c \
-        src/vec3_geometric.c \
+    src/loop.c \
+    src/vec3_arithmetic.c \
+    src/vec3_geometric.c \
+    src/vec3_utility.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
