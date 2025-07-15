@@ -1,16 +1,8 @@
 #include "minirt.h"
 
-// Scale a 3D vector by some value. (Multiply all of its components by some
-// scalar.)
-
-t_vec3	vec3_scale(t_vec3 v, float s)
-{
-	return (vec3(v.x * s, v.y * s, v.z * s));
-}
-
 // Get the dot product (scalar product) of two 3D vectors. The resulting value
-// is equal to the product of the lengths of the two vectors, and to the cosine
-// of the angle between them.
+// is proportional to the product of the lengths of the two vectors, and to the
+// cosine of the angle between them.
 
 float	vec3_dot(t_vec3 a, t_vec3 b)
 {
@@ -33,9 +25,9 @@ t_vec3	vec3_normalize(t_vec3 v)
 	return (vec3_scale(v, 1.0f / vec3_length(v)));
 }
 
-// Get the cross product of two 3D vectors. The resulting vector's length is
+// Get the cross product of two 3D vectors. The resulting vector is
 // perpendicular to the two vectors, and its length is equal to the product of
-// the lengths of the two vectors.
+// the lengths of the input vectors.
 
 t_vec3	vec3_cross(t_vec3 a, t_vec3 b)
 {

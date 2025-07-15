@@ -1,13 +1,20 @@
 #include "minirt.h"
 
-// Determine the color of a single pixel in the image.
-
-static uint32_t	trace_pixel(t_render *r, int x, int y)
+static void	init_camera(t_render *r)
 {
-	const int	cr = x * 255 / r->image->width;
-	const int	cg = y * 255 / r->image->height;
+	const float		aspect = (float) r->image->width / (float) r->image->height;
+	const t_vec3	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
+	const t_vec3	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
+	const t_vec3	y0 = vec3_scale(r->camera_y, -0.5f);
+	const t_vec3	y1 = vec3_scale(r->camera_y, +0.5f);
 
-	return ((cr << 24) | (cg << 16) | 255);
+	r->camera_z = vec3_normalize(r->scene->camera_pos);
+	r->camera_x = vec3_cross(vec3(0.0f, 1.0f, 0.0f), r->camera_z);
+	r->camera_y = vec3_cross(r->camera_x, r->camera_z);
+	r->viewport[0] = vec3_sub(vec3_add(x0, y0), r->camera_z);
+	r->viewport[1] = vec3_sub(vec3_add(x1, y0), r->camera_z);
+	r->viewport[2] = vec3_sub(vec3_add(x0, y1), r->camera_z);
+	r->viewport[3] = vec3_sub(vec3_add(x1, y1), r->camera_z);
 }
 
 // MLX loop hook. Runs every frame to render the next image.
@@ -19,6 +26,8 @@ static void	loop_hook(void *param)
 	const uint32_t	h = r->image->height;
 	uint32_t		i;
 
+	init_camera(r);
+	show_stats_in_window_title(r);
 	i = -1;
 	while (++i < w * h)
 		mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
