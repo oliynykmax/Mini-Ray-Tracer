@@ -119,6 +119,8 @@ void	render_scene(t_scene *scene)
 
 	ft_bzero(&r, sizeof(r));
 	r.scene = scene;
+	r.camera_yaw = atan2(scene->camera_dir.z, scene->camera_dir.x);
+	r.camera_pitch = acos(scene->camera_dir.y);
 	r.mlx = mlx_init(480, 360, "miniRT", true);
 	if (r.mlx != NULL)
 	{
