@@ -1,15 +1,5 @@
 #include "minirt.h"
 
-static float	clamp(float x, float lower, float upper)
-{
-	return (fmax(lower, fmin(upper, x)));
-}
-
-static float	radians(float degrees)
-{
-	return (degrees * (M_PI / 180.0f));
-}
-
 static void	camera_move_angular(t_render *r)
 {
 	const float		scale = 0.006f * sinf(r->scene->camera_fov * 0.5f);
@@ -19,12 +9,12 @@ static void	camera_move_angular(t_render *r)
 	mlx_get_mouse_pos(r->mlx, &curr[0], &curr[1]);
 	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
-		r->camera_yaw += scale * (curr[0] - prev[0]);
+		r->camera_yaw -= scale * (curr[0] - prev[0]);
 		r->camera_pitch -= scale * (curr[1] - prev[1]);
-		r->camera_pitch = clamp(r->camera_pitch, -radians(90), radians(90));
-		r->scene->camera_dir.x = sin(r->camera_yaw) * cos(r->camera_pitch);
-		r->scene->camera_dir.y = sin(r->camera_yaw) * sin(r->camera_pitch);
-		r->scene->camera_dir.z = cos(r->camera_yaw);
+		r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
+		r->scene->camera_dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
+		r->scene->camera_dir.y = cos(r->camera_pitch);
+		r->scene->camera_dir.z = sin(r->camera_pitch) * sin(r->camera_yaw);
 	}
 	prev[0] = curr[0];
 	prev[1] = curr[1];
