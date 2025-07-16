@@ -100,6 +100,10 @@ void		render_scene(t_scene *scene);
 // main.c
 void		parse_scene(t_scene *scene, char *filename);
 
+// math.c
+float		clamp(float x, float lower, float upper);
+float		radians(float degrees);
+
 // title.c
 void		show_stats_in_window_title(t_render *r);
 
