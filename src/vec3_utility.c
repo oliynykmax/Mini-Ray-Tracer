@@ -23,7 +23,7 @@ t_vec3	vec3_lerp(t_vec3 a, t_vec3 b, float t)
 
 uint32_t	vec3_to_color(t_vec3 color)
 {
-	const float		gamma = 2.3f;
+	const float		gamma = 1.0f / 2.3f;
 	const uint32_t	r = 255.5f * powf(color.r, gamma);
 	const uint32_t	g = 255.5f * powf(color.g, gamma);
 	const uint32_t	b = 255.5f * powf(color.b, gamma);

@@ -72,6 +72,8 @@ struct s_render
 	t_scene		*scene;			// The scene to render
 	mlx_t		*mlx;			// MLX state
 	mlx_image_t	*image;			// MLX image
+	float		camera_yaw;		// Camera yaw angle (in radians)
+	float		camera_pitch;	// Camera pitch angle (in radians)
 	t_vec3		camera_x;		// Camera "right" vector
 	t_vec3		camera_y;		// Camera "down" vector
 	t_vec3		camera_z;		// Camera "forward" vector
