@@ -21,7 +21,7 @@ void	parse_scene(t_scene *scene, char *filename)
 		.radius = 1.0f,
 	};
 	scene->camera_pos = vec3(3.0f, 0.0f, +3.0f);
-	scene->camera_dir = vec3(0.0f, 0.0f, -1.0f);
+	scene->camera_dir = vec3_normalize(vec3(-1.0f, 0.0f, -1.0f));
 	scene->camera_fov = 90.0f;
 	scene->ambient = vec3(0.0f, 0.3f, 0.5f);
 }
