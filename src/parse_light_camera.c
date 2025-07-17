@@ -53,13 +53,13 @@ bool	parse_camera(char **line, t_scene *sc)
 
 	if (exist == 1 || array_len(line) != 4)
 		return (true);
-	sc->camera_fov = ft_atof(line[3]);
-	if (!parse_vec3(line[1], &sc->camera_pos, 0, 0) || !parse_vec3(line[2],
-			&sc->camera_dir, -1, 1))
+	sc->fov = ft_atof(line[3]);
+	if (!parse_vec3(line[1], &sc->pos, 0, 0) || !parse_vec3(line[2],
+			&sc->dir, -1, 1))
 		return (true);
 	exist = 1;
-	return (!mrt_assert(fabsf(vec3_length(sc->camera_dir) - 1.0f) < 0.001f,
+	return (!mrt_assert(fabsf(vec3_length(sc->dir) - 1.0f) < 0.001f,
 			"Camera direction components must be between -1 and 1\n")
-		|| !mrt_assert(sc->camera_fov >= 0.0f && sc->camera_fov <= 180.0f,
+		|| !mrt_assert(sc->fov >= 0.0f && sc->fov <= 180.0f,
 			"Camera FOV must be between 0 and 180 degrees\n"));
 }
