@@ -94,6 +94,9 @@ struct s_ray
 	t_vec3		normal;	// Surface normal at that point
 };
 
+// camera.c
+void		camera_update(t_render *r);
+
 // loop.c
 void		render_scene(t_scene *scene);
 
@@ -109,7 +112,7 @@ float		radians(float degrees);
 void		show_stats_in_window_title(t_render *r);
 
 // trace.c
-uint32_t	trace_pixel(t_render *r, float x, float y);
+t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
 t_vec3		vec3_add(t_vec3 a, t_vec3 b);
@@ -128,6 +131,7 @@ t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);
 t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
+t_vec3		vec3_to_srgb(t_vec3 color);
 uint32_t	vec3_to_color(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */

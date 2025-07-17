@@ -6,7 +6,7 @@
 #    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/07/16 14:58:16 by abostrom         ###   ########.fr        #
+#    Updated: 2025/07/17 12:30:41 by abostrom         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,7 @@ INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
 SRCS := \
 	src/assert.c \
+	src/camera.c \
 	src/input.c \
 	src/loop.c \
 	src/main.c \

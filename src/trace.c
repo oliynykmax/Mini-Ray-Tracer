@@ -37,7 +37,7 @@ static void	lighting(t_scene *s, t_ray *ray, t_vec3 rd, t_vec3 light)
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
 
-static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
+static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
 	float			depth;
 	t_ray			ray;
@@ -61,12 +61,12 @@ static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 	}
 	if (ray.depth < 1e9f)
 		lighting(s, &ray, rd, vec3(1.0f, 0.0f, 0.0f));
-	return (vec3_to_color(ray.color));
+	return (ray.color);
 }
 
 // Trace the color of the pixel at (x, y) in the image.
 
-uint32_t	trace_pixel(t_render *r, float x, float y)
+t_vec3	trace_pixel(t_render *r, float x, float y)
 {
 	const float		u = x / (r->image->width - 1);
 	const float		v = y / (r->image->height - 1);
