@@ -9,11 +9,11 @@ void	debug_print_scene(t_scene *sc)
 	printf("Object count: %zu\n", sc->object_count);
 	printf("Ambient light: (%f, %f, %f)\n", sc->ambient.x, sc->ambient.y,
 		sc->ambient.z);
-	printf("Camera position: (%f, %f, %f)\n", sc->camera_pos.x,
-		sc->camera_pos.y, sc->camera_pos.z);
-	printf("Camera direction: (%f, %f, %f)\n", sc->camera_dir.x,
-		sc->camera_dir.y, sc->camera_dir.z);
-	printf("Camera FOV: %f\n", sc->camera_fov);
+	printf("Camera position: (%f, %f, %f)\n", sc->pos.x,
+		sc->pos.y, sc->pos.z);
+	printf("Camera direction: (%f, %f, %f)\n", sc->dir.x,
+		sc->dir.y, sc->dir.z);
+	printf("Camera FOV: %f\n", sc->fov);
 	printf("\nObjects:\n");
 	for (i = 0; i < sc->object_count; i++)
 	{
