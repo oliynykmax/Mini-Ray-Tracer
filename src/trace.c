@@ -74,5 +74,5 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
 	const t_vec3	rd = vec3_lerp(v0, v1, v);
 
-	return (trace_scene(r->scene, r->scene->camera_pos, vec3_normalize(rd)));
+	return (trace_scene(r->scene, r->scene->pos, vec3_normalize(rd)));
 }

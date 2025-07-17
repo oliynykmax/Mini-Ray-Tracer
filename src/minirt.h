@@ -60,12 +60,12 @@ struct						s_object
 
 struct s_scene
 {
-	t_object	*objects; // Array of objects in the scene
-	size_t		object_count; // Length of the objects array
-	t_vec3		camera_pos; // Camera position
-	t_vec3		camera_dir; // Camera direction (normalized)
-	float		camera_fov; // Camera field of view (in degrees)
-	t_vec3		ambient; // Ambient color (multiplied by ratio)
+	t_object	*objects;		// Array of objects in the scene
+	size_t		object_count;	// Length of the objects array
+	t_vec3		pos; 			// Camera position
+	t_vec3		dir; 			// Camera direction (normalized)
+	float		fov; 			// Camera field of view (in degrees)
+	t_vec3		ambient; 		// Ambient color (multiplied by ratio)
 };
 
 struct s_render

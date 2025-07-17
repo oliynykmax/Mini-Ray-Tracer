@@ -10,8 +10,8 @@ void	cleanup_scene(t_scene *sc)
 		sc->objects = NULL;
 	}
 	sc->object_count = 0;
-	sc->camera_fov = 0;
-	sc->camera_pos = vec3(0, 0, 0);
-	sc->camera_dir = vec3(0, 0, 0);
+	sc->fov = 0;
+	sc->pos = vec3(0, 0, 0);
+	sc->dir = vec3(0, 0, 0);
 	sc->ambient = vec3(0, 0, 0);
 }
