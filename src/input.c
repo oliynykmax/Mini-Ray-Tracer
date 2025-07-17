@@ -99,6 +99,5 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 	read_map_into_scene(fd, scene);
 	get_next_line(-1);
 	close(fd);
-	debug_print_scene(scene);
 	return (scene->object_count > 0);
 }

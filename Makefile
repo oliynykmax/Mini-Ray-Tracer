@@ -5,9 +5,9 @@ MLX42 := assets/MLX42/build/libmlx42.a
 HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := cc
-CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -march=native -ffast-math
+CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -flto -march=native -ffast-math
 CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include
-LDFLAGS := -ldl -lglfw -pthread -lm
+LDFLAGS := -ldl -lglfw -pthread -lm -flto
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
@@ -16,7 +16,6 @@ SRCS := \
 	src/assert.c \
 	src/camera.c \
 	src/cleanup.c \
-	src/debug.c \
 	src/input.c \
 	src/loop.c \
 	src/main.c \

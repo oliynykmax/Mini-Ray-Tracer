@@ -1,66 +1,75 @@
 #include "minirt.h"
 
-// Get the normal of a sphere, given a point on its surface.
-
-static t_vec3	sphere_normal(t_object *s, t_vec3 point)
+static void	trace_plane(t_ray *r, t_object *p)
 {
-	return (vec3_normalize(vec3_sub(point, s->pos)));
+	const float	denom = vec3_dot(p->normal, r->rd);
+	float		depth;
+
+	if (fabsf(denom) < 1e-6f)
+		return ;
+	depth = vec3_dot(vec3_sub(p->pos, r->ro), p->normal) / denom;
+	if (depth < 0.0f)
+		return ;
+	r->depth = depth;
+	r->color = p->color;
+	r->point = vec3_add(r->ro, vec3_scale(r->rd, depth));
+	r->normal = p->normal;
+	if (denom > 0.0f)
+		r->normal = vec3_scale(r->normal, -1.0f);
 }
 
-// Trace a ray with origin `ro` and direction `rd` toward a sphere. Returns the
-// parametric distance along the ray where the first intersection occurs, or
-// infinity if there's no intersection.
-
-static float	trace_sphere(t_object *s, t_vec3 ro, t_vec3 rd)
+static void	trace_sphere(t_ray *r, t_object *s)
 {
-	const t_vec3	o = vec3_sub(s->pos, ro);
-	const float		a = vec3_dot(rd, rd);
-	const float		h = vec3_dot(rd, o);
+	const t_vec3	o = vec3_sub(s->pos, r->ro);
+	const float		a = vec3_dot(r->rd, r->rd);
+	const float		h = vec3_dot(r->rd, o);
 	const float		d = h * h - a * (vec3_dot(o, o) - s->radius * s->radius);
+	float			depth;
 
 	if (d < 0.0f)
-		return (INFINITY);
-	return ((h - sqrtf(d)) / a);
+		return ;
+	depth = (h - sqrtf(d)) / a;
+	if (depth < 0.0f || depth >= r->depth)
+		return ;
+	r->depth = depth;
+	r->color = s->color;
+	r->point = vec3_add(r->ro, vec3_scale(r->rd, depth));
+	r->normal = vec3_normalize(vec3_sub(r->point, s->pos));
 }
 
 // Apply ambient/diffuse/specular lighting to a traced ray.
 
-static void	lighting(t_scene *s, t_ray *ray, t_vec3 rd, t_vec3 light)
+static void	lighting(t_scene *s, t_ray *r, t_vec3 light)
 {
-	const t_vec3	reflect = vec3_reflect(light, ray->normal);
-	const float		diffuse = saturate(vec3_dot(light, ray->normal));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(rd, reflect)), 20.0f);
+	const t_vec3	reflect = vec3_reflect(light, r->normal);
+	const float		diffuse = saturate(vec3_dot(light, r->normal));
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 20);
 
-	ray->color = vec3_lerp(s->ambient, ray->color, diffuse);
-	ray->color = vec3_lerp(ray->color, vec3(1.0f, 1.0f, 1.0f), specular);
+	r->color = vec3_lerp(s->ambient, r->color, diffuse);
+	r->color = vec3_lerp(r->color, vec3(1.0f, 1.0f, 1.0f), specular);
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
 
 static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
-	float			depth;
 	t_ray			ray;
 	size_t			i;
 
 	i = -1;
+	ray.ro = ro;
+	ray.rd = rd;
 	ray.depth = INFINITY;
 	ray.color = s->ambient;
 	while (++i < s->object_count)
 	{
-		depth = INFINITY;
 		if (s->objects[i].type == OBJECT_SPHERE)
-			depth = trace_sphere(&s->objects[i], ro, rd);
-		if (depth >= 0.0f && depth < ray.depth)
-		{
-			ray.depth = depth;
-			ray.color = s->objects[i].color;
-			ray.point = vec3_add(ro, vec3_scale(rd, depth));
-			ray.normal = sphere_normal(&s->objects[i], ray.point);
-		}
+			trace_sphere(&ray, &s->objects[i]);
+		if (s->objects[i].type == OBJECT_PLANE)
+			trace_plane(&ray, &s->objects[i]);
 	}
 	if (ray.depth < 1e9f)
-		lighting(s, &ray, rd, vec3(1.0f, 0.0f, 0.0f));
+		lighting(s, &ray, vec3_normalize(vec3(1.0f, -1.0f, 1.0f)));
 	return (ray.color);
 }
 
@@ -74,5 +83,5 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
 	const t_vec3	rd = vec3_lerp(v0, v1, v);
 
-	return (trace_scene(r->scene, r->scene->camera_pos, vec3_normalize(rd)));
+	return (trace_scene(r->scene, r->scene->pos, vec3_normalize(rd)));
 }

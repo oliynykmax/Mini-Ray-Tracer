@@ -1,12 +1,12 @@
 #include "minirt.h"
 
-static int	blue_noise(int x, int y)
-{
-	static const unsigned char	blue_noise_texture[] = {
-		#include "../assets/blue-noise.inc"
-	};
+// Dithering function for masking color banding artifacts. The specific method
+// is called Interleaved Gradient Noise; there are some good articles on it on
+// the web.
 
-	return (blue_noise_texture[(y % 64) * 64 + (x % 64)]);
+static float	dither(float x, float y)
+{
+	return (fract(52.9829189f * fract(0.06711056f * x + 0.00583715f * y)));
 }
 
 // MLX loop hook. Runs every frame to render the next image.
@@ -17,7 +17,7 @@ static void	loop_hook(void *param)
 	uint32_t		x;
 	uint32_t		y;
 	t_vec3			color;
-	float			dither;
+	float			noise;
 
 	camera_update(r);
 	show_stats_in_window_title(r);
@@ -27,10 +27,10 @@ static void	loop_hook(void *param)
 		x = -1;
 		while (++x < r->image->width)
 		{
-			dither = blue_noise(x, y) / 65535.0f;
+			noise = dither(x, y) / 255.0f;
 			color = trace_pixel(r, x, y);
 			color = vec3_to_srgb(color);
-			color = vec3_add(color, vec3(dither, dither, dither));
+			color = vec3_add(color, vec3(noise, noise, noise));
 			mlx_put_pixel(r->image, x, y, vec3_to_color(color));
 		}
 	}
@@ -63,8 +63,8 @@ void	render_scene(t_scene *scene)
 
 	ft_bzero(&r, sizeof(r));
 	r.scene = scene;
-	r.camera_yaw = atan2(scene->camera_dir.z, scene->camera_dir.x);
-	r.camera_pitch = acos(scene->camera_dir.y);
+	r.camera_yaw = atan2(scene->dir.z, scene->dir.x);
+	r.camera_pitch = acos(scene->dir.y);
 	r.mlx = mlx_init(480, 360, "miniRT", true);
 	if (r.mlx != NULL)
 	{
