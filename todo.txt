@@ -2,17 +2,17 @@
         TODO LIST
 =========================
 
-[ ] 1. Add support for other shapes
-[ ] 2. Implement hard shadows
+[ ] 1. Add support for other shapes // max will do some of them
+[ ] 2. Implement hard shadows // max
 [ ] 3. Complete all intersections (including inside objects)
-[ ] 4. Add object rotation, movement, and scaling
+[ ] 4. Add object rotation, movement, and scaling // max, maybe
 
 -------------------------
          BONUS
 -------------------------
 
 [x] 1. Add Phong reflection model
-[ ] 2. Implement bump mapping
+[ ] 2. Implement bump mapping // axel
 [ ] 3. Support cone shape
 [ ] 4. Support cube shape (optional?)
 [ ] 5. Add checkerboard pattern
