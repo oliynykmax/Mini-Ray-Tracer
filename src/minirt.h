@@ -60,12 +60,12 @@ struct						s_object
 
 struct s_scene
 {
-	t_object	*objects; // Array of objects in the scene
-	size_t		object_count; // Length of the objects array
-	t_vec3		camera_pos; // Camera position
-	t_vec3		camera_dir; // Camera direction (normalized)
-	float		camera_fov; // Camera field of view (in degrees)
-	t_vec3		ambient; // Ambient color (multiplied by ratio)
+	t_object	*objects;		// Array of objects in the scene
+	size_t		object_count;	// Length of the objects array
+	t_vec3		pos;			// Camera position
+	t_vec3		dir;			// Camera direction (normalized)
+	float		fov;			// Camera field of view (in degrees)
+	t_vec3		ambient;		// Ambient color (multiplied by ratio)
 };
 
 struct s_render
@@ -89,6 +89,8 @@ struct s_render
 
 struct s_ray
 {
+	t_vec3		ro;		// Ray origin
+	t_vec3		rd;		// Ray direction (normalized)
 	float		depth;	// Distance to closest point
 	t_vec3		point;	// Closest point of intersection
 	t_vec3		color;	// Color at that point
@@ -108,6 +110,7 @@ void		parse_scene(t_scene *scene, char *filename);
 float		clamp(float value, float lower, float upper);
 float		saturate(float value);
 float		radians(float degrees);
+float		fract(float x);
 
 // title.c
 void		show_stats_in_window_title(t_render *r);
@@ -146,8 +149,6 @@ bool		parse_point_light(char **line, t_scene *sc);
 bool		parse_object(char **line, t_scene *sc);
 bool		parse_camera(char **line, t_scene *sc);
 int			objects_malloc_manager(t_scene *sc);
-/* debug printing functions */
-void		debug_print_scene(t_scene *sc);
 /* asser	ting function, worth thinking if we want to builtin
  * the e	xiting and cleaning into it*/
 bool		mrt_assert(bool condition, char *format, ...);
