@@ -43,10 +43,11 @@ static void	lighting(t_scene *s, t_ray *r, t_vec3 light)
 {
 	const t_vec3	reflect = vec3_reflect(light, r->normal);
 	const float		diffuse = saturate(vec3_dot(light, r->normal));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 20);
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 30);
 
-	r->color = vec3_lerp(s->ambient, r->color, diffuse);
-	r->color = vec3_lerp(r->color, vec3(1.0f, 1.0f, 1.0f), specular);
+	r->color = vec3_scale(r->color, diffuse);
+	r->color = vec3_add(r->color, s->ambient);
+	r->color = vec3_add(r->color, vec3_scale(vec3(1, 1, 1), specular));
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
@@ -59,7 +60,7 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 	i = -1;
 	ray.ro = ro;
 	ray.rd = rd;
-	ray.depth = INFINITY;
+	ray.depth = 1e9f;
 	ray.color = s->ambient;
 	while (++i < s->object_count)
 	{

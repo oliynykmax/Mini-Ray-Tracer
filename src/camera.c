@@ -1,6 +1,10 @@
 #include "minirt.h"
 
-static void	camera_move_angular(t_render *r)
+// Handle mouse movement of the camera, pitching around the x-axis when the
+// mouse is moved up or down, and yawing around the y-axis when it's moved
+// sideways.
+
+static void	camera_mouse_movement(t_render *r)
 {
 	const float		scale = 0.006f * sinf(r->scene->fov * 0.5f);
 	static int32_t	prev[2];
@@ -20,7 +24,10 @@ static void	camera_move_angular(t_render *r)
 	prev[1] = curr[1];
 }
 
-static void	camera_move_horizontal(t_render *r)
+// Handle keyboard movement of the camera, moving horizontally with the WASD
+// keys, and vertically with the shift/space keys.
+
+static void	camera_keyboard_movement(t_render *r)
 {
 	t_vec3	vec;
 	t_vec3	move_x;
@@ -41,26 +48,34 @@ static void	camera_move_horizontal(t_render *r)
 	r->scene->pos = vec3_add(r->scene->pos, vec);
 }
 
-void	camera_update(t_render *r)
+// Update the basis vectors for the camera coordinate system, and and find the
+// direction vectors pointing toward the four corners of the viewport.
+
+static void	camera_update_viewport(t_render *r)
 {
-	const float	aspect = (float) r->image->width / (float) r->image->height;
-	t_vec3		x0;
-	t_vec3		x1;
-	t_vec3		y0;
-	t_vec3		y1;
+	const float	view_h = 0.5f * tan(radians(r->scene->fov) * 0.5f);
+	const float	view_w = view_h * (float) r->image->width / r->image->height;
+	t_vec3		vec[4];
 
 	r->camera_z = r->scene->dir;
 	r->camera_x = vec3_cross(r->camera_z, vec3(0.0f, -1.0f, 0.0f));
 	r->camera_x = vec3_normalize(r->camera_x);
 	r->camera_y = vec3_cross(r->camera_z, r->camera_x);
-	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
-	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
-	y0 = vec3_scale(r->camera_y, -0.5f);
-	y1 = vec3_scale(r->camera_y, +0.5f);
-	r->viewport[0] = vec3_add(vec3_add(x0, y0), r->camera_z);
-	r->viewport[1] = vec3_add(vec3_add(x1, y0), r->camera_z);
-	r->viewport[2] = vec3_add(vec3_add(x0, y1), r->camera_z);
-	r->viewport[3] = vec3_add(vec3_add(x1, y1), r->camera_z);
-	camera_move_angular(r);
-	camera_move_horizontal(r);
+	vec[0] = vec3_scale(r->camera_x, -view_w);
+	vec[1] = vec3_scale(r->camera_x, +view_w);
+	vec[2] = vec3_scale(r->camera_y, -view_h);
+	vec[3] = vec3_scale(r->camera_y, +view_h);
+	r->viewport[0] = vec3_add(vec3_add(vec[0], vec[2]), r->camera_z);
+	r->viewport[1] = vec3_add(vec3_add(vec[1], vec[2]), r->camera_z);
+	r->viewport[2] = vec3_add(vec3_add(vec[0], vec[3]), r->camera_z);
+	r->viewport[3] = vec3_add(vec3_add(vec[1], vec[3]), r->camera_z);
+}
+
+// Update all camera parameters. Called before rendering a new frame.
+
+void	camera_update(t_render *r)
+{
+	camera_update_viewport(r);
+	camera_mouse_movement(r);
+	camera_keyboard_movement(r);
 }
