@@ -14,11 +14,12 @@
 
 # define OBJECT_MAX 32
 
-typedef struct s_render		t_render;
-typedef union u_vec3		t_vec3;
-typedef struct s_scene		t_scene;
-typedef struct s_object		t_object;
 typedef enum e_object_type	t_object_type;
+typedef struct s_object		t_object;
+typedef struct s_ray		t_ray;
+typedef struct s_render		t_render;
+typedef struct s_scene		t_scene;
+typedef union u_vec3		t_vec3;
 
 enum						e_object_type
 {
@@ -72,11 +73,30 @@ struct s_render
 	t_scene		*scene;			// The scene to render
 	mlx_t		*mlx;			// MLX state
 	mlx_image_t	*image;			// MLX image
+	float		camera_yaw;		// Camera yaw angle (in radians)
+	float		camera_pitch;	// Camera pitch angle (in radians)
 	t_vec3		camera_x;		// Camera "right" vector
 	t_vec3		camera_y;		// Camera "down" vector
-	t_vec3		camera_z;		// Camera "out" vector
+	t_vec3		camera_z;		// Camera "forward" vector
 	t_vec3		viewport[4];	// The four corners of the viewport
+	int			key_forward;
+	int			key_back;
+	int			key_left;
+	int			key_right;
+	int			key_up;
+	int			key_down;
 };
+
+struct s_ray
+{
+	float		depth;	// Distance to closest point
+	t_vec3		point;	// Closest point of intersection
+	t_vec3		color;	// Color at that point
+	t_vec3		normal;	// Surface normal at that point
+};
+
+// camera.c
+void		camera_update(t_render *r);
 
 // loop.c
 void		render_scene(t_scene *scene);
@@ -84,11 +104,16 @@ void		render_scene(t_scene *scene);
 // main.c
 void		parse_scene(t_scene *scene, char *filename);
 
+// math.c
+float		clamp(float value, float lower, float upper);
+float		saturate(float value);
+float		radians(float degrees);
+
 // title.c
 void		show_stats_in_window_title(t_render *r);
 
 // trace.c
-uint32_t	trace_pixel(t_render *r, float x, float y);
+t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
 t_vec3		vec3_add(t_vec3 a, t_vec3 b);
@@ -102,10 +127,12 @@ float		vec3_dot(t_vec3 a, t_vec3 b);
 float		vec3_length(t_vec3 v);
 t_vec3		vec3_normalize(t_vec3 v);
 t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
+t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
 
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);
 t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
+t_vec3		vec3_to_srgb(t_vec3 color);
 uint32_t	vec3_to_color(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */

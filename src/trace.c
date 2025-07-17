@@ -23,50 +23,50 @@ static float	trace_sphere(t_object *s, t_vec3 ro, t_vec3 rd)
 	return ((h - sqrtf(d)) / a);
 }
 
-// Clamp a value to the range [0, 1].
+// Apply ambient/diffuse/specular lighting to a traced ray.
 
-static float	saturate(float value)
+static void	lighting(t_scene *s, t_ray *ray, t_vec3 rd, t_vec3 light)
 {
-	return (fmaxf(0.0f, fminf(1.0f, value)));
+	const t_vec3	reflect = vec3_reflect(light, ray->normal);
+	const float		diffuse = saturate(vec3_dot(light, ray->normal));
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(rd, reflect)), 20.0f);
+
+	ray->color = vec3_lerp(s->ambient, ray->color, diffuse);
+	ray->color = vec3_lerp(ray->color, vec3(1.0f, 1.0f, 1.0f), specular);
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
 
-static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
+static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	light = vec3_normalize(vec3(1.0f, 0.0f, 0.0f));
+	float			depth;
+	t_ray			ray;
 	size_t			i;
-	float			t;
-	float			t_min;
-	float			diffuse;
-	t_vec3			color;
-	t_vec3			normal;
-	t_vec3			point;
 
 	i = -1;
-	t_min = INFINITY;
-	color = s->ambient;
-	normal = light;
+	ray.depth = INFINITY;
+	ray.color = s->ambient;
 	while (++i < s->object_count)
 	{
-		t = INFINITY;
+		depth = INFINITY;
 		if (s->objects[i].type == OBJECT_SPHERE)
-			t = trace_sphere(&s->objects[i], ro, rd);
-		if (t < t_min)
+			depth = trace_sphere(&s->objects[i], ro, rd);
+		if (depth >= 0.0f && depth < ray.depth)
 		{
-			t_min = t;
-			color = s->objects[i].color;
-			point = vec3_add(ro, vec3_scale(rd, t));
-			normal = sphere_normal(&s->objects[i], point);
+			ray.depth = depth;
+			ray.color = s->objects[i].color;
+			ray.point = vec3_add(ro, vec3_scale(rd, depth));
+			ray.normal = sphere_normal(&s->objects[i], ray.point);
 		}
 	}
-	diffuse = saturate(vec3_dot(light, normal));
-	return (vec3_to_color(vec3_scale(color, diffuse)));
+	if (ray.depth < 1e9f)
+		lighting(s, &ray, rd, vec3(1.0f, 0.0f, 0.0f));
+	return (ray.color);
 }
 
 // Trace the color of the pixel at (x, y) in the image.
 
-uint32_t	trace_pixel(t_render *r, float x, float y)
+t_vec3	trace_pixel(t_render *r, float x, float y)
 {
 	const float		u = x / (r->image->width - 1);
 	const float		v = y / (r->image->height - 1);
@@ -74,5 +74,5 @@ uint32_t	trace_pixel(t_render *r, float x, float y)
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
 	const t_vec3	rd = vec3_lerp(v0, v1, v);
 
-	return (trace_scene(r->scene, r->scene->camera_pos, rd));
+	return (trace_scene(r->scene, r->scene->camera_pos, vec3_normalize(rd)));
 }

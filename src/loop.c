@@ -1,20 +1,12 @@
 #include "minirt.h"
 
-static void	init_camera(t_render *r)
+static int	blue_noise(int x, int y)
 {
-	const float		aspect = (float) r->image->width / (float) r->image->height;
-	const t_vec3	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
-	const t_vec3	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
-	const t_vec3	y0 = vec3_scale(r->camera_y, -0.5f);
-	const t_vec3	y1 = vec3_scale(r->camera_y, +0.5f);
+	static const unsigned char	blue_noise_texture[] = {
+		#include "../assets/blue-noise.inc"
+	};
 
-	r->camera_z = vec3_normalize(r->scene->camera_pos);
-	r->camera_x = vec3_cross(vec3(0.0f, 1.0f, 0.0f), r->camera_z);
-	r->camera_y = vec3_cross(r->camera_x, r->camera_z);
-	r->viewport[0] = vec3_sub(vec3_add(x0, y0), r->camera_z);
-	r->viewport[1] = vec3_sub(vec3_add(x1, y0), r->camera_z);
-	r->viewport[2] = vec3_sub(vec3_add(x0, y1), r->camera_z);
-	r->viewport[3] = vec3_sub(vec3_add(x1, y1), r->camera_z);
+	return (blue_noise_texture[(y % 64) * 64 + (x % 64)]);
 }
 
 // MLX loop hook. Runs every frame to render the next image.
@@ -22,15 +14,26 @@ static void	init_camera(t_render *r)
 static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
-	const uint32_t	w = r->image->width;
-	const uint32_t	h = r->image->height;
-	uint32_t		i;
+	uint32_t		x;
+	uint32_t		y;
+	t_vec3			color;
+	float			dither;
 
-	init_camera(r);
+	camera_update(r);
 	show_stats_in_window_title(r);
-	i = -1;
-	while (++i < w * h)
-		mlx_put_pixel(r->image, i % w, i / w, trace_pixel(r, i % w, i / w));
+	y = -1;
+	while (++y < r->image->height)
+	{
+		x = -1;
+		while (++x < r->image->width)
+		{
+			dither = blue_noise(x, y) / 65535.0f;
+			color = trace_pixel(r, x, y);
+			color = vec3_to_srgb(color);
+			color = vec3_add(color, vec3(dither, dither, dither));
+			mlx_put_pixel(r->image, x, y, vec3_to_color(color));
+		}
+	}
 }
 
 // MLX key hook. Used to quit when the escape key is pressed.
@@ -58,8 +61,11 @@ void	render_scene(t_scene *scene)
 {
 	t_render	r;
 
+	ft_bzero(&r, sizeof(r));
 	r.scene = scene;
-	r.mlx = mlx_init(1280, 720, "miniRT", true);
+	r.camera_yaw = atan2(scene->camera_dir.z, scene->camera_dir.x);
+	r.camera_pitch = acos(scene->camera_dir.y);
+	r.mlx = mlx_init(480, 360, "miniRT", true);
 	if (r.mlx != NULL)
 	{
 		r.image = mlx_new_image(r.mlx, r.mlx->width, r.mlx->height);

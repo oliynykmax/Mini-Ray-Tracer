@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/05/09 19:29:32 by maoliiny          #+#    #+#              #
-#    Updated: 2025/07/16 17:52:38 by maoliiny         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME    := miniRT
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
@@ -23,22 +11,24 @@ LDFLAGS := -ldl -lglfw -pthread -lm
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
-SRCS    := \
-		src/array_utils.c \
-		src/assert.c \
-		src/cleanup.c \
-		src/debug.c \
-		src/input.c \
-		src/main.c \
-		src/parse_light_camera.c \
-		src/parsing_objects.c \
-		src/title.c \
-		src/trace.c \
-		src/vec_parse_utils.c \
-		src/loop.c \
-		src/vec3_arithmetic.c \
-		src/vec3_geometric.c \
-		src/vec3_utility.c \
+SRCS := \
+	src/array_utils.c \
+	src/assert.c \
+	src/camera.c \
+	src/cleanup.c \
+	src/debug.c \
+	src/input.c \
+	src/loop.c \
+	src/main.c \
+	src/math.c \
+	src/parse_light_camera.c \
+	src/parsing_objects.c \
+	src/title.c \
+	src/trace.c \
+	src/vec3_arithmetic.c \
+	src/vec3_geometric.c \
+	src/vec3_utility.c \
+	src/vec_parse_utils.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
