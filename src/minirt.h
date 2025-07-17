@@ -149,8 +149,6 @@ bool		parse_point_light(char **line, t_scene *sc);
 bool		parse_object(char **line, t_scene *sc);
 bool		parse_camera(char **line, t_scene *sc);
 int			objects_malloc_manager(t_scene *sc);
-/* debug printing functions */
-void		debug_print_scene(t_scene *sc);
 /* asser	ting function, worth thinking if we want to builtin
  * the e	xiting and cleaning into it*/
 bool		mrt_assert(bool condition, char *format, ...);

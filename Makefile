@@ -16,7 +16,6 @@ SRCS := \
 	src/assert.c \
 	src/camera.c \
 	src/cleanup.c \
-	src/debug.c \
 	src/input.c \
 	src/loop.c \
 	src/main.c \
