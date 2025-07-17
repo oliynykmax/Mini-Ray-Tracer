@@ -101,7 +101,8 @@ void		render_scene(t_scene *scene);
 void		parse_scene(t_scene *scene, char *filename);
 
 // math.c
-float		clamp(float x, float lower, float upper);
+float		clamp(float value, float lower, float upper);
+float		saturate(float value);
 float		radians(float degrees);
 
 // title.c
@@ -122,6 +123,7 @@ float		vec3_dot(t_vec3 a, t_vec3 b);
 float		vec3_length(t_vec3 v);
 t_vec3		vec3_normalize(t_vec3 v);
 t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
+t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
 
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);

@@ -23,20 +23,23 @@ static float	trace_sphere(t_object *s, t_vec3 ro, t_vec3 rd)
 	return ((h - sqrtf(d)) / a);
 }
 
-// Clamp a value to the range [0, 1].
+// Apply ambient/diffuse/specular lighting to a traced ray.
 
-static float	saturate(float value)
+static void	lighting(t_scene *s, t_ray *ray, t_vec3 rd, t_vec3 light)
 {
-	return (fmaxf(0.0f, fminf(1.0f, value)));
+	const t_vec3	reflect = vec3_reflect(light, ray->normal);
+	const float		diffuse = saturate(vec3_dot(light, ray->normal));
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(rd, reflect)), 20.0f);
+
+	ray->color = vec3_lerp(s->ambient, ray->color, diffuse);
+	ray->color = vec3_lerp(ray->color, vec3(1.0f, 1.0f, 1.0f), specular);
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
 
 static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	light = vec3_normalize(vec3(1.0f, 0.0f, 0.0f));
 	float			depth;
-	float			diffuse;
 	t_ray			ray;
 	size_t			i;
 
@@ -56,11 +59,8 @@ static uint32_t	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 			ray.normal = sphere_normal(&s->objects[i], ray.point);
 		}
 	}
-	if (ray.depth < INFINITY)
-	{
-		diffuse = saturate(vec3_dot(light, ray.normal));
-		ray.color = vec3_lerp(s->ambient, ray.color, diffuse);
-	}
+	if (ray.depth < 1e9f)
+		lighting(s, &ray, rd, vec3(1.0f, 0.0f, 0.0f));
 	return (vec3_to_color(ray.color));
 }
 
