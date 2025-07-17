@@ -110,6 +110,7 @@ void		parse_scene(t_scene *scene, char *filename);
 float		clamp(float value, float lower, float upper);
 float		saturate(float value);
 float		radians(float degrees);
+float		fract(float x);
 
 // title.c
 void		show_stats_in_window_title(t_render *r);

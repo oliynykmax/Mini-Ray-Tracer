@@ -20,3 +20,11 @@ float	radians(float degrees)
 {
 	return (degrees * (M_PI / 180.0f));
 }
+
+// Get the fractional part of a floating point number. (Discard the digits
+// before the decimnal point.)
+
+float	fract(float x)
+{
+	return (fmodf(x, 1.0f));
+}
