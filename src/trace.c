@@ -1,5 +1,23 @@
 #include "minirt.h"
 
+static void	trace_plane(t_ray *r, t_object *p)
+{
+	const float	denom = vec3_dot(p->normal, r->rd);
+	float		depth;
+
+	if (fabsf(denom) < 1e-6f)
+		return ;
+	depth = vec3_dot(vec3_sub(p->pos, r->ro), p->normal) / denom;
+	if (depth < 0.0f)
+		return ;
+	r->depth = depth;
+	r->color = p->color;
+	r->point = vec3_add(r->ro, vec3_scale(r->rd, depth));
+	r->normal = p->normal;
+	if (denom > 0.0f)
+		r->normal = vec3_scale(r->normal, -1.0f);
+}
+
 static void	trace_sphere(t_ray *r, t_object *s)
 {
 	const t_vec3	o = vec3_sub(s->pos, r->ro);
@@ -47,9 +65,11 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 	{
 		if (s->objects[i].type == OBJECT_SPHERE)
 			trace_sphere(&ray, &s->objects[i]);
+		if (s->objects[i].type == OBJECT_PLANE)
+			trace_plane(&ray, &s->objects[i]);
 	}
 	if (ray.depth < 1e9f)
-		lighting(s, &ray, vec3(1.0f, 0.0f, 0.0f));
+		lighting(s, &ray, vec3_normalize(vec3(1.0f, -1.0f, 1.0f)));
 	return (ray.color);
 }
 
