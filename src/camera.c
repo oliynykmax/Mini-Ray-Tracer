@@ -51,6 +51,7 @@ void	camera_update(t_render *r)
 
 	r->camera_z = r->scene->dir;
 	r->camera_x = vec3_cross(r->camera_z, vec3(0.0f, -1.0f, 0.0f));
+	r->camera_x = vec3_normalize(r->camera_x);
 	r->camera_y = vec3_cross(r->camera_z, r->camera_x);
 	x0 = vec3_scale(r->camera_x, -0.5f * aspect);
 	x1 = vec3_scale(r->camera_x, +0.5f * aspect);
