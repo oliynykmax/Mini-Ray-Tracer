@@ -37,3 +37,11 @@ t_vec3	vec3_cross(t_vec3 a, t_vec3 b)
 
 	return (vec3(x, y, z));
 }
+
+// Get the reflected ray direction for an incident ray `i` and a surface normal
+// `n`.
+
+t_vec3	vec3_reflect(t_vec3 i, t_vec3 n)
+{
+	return (vec3_sub(i, vec3_scale(n, 2.0f * vec3_dot(n, i))));
+}
