@@ -65,9 +65,10 @@ static void	resize_hook(int32_t width, int32_t height, void *param)
 		r->frame = malloc(r->frame_size);
 		if (r->frame == NULL)
 			mlx_close_window(r->mlx);
-		else
-			ft_bzero(r->frame, r->frame_size);
 	}
+	if (r->frame != NULL)
+		ft_bzero(r->frame, r->image->width * r->image->height * sizeof(t_vec3));
+	r->frame_samples = 0;
 }
 
 // Renderer entry point. Sets up the MLX state and installs all event hooks.
