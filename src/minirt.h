@@ -101,6 +101,11 @@ struct s_render
 	t_vec3		camera_y;		// Camera "down" vector
 	t_vec3		camera_z;		// Camera "forward" vector
 	t_vec3		viewport[4];	// The four corners of the viewport
+	t_vec3		*frame;			// Floating point frame buffer
+	size_t		frame_size;		// Allocated size of the frame
+	int			frame_samples;	// Number of accumulated samples
+	float		jitter_x;		// Horizontal subpixel jitter
+	float		jitter_y;		// Vertical subpixel jitter
 };
 
 struct s_ray
@@ -120,7 +125,7 @@ void		intersect_cylinder_body(t_ray *r, t_object *c);
 void		camera_update(t_render *r);
 
 // loop.c
-void		render_scene(t_scene *scene);
+void		render_scene(t_render *r, t_scene *scene);
 
 // main.c
 void		parse_scene(t_scene *scene, char *filename);
