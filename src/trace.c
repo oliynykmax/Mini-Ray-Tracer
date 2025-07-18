@@ -31,6 +31,8 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 			trace_sphere(&ray, &s->objects[i]);
 		if (s->objects[i].type == OBJECT_PLANE)
 			trace_plane(&ray, &s->objects[i]);
+		if (s->objects[i].type == OBJECT_CYLINDER)
+			trace_cylinder(&ray, &s->objects[i]);
 	}
 	if (ray.depth < 1e9f)
 		lighting(s, &ray, vec3_normalize(vec3(1.0f, -1.0f, 1.0f)));

@@ -99,6 +99,9 @@ struct s_ray
 	t_vec3		normal;	// Surface normal at that point
 };
 
+// cylinder.c
+void		intersect_disc(t_ray *r, t_object *c, t_vec3 center, t_vec3 normal);
+void		intersect_cylinder_body(t_ray *r, t_object *c);
 // camera.c
 void		camera_update(t_render *r);
 
@@ -115,8 +118,11 @@ float		radians(float degrees);
 float		fract(float x);
 
 // shapes.c
+bool		ray_depth_test(t_ray *ray, t_object *object, float depth);
+// shouldn't be here lol
 void		trace_plane(t_ray *ray, t_object *plane);
 void		trace_sphere(t_ray *ray, t_object *sphere);
+void		trace_cylinder(t_ray *r, t_object *s);
 
 // title.c
 void		show_stats_in_window_title(t_render *r);
