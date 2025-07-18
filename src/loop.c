@@ -27,9 +27,8 @@ static void	loop_hook(void *param)
 		x = -1;
 		while (++x < r->image->width)
 		{
-			noise = dither(x, y) / 255.0f;
+			noise = dither(x, y) / 255.0f * 10.0f;
 			color = trace_pixel(r, x, y);
-			color = vec3_to_srgb(color);
 			color = vec3_add(color, vec3(noise, noise, noise));
 			mlx_put_pixel(r->image, x, y, vec3_to_color(color));
 		}
