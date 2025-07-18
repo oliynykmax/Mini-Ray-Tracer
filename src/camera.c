@@ -2,33 +2,40 @@
 
 // Handle mouse movement of the camera, pitching around the x-axis when the
 // mouse is moved up or down, and yawing around the y-axis when it's moved
-// sideways.
+// sideways. Returns true if the camera moved.
 
-static void	camera_mouse_movement(t_render *r)
+static bool	camera_mouse_movement(t_render *r)
 {
 	const float		fov = radians(r->scene->fov);
 	const float		sensitivity = MOUSE_SENSITIVITY * sinf(fov * 0.5f);
 	static int32_t	prev[2];
 	int32_t			curr[2];
+	int32_t			delta[2];
 
 	mlx_get_mouse_pos(r->mlx, &curr[0], &curr[1]);
-	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT))
+	delta[0] = curr[0] - prev[0];
+	delta[1] = curr[1] - prev[1];
+	prev[0] = curr[0];
+	prev[1] = curr[1];
+	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT)
+		&& (delta[0] != 0 || delta[1] != 0))
 	{
-		r->camera_yaw -= sensitivity * (curr[0] - prev[0]);
-		r->camera_pitch -= sensitivity * (curr[1] - prev[1]);
+		r->camera_yaw -= sensitivity * delta[0];
+		r->camera_pitch -= sensitivity * delta[1];
 		r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
 		r->scene->dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
 		r->scene->dir.y = cos(r->camera_pitch);
 		r->scene->dir.z = sin(r->camera_pitch) * sin(r->camera_yaw);
+		return (true);
 	}
-	prev[0] = curr[0];
-	prev[1] = curr[1];
+	return (false);
 }
 
 // Handle keyboard movement of the camera, moving horizontally with the WASD
-// keys, and vertically with the shift/space keys.
+// keys, and vertically with the shift/space keys. Returns true if the camera
+// moved.
 
-static void	camera_keyboard_movement(t_render *r)
+static bool	camera_keyboard_movement(t_render *r)
 {
 	t_vec3	vec;
 	t_vec3	move_x;
@@ -48,6 +55,7 @@ static void	camera_keyboard_movement(t_render *r)
 	vec = vec3_add(vec, vec3_scale(move_z, keys.forward - keys.back));
 	vec = vec3_scale(vec, 3.0f * r->mlx->delta_time);
 	r->scene->pos = vec3_add(r->scene->pos, vec);
+	return (vec3_length(vec) > 0.0f);
 }
 
 // Update the basis vectors for the camera coordinate system, and and find the
@@ -77,7 +85,19 @@ static void	camera_update_viewport(t_render *r)
 
 void	camera_update(t_render *r)
 {
+	const float	plastic_constant = 1.3247179572f;
+	size_t		i;
+
+	i = -1;
+	if (camera_mouse_movement(r))
+		r->frame_samples = 0;
 	camera_update_viewport(r);
-	camera_mouse_movement(r);
-	camera_keyboard_movement(r);
+	if (camera_keyboard_movement(r))
+		r->frame_samples = 0;
+	if (r->frame_samples == 0)
+		while (++i < r->image->width * r->image->height)
+			r->frame[i] = vec3(0.0f, 0.0f, 0.0f);
+	r->jitter_x = fract(r->frame_samples * powf(plastic_constant, -1.0f));
+	r->jitter_y = fract(r->frame_samples * powf(plastic_constant, -2.0f));
+	r->frame_samples++;
 }
