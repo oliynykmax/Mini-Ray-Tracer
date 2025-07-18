@@ -17,7 +17,7 @@ t_vec3	vec3_lerp(t_vec3 a, t_vec3 b, float t)
 	return (vec3_add(a, b));
 }
 
-// Convert a color vector to sRGB, applying an approximate gamme curve.
+// Convert a color vector to sRGB, applying an approximate gamma curve.
 
 t_vec3	vec3_to_srgb(t_vec3 color)
 {
@@ -30,8 +30,8 @@ t_vec3	vec3_to_srgb(t_vec3 color)
 }
 
 // Convert a color vector to a 32-bit MLX pixel value. Clamps all color channels
-// to [0, 1] before converting to 8-bit. sRGB conversion and dithering should be
-// done before this step!
+// to [0, 1] before converting to 8 bits per channel. sRGB conversion and
+// dithering should be done before this step!
 
 uint32_t	vec3_to_color(t_vec3 color)
 {

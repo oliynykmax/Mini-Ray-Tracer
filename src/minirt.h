@@ -12,6 +12,8 @@
 # include <unistd.h>
 # include <errno.h>
 
+# define MOUSE_SENSITIVITY 0.006
+
 # define OBJECT_MAX 32
 
 typedef enum e_object_type	t_object_type;

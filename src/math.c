@@ -22,7 +22,7 @@ float	radians(float degrees)
 }
 
 // Get the fractional part of a floating point number. (Discard the digits
-// before the decimnal point.)
+// before the decimal point.)
 
 float	fract(float x)
 {
