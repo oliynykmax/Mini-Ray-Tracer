@@ -1,8 +1,6 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
-# include "../assets/MLX42/include/MLX42/MLX42.h"
-# include "../assets/libft/libft.h"
 # include <fcntl.h>
 # include <math.h>
 # include <stdbool.h>
@@ -12,18 +10,30 @@
 # include <unistd.h>
 # include <errno.h>
 
+# include "../assets/MLX42/include/MLX42/MLX42.h"
+# include "../assets/libft/libft.h"
+
+// Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
 
-# define OBJECT_MAX 32
+// Key bindings.
+# define KEY_LEFT		MLX_KEY_A
+# define KEY_RIGHT		MLX_KEY_D
+# define KEY_FORWARD	MLX_KEY_W
+# define KEY_BACK		MLX_KEY_S
+# define KEY_UP			MLX_KEY_SPACE
+# define KEY_DOWN		MLX_KEY_LEFT_SHIFT
 
+// Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
+typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef union u_vec3		t_vec3;
 
-enum						e_object_type
+enum	e_object_type
 {
 	OBJECT_PLANE,
 	OBJECT_SPHERE,
@@ -32,24 +42,24 @@ enum						e_object_type
 	OBJECT_LIGHT,
 };
 
-union						u_vec3
+union	u_vec3
 {
 	struct // XYZ coordinate vector
 	{
-		float				x;
-		float				y;
-		float				z;
+		float	x;
+		float	y;
+		float	z;
 	};
 	struct // RGB color vector
 	{
-		float				r;
-		float				g;
-		float				b;
+		float	r;
+		float	g;
+		float	b;
 	};
 	float	a[3]; // Array access to components.
 };
 
-struct						s_object
+struct	s_object
 {
 	t_object_type	type; // Object type (one of OBJECT_xxx)
 	t_vec3			pos;
@@ -70,6 +80,16 @@ struct s_scene
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
 };
 
+struct s_keys
+{
+	int	forward;	// State of the key for walking forward
+	int	back;		// State of the key for walking backward
+	int	left;		// State of the key for strafing left
+	int	right;		// State of the key for strafing right
+	int	up;			// State of the key for floating up
+	int	down;		// State of the key for sinking down
+};
+
 struct s_render
 {
 	t_scene		*scene;			// The scene to render
@@ -81,12 +101,6 @@ struct s_render
 	t_vec3		camera_y;		// Camera "down" vector
 	t_vec3		camera_z;		// Camera "forward" vector
 	t_vec3		viewport[4];	// The four corners of the viewport
-	int			key_forward;
-	int			key_back;
-	int			key_left;
-	int			key_right;
-	int			key_up;
-	int			key_down;
 };
 
 struct s_ray

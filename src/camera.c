@@ -33,18 +33,19 @@ static void	camera_keyboard_movement(t_render *r)
 	t_vec3	vec;
 	t_vec3	move_x;
 	t_vec3	move_z;
+	t_keys	keys;
 
 	move_x = vec3_normalize(vec3(r->camera_x.x, 0.0f, r->camera_x.z));
 	move_z = vec3_normalize(vec3(r->camera_z.x, 0.0f, r->camera_z.z));
-	r->key_forward = mlx_is_key_down(r->mlx, MLX_KEY_W);
-	r->key_left = mlx_is_key_down(r->mlx, MLX_KEY_A);
-	r->key_back = mlx_is_key_down(r->mlx, MLX_KEY_S);
-	r->key_right = mlx_is_key_down(r->mlx, MLX_KEY_D);
-	r->key_up = mlx_is_key_down(r->mlx, MLX_KEY_SPACE);
-	r->key_down = mlx_is_key_down(r->mlx, MLX_KEY_LEFT_SHIFT);
-	vec = vec3(0.0f, r->key_down - r->key_up, 0.0f);
-	vec = vec3_add(vec, vec3_scale(move_x, r->key_right - r->key_left));
-	vec = vec3_add(vec, vec3_scale(move_z, r->key_forward - r->key_back));
+	keys.forward = mlx_is_key_down(r->mlx, KEY_FORWARD);
+	keys.left = mlx_is_key_down(r->mlx, KEY_LEFT);
+	keys.back = mlx_is_key_down(r->mlx, KEY_BACK);
+	keys.right = mlx_is_key_down(r->mlx, KEY_RIGHT);
+	keys.up = mlx_is_key_down(r->mlx, KEY_UP);
+	keys.down = mlx_is_key_down(r->mlx, KEY_DOWN);
+	vec = vec3(0.0f, keys.down - keys.up, 0.0f);
+	vec = vec3_add(vec, vec3_scale(move_x, keys.right - keys.left));
+	vec = vec3_add(vec, vec3_scale(move_z, keys.forward - keys.back));
 	vec = vec3_scale(vec, 3.0f * r->mlx->delta_time);
 	r->scene->pos = vec3_add(r->scene->pos, vec);
 }
