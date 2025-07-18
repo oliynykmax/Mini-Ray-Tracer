@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-// Add a string to the title buffer. Returns a pointer to the next place in the
+// Add a string to the title buffer. Returns a pointer to the position in the
 // buffer where the next character could be written.
 
 static char	*add_string(char *buffer, char *string)
@@ -10,7 +10,7 @@ static char	*add_string(char *buffer, char *string)
 	return (buffer);
 }
 
-// Add an integer value to the title buffer. Returns a pointer to the next place
+// Add an integer value to the title buffer. Returns a pointer to the position
 // in the buffer where the next character could be written. Does not handle
 // overflow if the value equals INT_MIN.
 

@@ -6,15 +6,16 @@
 
 static void	camera_mouse_movement(t_render *r)
 {
-	const float		scale = 0.006f * sinf(r->scene->fov * 0.5f);
+	const float		fov = radians(r->scene->fov);
+	const float		sensitivity = MOUSE_SENSITIVITY * sinf(fov * 0.5f);
 	static int32_t	prev[2];
 	int32_t			curr[2];
 
 	mlx_get_mouse_pos(r->mlx, &curr[0], &curr[1]);
 	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
-		r->camera_yaw += scale * (curr[0] - prev[0]);
-		r->camera_pitch += scale * (curr[1] - prev[1]);
+		r->camera_yaw -= sensitivity * (curr[0] - prev[0]);
+		r->camera_pitch -= sensitivity * (curr[1] - prev[1]);
 		r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
 		r->scene->dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
 		r->scene->dir.y = cos(r->camera_pitch);
