@@ -22,6 +22,7 @@ SRCS := \
 	src/math.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
+	src/shapes.c \
 	src/title.c \
 	src/trace.c \
 	src/vec3_arithmetic.c \

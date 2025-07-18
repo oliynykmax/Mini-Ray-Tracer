@@ -1,42 +1,5 @@
 #include "minirt.h"
 
-static void	trace_plane(t_ray *r, t_object *p)
-{
-	const float	denom = vec3_dot(p->normal, r->rd);
-	float		depth;
-
-	if (fabsf(denom) < 1e-6f)
-		return ;
-	depth = vec3_dot(vec3_sub(p->pos, r->ro), p->normal) / denom;
-	if (depth < 0.0f)
-		return ;
-	r->depth = depth;
-	r->color = p->color;
-	r->point = vec3_add(r->ro, vec3_scale(r->rd, depth));
-	r->normal = p->normal;
-	if (denom > 0.0f)
-		r->normal = vec3_scale(r->normal, -1.0f);
-}
-
-static void	trace_sphere(t_ray *r, t_object *s)
-{
-	const t_vec3	o = vec3_sub(s->pos, r->ro);
-	const float		a = vec3_dot(r->rd, r->rd);
-	const float		h = vec3_dot(r->rd, o);
-	const float		d = h * h - a * (vec3_dot(o, o) - s->radius * s->radius);
-	float			depth;
-
-	if (d < 0.0f)
-		return ;
-	depth = (h - sqrtf(d)) / a;
-	if (depth < 0.0f || depth >= r->depth)
-		return ;
-	r->depth = depth;
-	r->color = s->color;
-	r->point = vec3_add(r->ro, vec3_scale(r->rd, depth));
-	r->normal = vec3_normalize(vec3_sub(r->point, s->pos));
-}
-
 // Apply ambient/diffuse/specular lighting to a traced ray.
 
 static void	lighting(t_scene *s, t_ray *r, t_vec3 light)

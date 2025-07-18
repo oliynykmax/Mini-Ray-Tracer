@@ -114,6 +114,10 @@ float		saturate(float value);
 float		radians(float degrees);
 float		fract(float x);
 
+// shapes.c
+void		trace_plane(t_ray *ray, t_object *plane);
+void		trace_sphere(t_ray *ray, t_object *sphere);
+
 // title.c
 void		show_stats_in_window_title(t_render *r);
 
