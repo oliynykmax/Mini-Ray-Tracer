@@ -1,16 +1,32 @@
 #include "minirt.h"
 
+static t_vec3	single_light(t_scene *scene, t_ray *r, t_object *light)
+{
+	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, r->point));
+	const t_vec3	reflect = vec3_reflect(light_dir, r->normal);
+	const float		diffuse = saturate(vec3_dot(light_dir, r->normal));
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 30);
+	t_vec3			color;
+
+	color = vec3_mul(scene->ambient, r->color);
+	color = vec3_add(color, vec3_scale(vec3(1.0f, 1.0f, 1.0f), specular));
+	color = vec3_add(color, vec3_scale(r->color, diffuse * (1.0f - specular)));
+	return (color);
+}
+
 // Apply ambient/diffuse/specular lighting to a traced ray.
 
-static void	lighting(t_scene *s, t_ray *r, t_vec3 light)
+static void	lighting(t_scene *s, t_ray *r)
 {
-	const t_vec3	reflect = vec3_reflect(light, r->normal);
-	const float		diffuse = saturate(vec3_dot(light, r->normal));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 30);
+	size_t	i;
+	t_vec3	color;
 
-	r->color = vec3_scale(r->color, diffuse);
-	r->color = vec3_add(r->color, s->ambient);
-	r->color = vec3_add(r->color, vec3_scale(vec3(1, 1, 1), specular));
+	color = vec3(0.0f, 0.0f, 0.0f);
+	i = -1;
+	while (++i < s->object_count)
+		if (s->objects[i].type == OBJECT_LIGHT)
+			color = vec3_add(color, single_light(s, r, &s->objects[i]));
+	r->color = color;
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
@@ -35,7 +51,7 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 			trace_cylinder(&ray, &s->objects[i]);
 	}
 	if (ray.depth < 1e9f)
-		lighting(s, &ray, vec3_normalize(vec3(1.0f, -1.0f, 1.0f)));
+		lighting(s, &ray);
 	return (ray.color);
 }
 
