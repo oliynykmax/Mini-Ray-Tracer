@@ -17,7 +17,7 @@ bool	mrt_assert(bool condition, char *format, ...)
 			ft_putstr_fd(": ", STDERR_FILENO);
 		}
 		va_start(args, format);
-		ft_fprintf(2, format, args);
+		printf_fd(2, format, &args);
 		va_end(args);
 	}
 	return (false);
