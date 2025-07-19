@@ -17,15 +17,64 @@ static t_vec3	dither(float x, float y)
 static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
+
+	pthread_mutex_lock(&r->mutex);
+	camera_update(r);
+	show_stats_in_window_title(r);
+	r->jobs_available = THREAD_COUNT;
+	r->jobs_finished = 0;
+	pthread_cond_broadcast(&r->available_cond);
+	while (r->jobs_finished < THREAD_COUNT)
+		pthread_cond_wait(&r->finished_cond, &r->mutex);
+	pthread_mutex_unlock(&r->mutex);
+}
+
+// MLX key hook. Used to quit when the escape key is pressed.
+
+static void	key_hook(mlx_key_data_t data, void *param)
+{
+	t_render *const	r = (t_render*) param;
+
+	pthread_mutex_lock(&r->mutex);
+	if (data.action == MLX_PRESS && data.key == MLX_KEY_ESCAPE)
+		mlx_close_window(r->mlx);
+	pthread_mutex_unlock(&r->mutex);
+}
+
+// MLX window resize hook. Resizes the image to match the new window dimensions.
+
+static void	resize_hook(int32_t width, int32_t height, void *param)
+{
+	t_render *const	r = (t_render*) param;
+	const size_t	min_size = width * height * sizeof(t_vec3);
+
+	pthread_mutex_lock(&r->mutex);
+	mlx_resize_image(r->image, width, height);
+	if (min_size > r->frame_size)
+	{
+		r->frame_size = min_size;
+		free(r->frame);
+		r->frame = malloc(r->frame_size);
+		if (r->frame == NULL)
+			mlx_close_window(r->mlx);
+	}
+	if (r->frame != NULL)
+		ft_bzero(r->frame, r->image->width * r->image->height * sizeof(t_vec3));
+	r->frame_samples = 0;
+	pthread_mutex_unlock(&r->mutex);
+}
+
+static void	thread_render(t_render *r, int thread_id)
+{
+	const uint32_t	y_min = r->image->height / THREAD_COUNT * (thread_id + 0);
+	const uint32_t	y_max = r->image->height / THREAD_COUNT * (thread_id + 1);
 	uint32_t		x;
 	uint32_t		y;
 	t_vec3			color;
 	size_t			index;
 
-	camera_update(r);
-	show_stats_in_window_title(r);
-	y = -1;
-	while (++y < r->image->height)
+	y = y_min - 1;
+	while (++y < y_max)
 	{
 		x = -1;
 		while (++x < r->image->width)
@@ -40,35 +89,66 @@ static void	loop_hook(void *param)
 	}
 }
 
-// MLX key hook. Used to quit when the escape key is pressed.
-
-static void	key_hook(mlx_key_data_t data, void *param)
+static void	*threads_main(void *arg)
 {
-	t_render *const	r = (t_render*) param;
+	t_render *const r = (t_render*) arg;
+	static _Atomic int	id_counter;
+	const int			thread_id = id_counter++;
 
-	if (data.action == MLX_PRESS && data.key == MLX_KEY_ESCAPE)
-		mlx_close_window(r->mlx);
+	while (true)
+	{
+		pthread_mutex_lock(&r->mutex);
+		while (r->jobs_available == 0 && !r->threads_stop)
+			pthread_cond_wait(&r->available_cond, &r->mutex);
+		if (r->threads_stop)
+		{
+			pthread_mutex_unlock(&r->mutex);
+			break ;
+		}
+		r->jobs_available--;
+		pthread_mutex_unlock(&r->mutex);
+		thread_render(r, thread_id);
+		pthread_mutex_lock(&r->mutex);
+		if (++r->jobs_finished == THREAD_COUNT)
+			pthread_cond_signal(&r->finished_cond);
+		pthread_mutex_unlock(&r->mutex);
+	}
+	return (NULL);
 }
 
-// MLX window resize hook. Resizes the image to match the new window dimensions.
-
-static void	resize_hook(int32_t width, int32_t height, void *param)
+static bool	threads_init(t_render *r)
 {
-	t_render *const	r = (t_render*) param;
-	const size_t	min_size = width * height * sizeof(t_vec3);
+	int	i;
 
-	mlx_resize_image(r->image, width, height);
-	if (min_size > r->frame_size)
+	if (pthread_mutex_init(&r->mutex, NULL) != 0)
+		return (false);
+	if (pthread_cond_init(&r->available_cond, NULL) != 0
+	|| pthread_cond_init(&r->finished_cond, NULL) != 0)
+		return (false);
+	i = -1;
+	while (++i < THREAD_COUNT)
 	{
-		r->frame_size = min_size;
-		free(r->frame);
-		r->frame = malloc(r->frame_size);
-		if (r->frame == NULL)
-			mlx_close_window(r->mlx);
+		if (pthread_create(&r->threads[i], NULL, threads_main, r))
+			break ;
+		r->threads_started++;
 	}
-	if (r->frame != NULL)
-		ft_bzero(r->frame, r->image->width * r->image->height * sizeof(t_vec3));
-	r->frame_samples = 0;
+	return (true);
+}
+
+static void	threads_quit(t_render *r)
+{
+	int	i;
+
+	pthread_mutex_lock(&r->mutex);
+	r->threads_stop = true;
+	pthread_cond_broadcast(&r->available_cond);
+	pthread_mutex_unlock(&r->mutex);
+	i = -1;
+	while (++i < r->threads_started)
+		pthread_join(r->threads[i], NULL);
+	pthread_mutex_destroy(&r->mutex);
+	pthread_cond_destroy(&r->available_cond);
+	pthread_cond_destroy(&r->finished_cond);
 }
 
 // Renderer entry point. Sets up the MLX state and installs all event hooks.
@@ -88,11 +168,13 @@ void	render_scene(t_render *r, t_scene *scene)
 			r->frame = malloc(r->frame_size);
 			if (r->frame != NULL)
 			{
+				threads_init(r);
 				ft_bzero(r->frame, r->frame_size);
 				mlx_key_hook(r->mlx, key_hook, r);
 				mlx_resize_hook(r->mlx, resize_hook, r);
 				if (mlx_loop_hook(r->mlx, loop_hook, r))
 					mlx_loop(r->mlx);
+				threads_quit(r);
 			}
 			free(r->frame);
 		}
