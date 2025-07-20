@@ -1,17 +1,21 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
+# include <errno.h>
 # include <fcntl.h>
 # include <math.h>
+# include <pthread.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
-# include <errno.h>
 
 # include "../assets/MLX42/include/MLX42/MLX42.h"
 # include "../assets/libft/libft.h"
+
+// The number of rendering threads to use.
+# define THREAD_COUNT 4
 
 // Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
@@ -92,20 +96,28 @@ struct s_keys
 
 struct s_render
 {
-	t_scene		*scene;			// The scene to render
-	mlx_t		*mlx;			// MLX state
-	mlx_image_t	*image;			// MLX image
-	float		camera_yaw;		// Camera yaw angle (in radians)
-	float		camera_pitch;	// Camera pitch angle (in radians)
-	t_vec3		camera_x;		// Camera "right" vector
-	t_vec3		camera_y;		// Camera "down" vector
-	t_vec3		camera_z;		// Camera "forward" vector
-	t_vec3		viewport[4];	// The four corners of the viewport
-	t_vec3		*frame;			// Floating point frame buffer
-	size_t		frame_size;		// Allocated size of the frame
-	int			frame_samples;	// Number of accumulated samples
-	float		jitter_x;		// Horizontal subpixel jitter
-	float		jitter_y;		// Vertical subpixel jitter
+	t_scene			*scene;					// The scene to render
+	mlx_t			*mlx;					// MLX state
+	mlx_image_t		*image;					// MLX image
+	float			camera_yaw;				// Camera yaw angle (in radians)
+	float			camera_pitch;			// Camera pitch angle (in radians)
+	t_vec3			camera_x;				// Camera "right" vector
+	t_vec3			camera_y;				// Camera "down" vector
+	t_vec3			camera_z;				// Camera "forward" vector
+	t_vec3			viewport[4];			// The four corners of the viewport
+	t_vec3			*frame;					// Floating point frame buffer
+	size_t			frame_size;				// Allocated size of the frame
+	int				frame_samples;			// Number of accumulated samples
+	float			jitter_x;				// Horizontal subpixel jitter
+	float			jitter_y;				// Vertical subpixel jitter
+	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
+	int				threads_started;		// How many threads were initialized
+	bool			threads_stop;			// Set to stop the render threads
+	size_t			jobs_available;			// Available render jobs
+	size_t			jobs_finished;			// Finished render jobs
+	pthread_cond_t	available_cond;			// Tells when jobs become available
+	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
+	pthread_mutex_t	mutex;					// Protects common render state
 };
 
 struct s_ray
