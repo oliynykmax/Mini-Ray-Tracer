@@ -14,19 +14,52 @@ static t_vec3	single_light(t_scene *scene, t_ray *r, t_object *light)
 	return (color);
 }
 
+static t_vec3	checkboard(float u, float v)
+{
+	const float freq = 10.0f;
+	const float	c = fract((floorf(u * freq) + floorf(v * freq)) * 0.5f);
+
+	return (vec3(c, c, c));
+}
+
+static void	texturing(t_ray *r)
+{
+	float x = r->normal.x;
+	float y = r->normal.y;
+	float z = r->normal.z;
+	float absX = fabsf(x);
+	float absY = fabsf(y);
+	float absZ = fabsf(z);
+	float u, v;
+	if (absX >= absY && absX >= absZ) {
+		u = x > 0.0f ? -z : z;
+		v = y;
+	}
+	if (absY >= absX && absY >= absZ) {
+		u = x;
+		v = y > 0.0f ? -z : z;
+	}
+	if (absZ >= absX && absZ >= absY) {
+		u = z > 0.0f ? x : -x;
+		v = y;
+	}
+	float maxAxis = fmaxf(fmaxf(absX, absY), absZ);
+	u = u / maxAxis * 0.5f + 0.5f;
+	v = v / maxAxis * 0.5f + 0.5f;
+	r->color = checkboard(u, v);
+}
+
 // Apply ambient/diffuse/specular lighting to a traced ray.
 
 static void	lighting(t_scene *s, t_ray *r)
 {
 	size_t	i;
-	t_vec3	color;
 
-	color = vec3(0.0f, 0.0f, 0.0f);
+	texturing(r);
 	i = -1;
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
-			color = vec3_add(color, single_light(s, r, &s->objects[i]));
-	r->color = color;
+			r->color = vec3_add(r->color, single_light(s, r, &s->objects[i]));
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.
