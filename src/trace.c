@@ -16,37 +16,23 @@ static t_vec3	single_light(t_scene *scene, t_ray *r, t_object *light)
 
 static t_vec3	checkboard(float u, float v)
 {
-	const float freq = 10.0f;
+	const float	freq = 10.0f;
 	const float	c = fract((floorf(u * freq) + floorf(v * freq)) * 0.5f);
 
 	return (vec3(c, c, c));
 }
 
-static void	texturing(t_ray *r)
+static t_vec3	cubemap(t_vec3 d)
 {
-	float x = r->normal.x;
-	float y = r->normal.y;
-	float z = r->normal.z;
-	float absX = fabsf(x);
-	float absY = fabsf(y);
-	float absZ = fabsf(z);
-	float u, v;
-	if (absX >= absY && absX >= absZ) {
-		u = x > 0.0f ? -z : z;
-		v = y;
-	}
-	if (absY >= absX && absY >= absZ) {
-		u = x;
-		v = y > 0.0f ? -z : z;
-	}
-	if (absZ >= absX && absZ >= absY) {
-		u = z > 0.0f ? x : -x;
-		v = y;
-	}
-	float maxAxis = fmaxf(fmaxf(absX, absY), absZ);
-	u = u / maxAxis * 0.5f + 0.5f;
-	v = v / maxAxis * 0.5f + 0.5f;
-	r->color = checkboard(u, v);
+	const float	m = 0.5f / fmaxf(fmaxf(fabsf(d.x), fabsf(d.y)), fabsf(d.z));
+
+	if (fabsf(d.x) >= fabsf(d.y) && fabsf(d.x) >= fabsf(d.z))
+		d.x = d.z * (d.x <= 0.0f) - d.z * (d.x > 0.0f);
+	else if (fabsf(d.y) >= fabsf(d.x) && fabsf(d.y) >= fabsf(d.z))
+		d.y = d.z * (d.y <= 0.0f) - d.z * (d.y > 0.0f);
+	else
+		d.x = d.x * (d.z > 0.0f) - d.x * (d.z <= 0.0f);
+	return (checkboard(d.x * m + 0.5f, d.y * m + 0.5f));
 }
 
 // Apply ambient/diffuse/specular lighting to a traced ray.
@@ -55,7 +41,7 @@ static void	lighting(t_scene *s, t_ray *r)
 {
 	size_t	i;
 
-	texturing(r);
+	r->color = vec3_mul(r->color, cubemap(r->normal));
 	i = -1;
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
