@@ -21,10 +21,9 @@ static void	loop_hook(void *param)
 	pthread_mutex_lock(&r->mutex);
 	camera_update(r);
 	show_stats_in_window_title(r);
-	r->jobs_available = THREAD_COUNT;
-	r->jobs_finished = 0;
+	r->jobs_available += THREAD_COUNT;
 	pthread_cond_broadcast(&r->available_cond);
-	while (r->jobs_finished < THREAD_COUNT)
+	while (r->jobs_finished < r->jobs_available)
 		pthread_cond_wait(&r->finished_cond, &r->mutex);
 	pthread_mutex_unlock(&r->mutex);
 }
@@ -91,27 +90,28 @@ static void	thread_render(t_render *r, int thread_id)
 
 static void	*threads_main(void *arg)
 {
-	t_render *const r = (t_render*) arg;
-	static _Atomic int	id_counter;
-	const int			thread_id = id_counter++;
+	t_render *const			r = (t_render*) arg;
+	static _Atomic size_t	job_counter;
+	size_t					job_id;
 
+	job_id = job_counter++;
 	while (true)
 	{
 		pthread_mutex_lock(&r->mutex);
-		while (r->jobs_available == 0 && !r->threads_stop)
+		while (job_id >= r->jobs_available && !r->threads_stop)
 			pthread_cond_wait(&r->available_cond, &r->mutex);
 		if (r->threads_stop)
 		{
 			pthread_mutex_unlock(&r->mutex);
 			break ;
 		}
-		r->jobs_available--;
 		pthread_mutex_unlock(&r->mutex);
-		thread_render(r, thread_id);
+		thread_render(r, job_id % THREAD_COUNT);
 		pthread_mutex_lock(&r->mutex);
-		if (++r->jobs_finished == THREAD_COUNT)
+		if (++r->jobs_finished == r->jobs_available)
 			pthread_cond_signal(&r->finished_cond);
 		pthread_mutex_unlock(&r->mutex);
+		job_id += THREAD_COUNT;
 	}
 	return (NULL);
 }

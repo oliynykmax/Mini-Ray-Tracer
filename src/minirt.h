@@ -113,8 +113,8 @@ struct s_render
 	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
 	int				threads_started;		// How many threads were initialized
 	bool			threads_stop;			// Set to stop the render threads
-	int				jobs_available;			// Available render jobs
-	int				jobs_finished;			// Finished render jobs
+	size_t			jobs_available;			// Available render jobs
+	size_t			jobs_finished;			// Finished render jobs
 	pthread_cond_t	available_cond;			// Tells when jobs become available
 	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
 	pthread_mutex_t	mutex;					// Protects common render state
