@@ -1,20 +1,49 @@
 =========================
-        TODO LIST
+     MANDATORY LEVEL
 =========================
 
-[ ] 1. Add support for other shapes // max will do some of them
-[ ] 2. Implement hard shadows // max
-[ ] 3. Complete all intersections (including inside objects)
-[ ] 4. Add object rotation, movement, and scaling // max, maybe
+[X] Basic objects
+	[X] Plane
+	[X] Sphere
+	[X] Cylinder
+[X] Double-sided intersections
+[X] Ambient lighting
+[X] Diffuse lighting
+[ ] Hard shadows
+[ ] Object resizing
+	[ ] Sphere diameter
+	[ ] Cylinder diameter
+	[ ] Cylinder height
+	[ ] Cone diameter
+	[ ] Cone height
+[ ] Object rotation
+	[ ] Plane
+	[ ] Cylinder
+	[ ] Cone
 
--------------------------
-         BONUS
--------------------------
+=========================
+       BONUS LEVEL
+=========================
 
-[x] 1. Add Phong reflection model
-[ ] 2. Implement bump mapping // axel
-[ ] 3. Support cone shape
-[ ] 4. Support cube shape (optional?)
-[ ] 5. Add checkerboard pattern
+[X] Specular highlights
+[X] Multiple lights
+[X] Colored lights
+[ ] Cone shape
+	[ ] Cone
+[ ] Checkboard texture
+	[X] Sphere
+	[ ] Plane
+	[ ] Cylinder
+	[ ] Cone
+[ ] Bump mapping
 
+=========================
+      TRYHARD LEVEL
+=========================
 
+[X] Threaded rendering
+[X] Antialiasing
+[X] Dithering
+[ ] Soft shadows
+[ ] Tone mapping
+[ ] SIMD optimization?
