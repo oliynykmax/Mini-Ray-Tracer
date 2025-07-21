@@ -15,18 +15,18 @@
 # include "../assets/libft/libft.h"
 
 // The number of rendering threads to use.
-# define THREAD_COUNT 4
+# define THREAD_COUNT 6
 
 // Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
 
 // Key bindings.
-# define KEY_LEFT		MLX_KEY_A
-# define KEY_RIGHT		MLX_KEY_D
-# define KEY_FORWARD	MLX_KEY_W
-# define KEY_BACK		MLX_KEY_S
-# define KEY_UP			MLX_KEY_SPACE
-# define KEY_DOWN		MLX_KEY_LEFT_SHIFT
+# define KEY_FORWARD	MLX_KEY_W			// Walk forward
+# define KEY_LEFT		MLX_KEY_A			// Strafe left
+# define KEY_BACK		MLX_KEY_S			// Walk backward
+# define KEY_RIGHT		MLX_KEY_D			// Strafe right
+# define KEY_UP			MLX_KEY_SPACE		// Float up
+# define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
@@ -35,17 +35,10 @@ typedef struct s_object		t_object;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
+typedef struct s_thread		t_thread;
 typedef union u_vec3		t_vec3;
 
-enum	e_object_type
-{
-	OBJECT_PLANE,
-	OBJECT_SPHERE,
-	OBJECT_CYLINDER,
-	OBJECT_CONE,
-	OBJECT_LIGHT,
-};
-
+// 3D coordinate vector type (also used for colors).
 union	u_vec3
 {
 	struct // XYZ coordinate vector
@@ -60,9 +53,19 @@ union	u_vec3
 		float	g;
 		float	b;
 	};
-	float	a[3]; // Array access to components.
 };
 
+// Enumeration for different scene object types.
+enum	e_object_type
+{
+	OBJECT_PLANE,
+	OBJECT_SPHERE,
+	OBJECT_CYLINDER,
+	OBJECT_CONE,
+	OBJECT_LIGHT,
+};
+
+// Data describing one geometric object or light in the scene.
 struct	s_object
 {
 	t_object_type	type; // Object type (one of OBJECT_xxx)
@@ -74,6 +77,7 @@ struct	s_object
 	float			angle; // Angle (cone)
 };
 
+// Data describing the objects in the scene.
 struct s_scene
 {
 	t_object	*objects;		// Array of objects in the scene
@@ -84,6 +88,7 @@ struct s_scene
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
 };
 
+// Data for the current keyboard state.
 struct s_keys
 {
 	int	forward;	// State of the key for walking forward
@@ -94,6 +99,7 @@ struct s_keys
 	int	down;		// State of the key for sinking down
 };
 
+// Common renderer state.
 struct s_render
 {
 	t_scene			*scene;					// The scene to render
@@ -120,19 +126,30 @@ struct s_render
 	pthread_mutex_t	mutex;					// Protects common render state
 };
 
+// Data for one traced ray.
 struct s_ray
 {
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction (normalized)
-	float		depth;	// Distance to closest point
-	t_vec3		point;	// Closest point of intersection
+	float		depth;	// Distance to closest point of intersection
+	t_vec3		point;	// Position of closest point of intersection
 	t_vec3		color;	// Color at that point
 	t_vec3		normal;	// Surface normal at that point
+};
+
+// Data for one render thread.
+struct s_thread
+{
+	size_t	id;		// Index from 0 to THREAD_COUNT - 1
+	size_t	job;	// Job index (always increasing)
+	size_t	y_min;	// y-coordinate of top scanline of region
+	size_t	y_max;	// y-coordinate of bottom scanline of region
 };
 
 // cylinder.c
 void		intersect_disc(t_ray *r, t_object *c, t_vec3 center, t_vec3 normal);
 void		intersect_cylinder_body(t_ray *r, t_object *c);
+
 // camera.c
 void		camera_update(t_render *r);
 
@@ -150,10 +167,15 @@ float		fract(float x);
 
 // shapes.c
 bool		ray_depth_test(t_ray *ray, t_object *object, float depth);
+
 // shouldn't be here lol
 void		trace_plane(t_ray *ray, t_object *plane);
 void		trace_sphere(t_ray *ray, t_object *sphere);
 void		trace_cylinder(t_ray *r, t_object *s);
+
+// threads.c
+bool		threads_init(t_render *r);
+void		threads_quit(t_render *r);
 
 // title.c
 void		show_stats_in_window_title(t_render *r);

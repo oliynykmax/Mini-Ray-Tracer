@@ -86,17 +86,12 @@ static void	camera_update_viewport(t_render *r)
 void	camera_update(t_render *r)
 {
 	const float	plastic_constant = 1.3247179572f;
-	size_t		i;
 
-	i = -1;
 	if (camera_mouse_movement(r))
 		r->frame_samples = 0;
 	camera_update_viewport(r);
 	if (camera_keyboard_movement(r))
 		r->frame_samples = 0;
-	if (r->frame_samples == 0)
-		while (++i < r->image->width * r->image->height)
-			r->frame[i] = vec3(0.0f, 0.0f, 0.0f);
 	r->jitter_x = fract(r->frame_samples * powf(plastic_constant, -1.0f));
 	r->jitter_y = fract(r->frame_samples * powf(plastic_constant, -2.0f));
 	r->frame_samples++;
