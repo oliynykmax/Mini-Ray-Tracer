@@ -24,30 +24,16 @@ void	intersect_cylinder_body(t_ray *r, t_object *c)
 	if (y < -c->height / 2.0f || y > c->height / 2.0f)
 		return ;
 	if (ray_depth_test(r, c, t))
-	{
 		r->normal = vec3_normalize(vec3_sub(r->point, vec3_add(c->pos,
 						vec3_scale(c->normal, y))));
-		if (vec3_dot(r->rd, r->normal) > 0)
-			r->normal = vec3_scale(r->normal, -1.0f);
-	}
 }
 
-void	intersect_disc(t_ray *r, t_object *c, t_vec3 center, t_vec3 normal)
+void	intersect_disc(t_ray *r, t_object *o, t_vec3 c, t_vec3 n)
 {
-	const float	denom = vec3_dot(r->rd, normal);
-	float		t;
-	t_vec3		p;
+	const float		t = vec3_dot(vec3_sub(c, r->ro), n) / vec3_dot(r->rd, n);
+	const t_vec3	p = vec3_add(r->ro, vec3_scale(r->rd, t));
+	const t_vec3	d = vec3_sub(p, c);
 
-	if (fabsf(denom) < 1e-6f)
-		return ;
-	t = vec3_dot(vec3_sub(center, r->ro), normal) / denom;
-	p = vec3_add(r->ro, vec3_scale(r->rd, t));
-	if (vec3_length(vec3_sub(p, center)) > c->radius)
-		return ;
-	if (ray_depth_test(r, c, t))
-	{
-		r->normal = normal;
-		if (vec3_dot(r->rd, r->normal) > 0)
-			r->normal = vec3_scale(r->normal, -1.0f);
-	}
+	if (vec3_dot(d, d) <= o->radius * o->radius && ray_depth_test(r, o, t))
+		r->normal = n;
 }
