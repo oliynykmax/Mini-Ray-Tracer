@@ -28,3 +28,11 @@ float	fract(float x)
 {
 	return (fmodf(x, 1.0f));
 }
+
+// Get the sign of a value. Returns -1 if the value is negative, 1 if it's
+// positive, and 0 otherwise.
+
+float	sign(float x)
+{
+	return ((x > 0.0f) - (x < 0.0f));
+}

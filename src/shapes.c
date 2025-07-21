@@ -17,16 +17,10 @@ bool	ray_depth_test(t_ray *ray, t_object *object, float depth)
 void	trace_plane(t_ray *r, t_object *p)
 {
 	const float	denom = vec3_dot(p->normal, r->rd);
-	float		depth;
+	const float	depth = vec3_dot(vec3_sub(p->pos, r->ro), p->normal) / denom;
 
-	if (fabsf(denom) < 1e-6f)
-		return ;
-	depth = vec3_dot(vec3_sub(p->pos, r->ro), p->normal) / denom;
-	if (!ray_depth_test(r, p, depth))
-		return ;
-	r->normal = p->normal;
-	if (denom > 0.0f)
-		r->normal = vec3_scale(r->normal, -1.0f);
+	if (ray_depth_test(r, p, depth))
+		r->normal = p->normal;
 }
 
 void	trace_sphere(t_ray *r, t_object *s)
@@ -39,22 +33,18 @@ void	trace_sphere(t_ray *r, t_object *s)
 
 	if (d < 0.0f)
 		return ;
-	depth = (h - sqrtf(d)) / a;
-	if (depth < 0.001f)
-		depth = (h + sqrtf(d)) / a;
-	if (!ray_depth_test(r, s, depth))
-		return ;
-	r->normal = vec3_normalize(vec3_sub(r->point, s->pos));
+	depth = sqrtf(d);
+	depth = (h + copysignf(depth, depth - h)) / a;
+	if (ray_depth_test(r, s, depth))
+		r->normal = vec3_scale(vec3_sub(r->point, s->pos), 1.0f / s->radius);
 }
 
 void	trace_cylinder(t_ray *r, t_object *c)
 {
-	const t_vec3	top_cap_center = vec3_add(c->pos,
-			vec3_scale(c->normal, c->height / 2.0f));
-	const t_vec3	bottom_cap_center = vec3_add(c->pos,
-			vec3_scale(c->normal, -c->height / 2.0f));
+	const t_vec3	t = vec3_add(c->pos, vec3_scale(c->normal, +c->height / 2));
+	const t_vec3	b = vec3_add(c->pos, vec3_scale(c->normal, -c->height / 2));
 
-	intersect_disc(r, c, top_cap_center, c->normal);
-	intersect_disc(r, c, bottom_cap_center, vec3_scale(c->normal, -1.0f));
+	intersect_disc(r, c, t, c->normal);
+	intersect_disc(r, c, b, c->normal);
 	intersect_cylinder_body(r, c);
 }

@@ -41,6 +41,7 @@ static void	lighting(t_scene *s, t_ray *r)
 {
 	size_t	i;
 
+	r->normal = vec3_scale(r->normal, -sign(vec3_dot(r->rd, r->normal)));
 	r->color = vec3_mul(r->color, cubemap(r->normal));
 	i = -1;
 	while (++i < s->object_count)

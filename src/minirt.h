@@ -164,6 +164,7 @@ float		clamp(float value, float lower, float upper);
 float		saturate(float value);
 float		radians(float degrees);
 float		fract(float x);
+float		sign(float x);
 
 // shapes.c
 bool		ray_depth_test(t_ray *ray, t_object *object, float depth);
