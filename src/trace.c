@@ -1,28 +1,24 @@
 #include "minirt.h"
 
-static t_vec3	single_light(t_scene *scene, t_ray *r, t_object *light)
+static t_vec3	single_light(t_ray *r, t_object *light)
 {
 	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, r->point));
-	const t_vec3	reflect = vec3_reflect(light_dir, r->normal);
+	const t_vec3	half = vec3_normalize(vec3_sub(light_dir, r->rd));
 	const float		diffuse = saturate(vec3_dot(light_dir, r->normal));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->rd, reflect)), 30);
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->normal, half)), 30);
 	t_vec3			color;
 
-	color = vec3_mul(scene->ambient, r->color);
-	color = vec3_add(color, vec3_scale(vec3(1.0f, 1.0f, 1.0f), specular));
-	color = vec3_add(color, vec3_scale(r->color, diffuse * (1.0f - specular)));
+	color = vec3(specular, specular, specular);
+	color = vec3_add(color, vec3_scale(r->color, diffuse));
 	return (color);
 }
 
-static t_vec3	checkboard(float u, float v)
+static float	checkboard(float u, float v)
 {
-	const float	freq = 10.0f;
-	const float	c = fract((floorf(u * freq) + floorf(v * freq)) * 0.5f);
-
-	return (vec3(c, c, c));
+	return (fract((floorf(u * 10.0f) + floorf(v * 10.0f)) * 0.5f));
 }
 
-static t_vec3	cubemap(t_vec3 d)
+static float	cubemap(t_vec3 d)
 {
 	const float	m = 0.5f / fmaxf(fmaxf(fabsf(d.x), fabsf(d.y)), fabsf(d.z));
 
@@ -40,13 +36,16 @@ static t_vec3	cubemap(t_vec3 d)
 static void	lighting(t_scene *s, t_ray *r)
 {
 	size_t	i;
+	t_vec3	light;
 
+	light = s->ambient;
 	r->normal = vec3_scale(r->normal, -sign(vec3_dot(r->rd, r->normal)));
-	r->color = vec3_mul(r->color, cubemap(r->normal));
+	r->color = vec3_scale(r->color, 0.5f + cubemap(r->normal));
 	i = -1;
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
-			r->color = vec3_add(r->color, single_light(s, r, &s->objects[i]));
+			light = vec3_add(light, single_light(r, &s->objects[i]));
+	r->color = vec3_mul(r->color, light);
 }
 
 // Trace the scene with ray origin `ro` and ray direction `rd`.

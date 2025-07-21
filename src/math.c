@@ -26,7 +26,7 @@ float	radians(float degrees)
 
 float	fract(float x)
 {
-	return (fmodf(x, 1.0f));
+	return (x - floorf(x));
 }
 
 // Get the sign of a value. Returns -1 if the value is negative, 1 if it's
