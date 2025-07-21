@@ -12,6 +12,11 @@ static t_vec3	dither(float x, float y)
 	return (vec3(x, x, x));
 }
 
+// Render one thread's region of the frame. The region extends from y_min to
+// y_max. During this function, it's important that the thread only reads from
+// common render and scene data, to avoid data races. The only memory the thread
+// should write to is the color/pixel data of its own region of the frame.
+
 static void	threads_render(t_render *r, uint32_t y_min, uint32_t y_max)
 {
 	uint32_t		x;
@@ -37,6 +42,15 @@ static void	threads_render(t_render *r, uint32_t y_min, uint32_t y_max)
 		}
 	}
 }
+
+// Render thread entry point. The frame is divided between threads into regions
+// of equal size. When the MLX loop hook is called, the main thread increments
+// the jobs_available counter to indicate that there is rendering work to be
+// done. The render threads wait for work to become available, using a condition
+// variable to avoid busy waiting. After rendering its region of the frame, each
+// render thread increments the jobs_finished counter to indicate completion.
+// When all jobs for one frame have finished, the main thread is signaled, after
+// which it returns from the MLX loop hook, and the cycle repeats.
 
 static void	*threads_main(void *arg)
 {
@@ -67,6 +81,10 @@ static void	*threads_main(void *arg)
 	return (NULL);
 }
 
+// Create synchronization objects and start the render threads. Returns true on
+// success, or false if an object couldn't be created. The threads_started
+// counter keeps track of how many threads were actually started.
+
 bool	threads_init(t_render *r)
 {
 	if (pthread_mutex_init(&r->mutex, NULL) != 0)
@@ -80,8 +98,11 @@ bool	threads_init(t_render *r)
 			break ;
 		r->threads_started++;
 	}
-	return (true);
+	return (r->threads_started == THREAD_COUNT);
 }
+
+// Signal the render threads to stop, wait for all of them to finish, then
+// destroy all synchronization objects.
 
 void	threads_quit(t_render *r)
 {
