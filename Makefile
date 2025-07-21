@@ -24,6 +24,7 @@ SRCS := \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/shapes.c \
+	src/threads.c \
 	src/title.c \
 	src/trace.c \
 	src/vec3_arithmetic.c \
@@ -82,7 +83,10 @@ norm:
 			print \
 		}'
 
+start: all
+	./$(NAME) maps/subject.rt
+
 .SILENT:
-.PHONY: all clean fclean re norm
+.PHONY: all clean fclean re norm start
 
 -include $(OBJ:%.o=%.d)

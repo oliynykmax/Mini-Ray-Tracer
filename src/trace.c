@@ -78,8 +78,8 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 
 t_vec3	trace_pixel(t_render *r, float x, float y)
 {
-	const float		u = x / (r->image->width - 1);
-	const float		v = y / (r->image->height - 1);
+	const float		u = (r->jitter_x + x) / r->image->width;
+	const float		v = (r->jitter_y + y) / r->image->height;
 	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
 	const t_vec3	rd = vec3_lerp(v0, v1, v);
