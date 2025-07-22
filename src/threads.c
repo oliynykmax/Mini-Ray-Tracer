@@ -69,8 +69,8 @@ static void	*threads_main(void *arg)
 		if (r->threads_stop)
 			break ;
 		pthread_mutex_unlock(&r->mutex);
-		thread.y_min = r->image->height / THREAD_COUNT * (thread.id + 0);
-		thread.y_max = r->image->height / THREAD_COUNT * (thread.id + 1);
+		thread.y_min = r->image->height * (thread.id + 0) / THREAD_COUNT;
+		thread.y_max = r->image->height * (thread.id + 1) / THREAD_COUNT;
 		threads_render(r, thread.y_min, thread.y_max);
 		pthread_mutex_lock(&r->mutex);
 		if (++r->jobs_finished == r->jobs_available)
