@@ -38,6 +38,11 @@ typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
 typedef union u_vec3		t_vec3;
 
+// Typedefs for function types.
+typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
+typedef t_vec3				(*t_normal_function)(t_object*, t_vec3);
+typedef t_vec3				(*t_texcoord_function)(t_object*, t_vec3);
+
 // 3D coordinate vector type (also used for colors).
 union	u_vec3
 {
@@ -146,12 +151,13 @@ struct s_thread
 	size_t	y_max;	// y-coordinate of bottom scanline of region
 };
 
-// cylinder.c
-void		intersect_disc(t_ray *r, t_object *c, t_vec3 center, t_vec3 normal);
-void		intersect_cylinder_body(t_ray *r, t_object *c);
-
 // camera.c
 void		camera_update(t_render *r);
+
+// cylinder.c
+float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+t_vec3		cylinder_normal(t_object *o, t_vec3 p);
+t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
 
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
@@ -166,8 +172,15 @@ float		radians(float degrees);
 float		fract(float x);
 float		sign(float x);
 
-// shapes.c
-bool		ray_depth_test(t_ray *ray, t_object *object, float depth);
+// plane.c
+float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+t_vec3		plane_normal(t_object *o, t_vec3 p);
+t_vec3		plane_texcoord(t_object *o, t_vec3 p);
+
+// sphere.c
+float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
+t_vec3		sphere_normal(t_object *s, t_vec3 p);
+t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
 
 // shouldn't be here lol
 void		trace_plane(t_ray *ray, t_object *plane);
