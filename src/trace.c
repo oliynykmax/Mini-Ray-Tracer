@@ -38,11 +38,11 @@ static t_vec3	single_light(t_object *light, t_vec3 rd, t_vec3 n, t_vec3 p)
 	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, p));
 	const t_vec3	half = vec3_normalize(vec3_sub(light_dir, rd));
 	const float		diffuse = saturate(vec3_dot(light_dir, n));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(n, half)), 30);
+	const float		specular = 5.0f * powf(fmaxf(0.0f, vec3_dot(n, half)), 30);
 	t_vec3			color;
 
-	color = vec3(specular, specular, specular);
-	color = vec3_add(color, vec3_scale(color, diffuse));
+	color = vec3_scale(light->color, diffuse);
+	color = vec3_add(color, vec3(specular, specular, specular));
 	return (color);
 }
 
@@ -62,7 +62,8 @@ t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 	size_t	i;
 
 	i = -1;
-	light = s->ambient;
+	// light = s->ambient;
+	light = vec3(0,0,0);
 	n = object_normal(object, p);
 	n = vec3_scale(n, -sign(vec3_dot(rd, n)));
 	while (++i < s->object_count)
@@ -123,11 +124,28 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 
 t_vec3	trace_pixel(t_render *r, float x, float y)
 {
+	const float	focal_length = 5.0f;
+	const float aperture = 0.05f;
+
 	const float		u = (r->jitter_x + x) / r->image->width;
 	const float		v = (r->jitter_y + y) / r->image->height;
 	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
-	const t_vec3	rd = vec3_lerp(v0, v1, v);
+	t_vec3	rd = vec3_lerp(v0, v1, v);
+	t_vec3	target = vec3_add(r->scene->pos, vec3_scale(rd, focal_length));
 
-	return (trace_scene(r->scene, r->scene->pos, vec3_normalize(rd)));
+	static size_t index;
+	const float a1 = pow(1.32471795724474602596, -1.0);
+	const float a2 = pow(1.32471795724474602596, -2.0);
+	const float jitter_u = fract(a1 * index);
+	const float jitter_v = fract(a2 * index++) * 2.0f * M_PI;
+	index = index % 1000;
+	const float jitter_x = sqrtf(jitter_u) * cosf(jitter_v) * aperture;
+	const float jitter_y = sqrtf(jitter_u) * sinf(jitter_v) * aperture;
+	t_vec3 ro = r->scene->pos;
+	ro = vec3_add(ro, vec3_scale(r->camera_x, jitter_x * 2.0f - 1.0f));
+	ro = vec3_add(ro, vec3_scale(r->camera_y, jitter_y * 2.0f - 1.0f));
+	rd = vec3_sub(target, ro);
+
+	return (trace_scene(r->scene, ro, vec3_normalize(rd)));
 }
