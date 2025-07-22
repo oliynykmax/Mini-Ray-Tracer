@@ -6,7 +6,7 @@ HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := clang
 CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -flto -march=native -ffast-math
-CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include
+CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include -g
 LDFLAGS := -ldl -lglfw -pthread -lm -flto
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
@@ -23,7 +23,8 @@ SRCS := \
 	src/math.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
-	src/shapes.c \
+	src/plane.c \
+	src/sphere.c \
 	src/threads.c \
 	src/title.c \
 	src/trace.c \

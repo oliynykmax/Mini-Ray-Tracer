@@ -29,7 +29,6 @@
 [X] Multiple lights
 [X] Colored lights
 [ ] Cone shape
-	[ ] Cone
 [ ] Checkboard texture
 	[X] Sphere
 	[ ] Plane
@@ -44,6 +43,8 @@
 [X] Threaded rendering
 [X] Antialiasing
 [X] Dithering
+[ ] Depth of field
 [ ] Soft shadows
 [ ] Tone mapping
 [ ] SIMD optimization?
+[ ] Saving a map that's been edited

@@ -1,77 +1,122 @@
 #include "minirt.h"
 
-static t_vec3	single_light(t_ray *r, t_object *light)
+static float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, r->point));
-	const t_vec3	half = vec3_normalize(vec3_sub(light_dir, r->rd));
-	const float		diffuse = saturate(vec3_dot(light_dir, r->normal));
-	const float		specular = powf(fmaxf(0.0f, vec3_dot(r->normal, half)), 30);
+	static const t_distance_function	functions[] = {
+		plane_distance,
+		sphere_distance,
+		cylinder_distance,
+	};
+
+	return (functions[object->type](object, ro, rd));
+}
+
+static t_vec3	object_normal(t_object *object, t_vec3 point)
+{
+	static const t_normal_function	functions[] = {
+		plane_normal,
+		sphere_normal,
+		cylinder_normal,
+	};
+
+	return (functions[object->type](object, point));
+}
+
+static t_vec3	object_texcoord(t_object *object, t_vec3 point)
+{
+	static const t_normal_function	functions[] = {
+		plane_texcoord,
+		sphere_texcoord,
+		cylinder_texcoord,
+	};
+
+	return (functions[object->type](object, point));
+}
+
+static t_vec3	single_light(t_object *light, t_vec3 rd, t_vec3 n, t_vec3 p)
+{
+	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, p));
+	const t_vec3	half = vec3_normalize(vec3_sub(light_dir, rd));
+	const float		diffuse = saturate(vec3_dot(light_dir, n));
+	const float		specular = powf(fmaxf(0.0f, vec3_dot(n, half)), 30);
 	t_vec3			color;
 
 	color = vec3(specular, specular, specular);
-	color = vec3_add(color, vec3_scale(r->color, diffuse));
+	color = vec3_add(color, vec3_scale(color, diffuse));
 	return (color);
 }
 
 static float	checkboard(float u, float v)
 {
-	return (fract((floorf(u * 10.0f) + floorf(v * 10.0f)) * 0.5f));
-}
-
-static float	cubemap(t_vec3 d)
-{
-	const float	m = 0.5f / fmaxf(fmaxf(fabsf(d.x), fabsf(d.y)), fabsf(d.z));
-
-	if (fabsf(d.x) >= fabsf(d.y) && fabsf(d.x) >= fabsf(d.z))
-		d.x = d.z * (d.x <= 0.0f) - d.z * (d.x > 0.0f);
-	else if (fabsf(d.y) >= fabsf(d.x) && fabsf(d.y) >= fabsf(d.z))
-		d.y = d.z * (d.y <= 0.0f) - d.z * (d.y > 0.0f);
-	else
-		d.x = d.x * (d.z > 0.0f) - d.x * (d.z <= 0.0f);
-	return (checkboard(d.x * m + 0.5f, d.y * m + 0.5f));
+	u = floorf(u * 10.0f);
+	v = floorf(v * 10.0f);
+	return (0.1f + 0.9f * fract((u + v) * 0.5f));
 }
 
 // Apply ambient/diffuse/specular lighting to a traced ray.
 
-static void	lighting(t_scene *s, t_ray *r)
+t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 {
-	size_t	i;
 	t_vec3	light;
+	t_vec3	n;
+	size_t	i;
 
-	light = s->ambient;
-	r->normal = vec3_scale(r->normal, -sign(vec3_dot(r->rd, r->normal)));
-	r->color = vec3_scale(r->color, 0.5f + cubemap(r->normal));
 	i = -1;
+	light = s->ambient;
+	n = object_normal(object, p);
+	n = vec3_scale(n, -sign(vec3_dot(rd, n)));
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
-			light = vec3_add(light, single_light(r, &s->objects[i]));
-	r->color = vec3_mul(r->color, light);
+			light = vec3_add(light, single_light(&s->objects[i], rd, n, p));
+	return (light);
 }
 
-// Trace the scene with ray origin `ro` and ray direction `rd`.
+static t_vec3	texturing(t_object *object, t_vec3 point)
+{
+	const t_vec3	texcoord = object_texcoord(object, point);
+	const float		value = checkboard(texcoord.x, texcoord.y);
+
+	return (vec3(value, value, value));
+}
+
+float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
+{
+	float		t_min;
+	float		t;
+	size_t		i;
+
+	i = -1;
+	if (object != NULL)
+		*object = NULL;
+	t_min = 1e9f;
+	while (++i < s->object_count)
+	{
+		if (s->objects[i].type == OBJECT_LIGHT)
+			continue ;
+		t = object_distance(&s->objects[i], ro, rd);
+		if (t < 0.0f || t >= t_min)
+			continue ;
+		t_min = t;
+		if (object != NULL)
+			*object = &s->objects[i];
+	}
+	return (t_min);
+}
 
 static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 {
-	t_ray			ray;
-	size_t			i;
+	t_object	*object;
+	t_vec3		point;
+	t_vec3		color;
+	const float	t = scene_distance(s, ro, rd, &object);
 
-	i = -1;
-	ray.ro = ro;
-	ray.rd = rd;
-	ray.depth = 1e9f;
-	ray.color = s->ambient;
-	while (++i < s->object_count)
-	{
-		if (s->objects[i].type == OBJECT_SPHERE)
-			trace_sphere(&ray, &s->objects[i]);
-		if (s->objects[i].type == OBJECT_PLANE)
-			trace_plane(&ray, &s->objects[i]);
-		if (s->objects[i].type == OBJECT_CYLINDER)
-			trace_cylinder(&ray, &s->objects[i]);
-	}
-	if (ray.depth < 1e9f)
-		lighting(s, &ray);
-	return (ray.color);
+	if (object == NULL)
+		return (s->ambient);
+	point = vec3_add(ro, vec3_scale(rd, t));
+	color = object->color;
+	color = vec3_mul(color, texturing(object, point));
+	color = vec3_mul(color, lighting(object, point, s, rd));
+	return (color);
 }
 
 // Trace the color of the pixel at (x, y) in the image.
