@@ -1,9 +1,5 @@
 #include "minirt.h"
 
-// parse_scene should call exit() if anything goes wrong during parsing.
-// Eventually main should also free any resources in the scene, but right now
-// there aren't any. FIXME: The argc should be fixed when we have files to test.
-
 int	main(int ac, char **av)
 {
 	t_scene		scene;

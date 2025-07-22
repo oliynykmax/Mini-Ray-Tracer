@@ -1,39 +1,63 @@
 #include "minirt.h"
 
-/**
- * @brief Intersects a ray with the wall of a cylinder.
- */
-void	intersect_cylinder_body(t_ray *r, t_object *c)
+static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	oc = vec3_sub(r->ro, c->pos);
-	const float		coef[3] = {vec3_dot(r->rd, r->rd) - powf(vec3_dot(r->rd,
-				c->normal), 2), 2.0f * (vec3_dot(r->rd, oc)
-			- vec3_dot(r->rd, c->normal) * vec3_dot(oc, c->normal)),
-		vec3_dot(oc, oc) - powf(vec3_dot(oc, c->normal), 2) - c->radius
-		* c->radius};
-	const float		discriminant = coef[1] * coef[1] - 4.0f * coef[0] * coef[2];
+	const t_vec3	oc = vec3_sub(ro, o->pos);
+	const float		rn = vec3_dot(rd, o->normal);
+	const float		on = vec3_dot(oc, o->normal);
+	const float		a = 2.0f * (vec3_dot(rd, rd) - rn * rn);
+	const float		b = 2.0f * (vec3_dot(rd, oc) - rn * on);
+	const float		c = vec3_dot(oc, oc) - on * on - o->radius * o->radius;
+	float			d = b * b - 2.0f * a * c;
 	float			t;
 	float			y;
 
-	if (discriminant < 0.0f)
-		return ;
-	t = (-coef[1] - sqrtf(discriminant)) / (2.0f * coef[0]);
-	if (t < 0.001f)
-		t = (-coef[1] + sqrtf(discriminant)) / (2.0f * coef[0]);
-	y = vec3_dot(oc, c->normal) + t * vec3_dot(r->rd, c->normal);
-	if (y < -c->height / 2.0f || y > c->height / 2.0f)
-		return ;
-	if (ray_depth_test(r, c, t))
-		r->normal = vec3_normalize(vec3_sub(r->point, vec3_add(c->pos,
-						vec3_scale(c->normal, y))));
+	if (d < 0.0f)
+		return (1e9f);
+	d = sqrtf(d);
+	t = (copysignf(d, b + d) - b) / a;
+	y = vec3_dot(oc, o->normal) + t * vec3_dot(rd, o->normal);
+	if (fabsf(y) > o->height * 0.5f)
+		return (1e9f);
+	return (t);
 }
 
-void	intersect_disc(t_ray *r, t_object *o, t_vec3 c, t_vec3 n)
+static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 {
-	const float		t = vec3_dot(vec3_sub(c, r->ro), n) / vec3_dot(r->rd, n);
-	const t_vec3	p = vec3_add(r->ro, vec3_scale(r->rd, t));
-	const t_vec3	d = vec3_sub(p, c);
+	const t_vec3	c = vec3_add(o->pos, vec3_scale(o->normal, h));
+	const float		denom = vec3_dot(o->normal, rd);
+	const float		t = vec3_dot(vec3_sub(c, ro), o->normal) / denom;
+	const t_vec3	p = vec3_sub(c, vec3_add(ro, vec3_scale(rd, t)));
 
-	if (vec3_dot(d, d) <= o->radius * o->radius && ray_depth_test(r, o, t))
-		r->normal = n;
+	if (t < 0.0f || vec3_dot(p, p) > o->radius * o->radius)
+		return (1e9f);
+	return (t);
+}
+
+float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
+{
+	const float	body = body_distance(o, ro, rd);
+	const float	top = disk_distance(o, ro, rd, -0.5f * o->height);
+	const float	bot = disk_distance(o, ro, rd, +0.5f * o->height);
+
+	return (fminf(body, fminf(top, bot)));
+}
+
+t_vec3	cylinder_normal(t_object *o, t_vec3 p)
+{
+	const float		h = vec3_dot(vec3_sub(p, o->pos), o->normal);
+	const t_vec3	c = vec3_add(o->pos, vec3_scale(o->normal, h));
+
+	if (fabsf(h) >= o->height * 0.5f - 1e-6f)
+		return (o->normal);
+	return (vec3_scale(vec3_sub(p, c), 1.0f / o->radius));
+}
+
+t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
+{
+	const t_vec3	d = vec3_sub(p, o->pos);
+	const float		u = vec3_dot(d, o->normal);
+	const float		v = atan2f(d.x, d.z) / M_PI * 0.5f + 0.5f;
+
+	return (vec3(u, v, 0.0f));
 }

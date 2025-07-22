@@ -21,7 +21,7 @@ t_vec3	vec3_lerp(t_vec3 a, t_vec3 b, float t)
 
 t_vec3	vec3_to_srgb(t_vec3 color)
 {
-	const float		gamma = 1.0f / 2.3f;
+	const float		gamma = 1.0f / 2.2f;
 
 	color.r = powf(color.r, gamma);
 	color.g = powf(color.g, gamma);

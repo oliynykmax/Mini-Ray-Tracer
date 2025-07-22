@@ -38,12 +38,12 @@ static void	update_window_title(t_render *r)
 	buffer = title;
 	buffer = add_string(buffer, "miniRT — objects: ");
 	buffer = add_int(buffer, r->scene->object_count);
-	buffer = add_string(buffer, " | delta: ");
+	buffer = add_string(buffer, " | dt: ");
 	buffer = add_int(buffer, r->mlx->delta_time * 1000.0);
 	buffer = add_string(buffer, " ms");
 	buffer = add_string(buffer, " | fps: ");
 	buffer = add_int(buffer, 1.0 / r->mlx->delta_time);
-	buffer = add_string(buffer, " | resolution: ");
+	buffer = add_string(buffer, " | size: ");
 	buffer = add_int(buffer, r->image->width);
 	buffer = add_string(buffer, " x ");
 	buffer = add_int(buffer, r->image->height);
