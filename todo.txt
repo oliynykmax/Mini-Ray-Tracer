@@ -18,6 +18,7 @@
 	[ ] Cone height
 [ ] Object rotation
 	[ ] Plane
+	[ ] Sphere
 	[ ] Cylinder
 	[ ] Cone
 
@@ -28,9 +29,10 @@
 [X] Specular highlights
 [X] Multiple lights
 [X] Colored lights
+[X] Checkboard texture
 [ ] Cone shape
-[ ] Checkboard texture
-	[X] Sphere
+[ ] UV mapping
+	[ ] Sphere
 	[ ] Plane
 	[ ] Cylinder
 	[ ] Cone
@@ -43,7 +45,9 @@
 [X] Threaded rendering
 [X] Antialiasing
 [X] Dithering
-[ ] Depth of field
+[X] Depth of field
+[ ] Physically based lighting
+[ ] Directional lights
 [ ] Soft shadows
 [ ] Tone mapping
 [ ] SIMD optimization?

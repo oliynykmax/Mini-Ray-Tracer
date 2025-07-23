@@ -28,6 +28,20 @@
 # define KEY_UP			MLX_KEY_SPACE		// Float up
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
+// Camera parameters for depth of field.
+# define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
+# define CAMERA_APERTURE 0.01 // Camera aperture size (TODO: Add to parser)
+
+// Constants used for generating random points. The number 1.324… is the
+// "plastic ratio," which is the solution to the equation x³ = x + 1. This
+// number has unique properties that are useful for generating points that look
+// "random" but don't clump together like truly randomly generated points do.
+
+# define PLASTIC_RATIO_X 0.7548776662466927 // (plastic ratio)¯¹
+# define PLASTIC_RATIO_Y 0.5698402909980532 // (plastic ratio)¯²
+
+# define TAU 6.283185307179586 // 2π
+
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
 typedef struct s_keys		t_keys;
