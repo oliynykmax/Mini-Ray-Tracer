@@ -62,10 +62,9 @@ t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 	size_t	i;
 
 	i = -1;
-	// light = s->ambient;
-	light = vec3(0,0,0);
+	light = s->ambient;
 	n = object_normal(object, p);
-	n = vec3_scale(n, -sign(vec3_dot(rd, n)));
+	n = vec3_scale(n, copysignf(1.0f, -vec3_dot(rd, n)));
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
 			light = vec3_add(light, single_light(&s->objects[i], rd, n, p));
@@ -125,7 +124,7 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 t_vec3	trace_pixel(t_render *r, float x, float y)
 {
 	const float	focal_length = 5.0f;
-	const float aperture = 0.05f;
+	const float aperture = 0.01f;
 
 	const float		u = (r->jitter_x + x) / r->image->width;
 	const float		v = (r->jitter_y + y) / r->image->height;
