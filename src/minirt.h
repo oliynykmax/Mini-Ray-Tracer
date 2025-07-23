@@ -170,7 +170,7 @@ float		clamp(float value, float lower, float upper);
 float		saturate(float value);
 float		radians(float degrees);
 float		fract(float x);
-float		sign(float x);
+float		solve_quadratic(float a, float b, float c);
 
 // plane.c
 float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);

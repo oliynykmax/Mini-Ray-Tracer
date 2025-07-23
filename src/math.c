@@ -29,10 +29,15 @@ float	fract(float x)
 	return (x - floorf(x));
 }
 
-// Get the sign of a value. Returns -1 if the value is negative, 1 if it's
-// positive, and 0 otherwise.
+// Solve the quadratic equation ax² + bx + c. Returns the lower of the two
+// roots, or if the lower root is negative, returns the higher root. If no
+// solution exists, returns a huge float value.
 
-float	sign(float x)
+float	solve_quadratic(float a, float b, float c)
 {
-	return ((x > 0.0f) - (x < 0.0f));
+	const float	d = b * b - 4.0f * a * c;
+
+	if (d < 0.0f)
+		return (1e9f);
+	return (copysignf(sqrtf(d), b + sqrtf(d)) - b) / (2.0f * a);
 }
