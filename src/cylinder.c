@@ -1,26 +1,25 @@
 #include "minirt.h"
 
+// Get the distance along a ray to a cylinder body.
+
 static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
 	const t_vec3	oc = vec3_sub(ro, o->pos);
 	const float		rn = vec3_dot(rd, o->normal);
 	const float		on = vec3_dot(oc, o->normal);
-	const float		a = 2.0f * (vec3_dot(rd, rd) - rn * rn);
-	const float		b = 2.0f * (vec3_dot(rd, oc) - rn * on);
-	const float		c = vec3_dot(oc, oc) - on * on - o->radius * o->radius;
-	float			d = b * b - 2.0f * a * c;
-	float			t;
-	float			y;
+	const float		c[] = {
+		(vec3_dot(rd, rd) - rn * rn),
+		2.0f * (vec3_dot(rd, oc) - rn * on),
+		vec3_dot(oc, oc) - on * on - o->radius * o->radius,
+	};
+	const float		t = solve_quadratic(c[0], c[1], c[2]);
 
-	if (d < 0.0f)
-		return (1e9f);
-	d = sqrtf(d);
-	t = (copysignf(d, b + d) - b) / a;
-	y = vec3_dot(oc, o->normal) + t * vec3_dot(rd, o->normal);
-	if (fabsf(y) > o->height * 0.5f)
+	if (fabsf(on + t * rn) > o->height * 0.5f)
 		return (1e9f);
 	return (t);
 }
+
+// Get the distance along a ray to a cylinder end cap (a disk).
 
 static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 {
@@ -34,6 +33,8 @@ static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 	return (t);
 }
 
+// Get the distance along a ray to a full cylinder.
+
 float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
 	const float	body = body_distance(o, ro, rd);
@@ -42,6 +43,8 @@ float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 
 	return (fminf(body, fminf(top, bot)));
 }
+
+// Get the normal of a cylinder at a point `p` on its surface.
 
 t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 {
@@ -52,6 +55,8 @@ t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 		return (o->normal);
 	return (vec3_scale(vec3_sub(p, c), 1.0f / o->radius));
 }
+
+// Get the texture coordinates of a cylinder at a point `p` on its surface.
 
 t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
 {
