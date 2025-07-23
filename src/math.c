@@ -39,5 +39,5 @@ float	solve_quadratic(float a, float b, float c)
 
 	if (d < 0.0f)
 		return (1e9f);
-	return (copysignf(sqrtf(d), b + sqrtf(d)) - b) / (2.0f * a);
+	return ((copysignf(sqrtf(d), b + sqrtf(d)) - b) / (2.0f * a));
 }
