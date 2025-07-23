@@ -119,32 +119,35 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 	return (color);
 }
 
+// Generate a random point in a disk centered at the origin with the given
+// radius.
+
+static t_vec3	random_point_in_disk(float radius)
+{
+	static _Thread_local uint16_t	i;
+	const float						u = fract(PLASTIC_RATIO_X * i);
+	const float						v = fract(PLASTIC_RATIO_Y * i++) * TAU;
+	const float						x = sqrtf(u) * cosf(v) * radius;
+	const float						y = sqrtf(u) * sinf(v) * radius;
+
+	return (vec3(x, y, 0.0f));
+}
+
 // Trace the color of the pixel at (x, y) in the image.
 
 t_vec3	trace_pixel(t_render *r, float x, float y)
 {
-	const float	focal_length = 5.0f;
-	const float aperture = 0.01f;
-
 	const float		u = (r->jitter_x + x) / r->image->width;
 	const float		v = (r->jitter_y + y) / r->image->height;
 	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
-	t_vec3	rd = vec3_lerp(v0, v1, v);
-	t_vec3	target = vec3_add(r->scene->pos, vec3_scale(rd, focal_length));
+	const t_vec3	disk = random_point_in_disk(CAMERA_APERTURE);
+	t_vec3			rd = vec3_lerp(v0, v1, v);
+	t_vec3			rt = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
+	t_vec3			ro;
 
-	static size_t index;
-	const float a1 = pow(1.32471795724474602596, -1.0);
-	const float a2 = pow(1.32471795724474602596, -2.0);
-	const float jitter_u = fract(a1 * index);
-	const float jitter_v = fract(a2 * index++) * 2.0f * M_PI;
-	index = index % 1000;
-	const float jitter_x = sqrtf(jitter_u) * cosf(jitter_v) * aperture;
-	const float jitter_y = sqrtf(jitter_u) * sinf(jitter_v) * aperture;
-	t_vec3 ro = r->scene->pos;
-	ro = vec3_add(ro, vec3_scale(r->camera_x, jitter_x * 2.0f - 1.0f));
-	ro = vec3_add(ro, vec3_scale(r->camera_y, jitter_y * 2.0f - 1.0f));
-	rd = vec3_sub(target, ro);
-
-	return (trace_scene(r->scene, ro, vec3_normalize(rd)));
+	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
+	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
+	rd = vec3_normalize(vec3_sub(rt, ro));
+	return (trace_scene(r->scene, ro, rd));
 }
