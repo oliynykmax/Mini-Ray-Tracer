@@ -24,6 +24,7 @@ SRCS := \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/plane.c \
+	src/quaternion.c \
 	src/sphere.c \
 	src/threads.c \
 	src/title.c \
