@@ -47,6 +47,8 @@ static void	update_window_title(t_render *r)
 	buffer = add_int(buffer, r->image->width);
 	buffer = add_string(buffer, " x ");
 	buffer = add_int(buffer, r->image->height);
+	buffer = add_string(buffer, " | samples: ");
+	buffer = add_int(buffer, r->frame_samples);
 	mlx_set_window_title(r->mlx, title);
 }
 
