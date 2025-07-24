@@ -9,8 +9,8 @@ static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 	const float		on = vec3_dot(oc, o->normal);
 	const float		c[] = {
 		(vec3_dot(rd, rd) - rn * rn),
-		2.0f * (vec3_dot(rd, oc) - rn * on),
-		vec3_dot(oc, oc) - on * on - o->radius * o->radius,
+		(vec3_dot(rd, oc) - rn * on) * 2.0f,
+		(vec3_dot(oc, oc) - on * on) - o->radius * o->radius,
 	};
 	const float		t = solve_quadratic(c[0], c[1], c[2]);
 
