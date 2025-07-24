@@ -5,7 +5,7 @@
 
 static t_vec3	random_point_in_disk(float radius)
 {
-	static _Thread_local uint32_t	i;
+	static _Thread_local uint16_t	i;
 	const float						u = fract(PLASTIC_RATIO_X * i);
 	const float						v = fract(PLASTIC_RATIO_Y * i++) * TAU;
 	const float						x = sqrtf(u) * cosf(v) * radius;
@@ -17,23 +17,20 @@ static t_vec3	random_point_in_disk(float radius)
 # define LDS_3D_X 0.8191725133961644
 # define LDS_3D_Y 0.6710436067037892
 # define LDS_3D_Z 0.5497004779019702
-
-static _Thread_local uint32_t	sphere_rng;
+	static _Thread_local uint16_t	i;
 
 static t_vec3	random_point_in_sphere(float radius)
 {
-	const float						u = fract(PLASTIC_RATIO_X * sphere_rng) * M_PI;
-	const float						v = fract(PLASTIC_RATIO_Y * sphere_rng++) * TAU;
 	t_vec3							p;
 
+#if 0
+	const float						u = fract(PLASTIC_RATIO_X * i) * M_PI;
+	const float						v = fract(PLASTIC_RATIO_Y * i++) * TAU;
 	p.x = sinf(u) * cosf(v);
 	p.y = sinf(u) * sinf(v);
 	p.z = cosf(u);
 	return (vec3_scale(p, radius));
-
-	/*
-	t_vec3							p;
-
+#else
 	while (true)
 	{
 		i++;
@@ -43,7 +40,7 @@ static t_vec3	random_point_in_sphere(float radius)
 		if (vec3_dot(p, p) < 1.0f)
 			return (vec3_scale(p, radius));
 	}
-	*/
+#endif
 }
 
 static float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
@@ -139,7 +136,7 @@ t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
 		{
-			t_vec3 rand = random_point_in_sphere(2.0f);
+			t_vec3 rand = random_point_in_sphere(1.5f);
 			t_vec3 light_pos = vec3_add(s->objects[i].pos, rand);
 			t_vec3 light_dir = vec3_sub(light_pos, p);
 			if (scene_distance(s, p, light_dir, NULL) >= 1.0f)
@@ -185,7 +182,10 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	t_vec3			rt = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
 	t_vec3			ro;
 
-	sphere_rng = r->frame_samples + x + y * r->image->width;
+	uint32_t index = (int) x + (int) y * r->image->width;
+	index *= 2654435769u;
+	i += r->frame_samples;
+
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
 	rd = vec3_normalize(vec3_sub(rt, ro));
