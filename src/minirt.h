@@ -50,6 +50,7 @@ typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
+typedef union u_quat		t_quat;
 typedef union u_vec3		t_vec3;
 
 // Typedefs for function types.
@@ -72,6 +73,19 @@ union	u_vec3
 		float	g;
 		float	b;
 	};
+};
+
+// Quaternion type (used for rotating/orienting objects).
+union	u_quat
+{
+	struct
+	{
+		float	x;		// Imaginary
+		float	y;		// Imaginary
+		float	z;		// Imaginary
+		float	w;		// Real
+	};
+	t_vec3		xyz;	// Imaginary parts as vector
 };
 
 // Enumeration for different scene object types.
@@ -190,6 +204,12 @@ float		solve_quadratic(float a, float b, float c);
 float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		plane_normal(t_object *o, t_vec3 p);
 t_vec3		plane_texcoord(t_object *o, t_vec3 p);
+
+// quaternion.c
+t_quat		quat(float x, float y, float z, float w);
+t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
+t_quat		quat_multiply(t_quat a, t_quat b);
+t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 
 // sphere.c
 float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
