@@ -210,6 +210,7 @@ t_quat		quat(float x, float y, float z, float w);
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
 t_quat		quat_multiply(t_quat a, t_quat b);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
+t_quat		quat_inverse(t_quat q);
 
 // sphere.c
 float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
