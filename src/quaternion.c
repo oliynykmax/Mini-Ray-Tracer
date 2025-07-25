@@ -38,3 +38,10 @@ t_vec3	quat_rotate_vec3(t_quat q, t_vec3 v)
 
 	return (vec3_add(v, vec3_scale(vec3_cross(v, a), 2.0f)));
 }
+
+// Invert a quaternion.
+
+t_quat	quat_inverse(t_quat q)
+{
+	return (quat(-q.x, -q.y, -q.z, q.w));
+}
