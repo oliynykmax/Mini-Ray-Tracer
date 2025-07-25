@@ -38,7 +38,9 @@ static t_vec3	random_point_in_sphere(float radius)
 		p.y = fract(LDS_3D_Y * i) * 2.0f - 1.0f;
 		p.z = fract(LDS_3D_Z * i) * 2.0f - 1.0f;
 		if (vec3_dot(p, p) < 1.0f)
+		{
 			return (vec3_scale(p, radius));
+		}
 	}
 #endif
 }
@@ -183,8 +185,7 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	t_vec3			ro;
 
 	uint32_t index = (int) x + (int) y * r->image->width;
-	index *= 2654435769u;
-	i += r->frame_samples;
+	i = index * 2654435769u + r->frame_samples;
 
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));

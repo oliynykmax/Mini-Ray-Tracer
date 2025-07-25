@@ -21,6 +21,11 @@
 	[ ] Sphere
 	[ ] Cylinder
 	[ ] Cone
+[ ] Object translation
+	[ ] Plane
+	[ ] Sphere
+	[ ] Cylinder
+	[ ] Cone
 
 =========================
        BONUS LEVEL
@@ -46,9 +51,12 @@
 [X] Antialiasing
 [X] Dithering
 [X] Depth of field
+[ ] Soft shadows
 [ ] Physically based lighting
 [ ] Directional lights
-[ ] Soft shadows
 [ ] Tone mapping
-[ ] SIMD optimization?
 [ ] Saving a map that's been edited
+[ ] Metallic/reflective surfaces
+[ ] Offline rendering
+[ ] Refractive surfaces (lenses/glass)
+[ ] SIMD optimization?
