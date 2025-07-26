@@ -1,48 +1,35 @@
 #include "minirt.h"
 
+	static _Thread_local uint16_t	i;
+
+static t_vec3	random_point_in_square(void)
+{
+	const float	x = fract(PLASTIC_RATIO_X * i);
+	const float	y = fract(PLASTIC_RATIO_Y * i);
+
+	return (vec3(x, y, 0.0f));
+}
+
 // Generate a random point in a disk centered at the origin with the given
 // radius.
 
 static t_vec3	random_point_in_disk(float radius)
 {
-	static _Thread_local uint16_t	i;
-	const float						u = fract(PLASTIC_RATIO_X * i);
-	const float						v = fract(PLASTIC_RATIO_Y * i++) * TAU;
-	const float						x = sqrtf(u) * cosf(v) * radius;
-	const float						y = sqrtf(u) * sinf(v) * radius;
+	const t_vec3	p = random_point_in_square();
+	const float		x = sqrtf(p.x) * cosf(p.y * TAU) * radius;
+	const float		y = sqrtf(p.x) * sinf(p.y * TAU) * radius;
 
 	return (vec3(x, y, 0.0f));
 }
 
-# define LDS_3D_X 0.8191725133961644
-# define LDS_3D_Y 0.6710436067037892
-# define LDS_3D_Z 0.5497004779019702
-	static _Thread_local uint16_t	i;
-
 static t_vec3	random_point_in_sphere(float radius)
 {
-	t_vec3							p;
+	const t_vec3	p = random_point_in_square();
+	const float		x = sinf(p.x * M_PI) * cosf(p.y * TAU);
+	const float		y = sinf(p.x * M_PI) * sinf(p.y * TAU);
+	const float		z = cosf(p.x * M_PI);
 
-#if 0
-	const float						u = fract(PLASTIC_RATIO_X * i) * M_PI;
-	const float						v = fract(PLASTIC_RATIO_Y * i++) * TAU;
-	p.x = sinf(u) * cosf(v);
-	p.y = sinf(u) * sinf(v);
-	p.z = cosf(u);
-	return (vec3_scale(p, radius));
-#else
-	while (true)
-	{
-		i++;
-		p.x = fract(LDS_3D_X * i) * 2.0f - 1.0f;
-		p.y = fract(LDS_3D_Y * i) * 2.0f - 1.0f;
-		p.z = fract(LDS_3D_Z * i) * 2.0f - 1.0f;
-		if (vec3_dot(p, p) < 1.0f)
-		{
-			return (vec3_scale(p, radius));
-		}
-	}
-#endif
+	return (vec3_scale(vec3(x, y, z), radius));
 }
 
 static float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
@@ -80,7 +67,8 @@ static t_vec3	object_texcoord(t_object *object, t_vec3 point)
 
 static t_vec3	single_light(t_object *light, t_vec3 rd, t_vec3 n, t_vec3 p)
 {
-	const t_vec3	light_dir = vec3_normalize(vec3_sub(light->pos, p));
+	const t_vec3	light_vec = vec3_sub(light->pos, p);
+	const t_vec3	light_dir = vec3_normalize(light_vec);
 	const t_vec3	half = vec3_normalize(vec3_sub(light_dir, rd));
 	const float		diffuse = saturate(vec3_dot(light_dir, n));
 	const float		specular = 5.0f * powf(fmaxf(0.0f, vec3_dot(n, half)), 30);
@@ -88,6 +76,7 @@ static t_vec3	single_light(t_object *light, t_vec3 rd, t_vec3 n, t_vec3 p)
 
 	color = vec3_scale(light->color, diffuse);
 	color = vec3_add(color, vec3(specular, specular, specular));
+	color = vec3_scale(color, 300.0f / vec3_dot(light_vec, light_vec));
 	return (color);
 }
 
@@ -138,7 +127,7 @@ t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 	while (++i < s->object_count)
 		if (s->objects[i].type == OBJECT_LIGHT)
 		{
-			t_vec3 rand = random_point_in_sphere(1.5f);
+			t_vec3 rand = random_point_in_sphere(2.0f);
 			t_vec3 light_pos = vec3_add(s->objects[i].pos, rand);
 			t_vec3 light_dir = vec3_sub(light_pos, p);
 			if (scene_distance(s, p, light_dir, NULL) >= 1.0f)
@@ -155,7 +144,7 @@ static t_vec3	texturing(t_object *object, t_vec3 point)
 	return (vec3(value, value, value));
 }
 
-static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
+static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd, int limit)
 {
 	t_object	*object;
 	t_vec3		point;
@@ -168,6 +157,18 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd)
 	color = object->color;
 	color = vec3_mul(color, texturing(object, point));
 	color = vec3_mul(color, lighting(object, point, s, rd));
+	if (object->type == OBJECT_SPHERE)
+	{
+		t_vec3 n = object_normal(object, point);
+		n = vec3_scale(n, copysignf(1.0f, -vec3_dot(rd, n)));
+		t_vec3 p = vec3_add(point, vec3_scale(n, 1e-6f));
+		n = vec3_reflect(rd, n);
+		n = vec3_normalize(vec3_add(n, random_point_in_sphere(0.0f)));
+		if (limit > 0)
+			color = trace_scene(s, p, n, limit - 1);
+		else
+			color = vec3(0.0f, 0.0f, 0.0f);
+	}
 	return (color);
 }
 
@@ -184,11 +185,11 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	t_vec3			rt = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
 	t_vec3			ro;
 
-	uint32_t index = (int) x + (int) y * r->image->width;
-	i = index * 2654435769u + r->frame_samples;
+	const uint32_t	index = (int) x + (int) y * r->image->width;
+	i = index + r->frame_samples;
 
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
 	rd = vec3_normalize(vec3_sub(rt, ro));
-	return (trace_scene(r->scene, ro, rd));
+	return (trace_scene(r->scene, ro, rd, 3));
 }
