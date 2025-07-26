@@ -51,7 +51,7 @@ t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 	const float		h = vec3_dot(vec3_sub(p, o->pos), o->normal);
 	const t_vec3	c = vec3_add(o->pos, vec3_scale(o->normal, h));
 
-	if (fabsf(h) >= o->height * 0.5f - 1e-6f)
+	if (fabsf(h) >= o->height * 0.5f - 1e-4f)
 		return (o->normal);
 	return (vec3_scale(vec3_sub(p, c), 1.0f / o->radius));
 }

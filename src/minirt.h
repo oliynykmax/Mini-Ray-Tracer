@@ -15,7 +15,7 @@
 # include "../assets/libft/libft.h"
 
 // The number of rendering threads to use.
-# define THREAD_COUNT 6
+# define THREAD_COUNT 12
 
 // Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
@@ -36,7 +36,6 @@
 // "plastic ratio," which is the solution to the equation x³ = x + 1. This
 // number has unique properties that are useful for generating points that look
 // "random" but don't clump together like truly randomly generated points do.
-
 # define PLASTIC_RATIO_X 0.7548776662466927 // (plastic ratio)¯¹
 # define PLASTIC_RATIO_Y 0.5698402909980532 // (plastic ratio)¯²
 
@@ -46,7 +45,6 @@
 typedef enum e_object_type	t_object_type;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
-typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
@@ -159,17 +157,6 @@ struct s_render
 	pthread_mutex_t	mutex;					// Protects common render state
 };
 
-// Data for one traced ray.
-struct s_ray
-{
-	t_vec3		ro;		// Ray origin
-	t_vec3		rd;		// Ray direction (normalized)
-	float		depth;	// Distance to closest point of intersection
-	t_vec3		point;	// Position of closest point of intersection
-	t_vec3		color;	// Color at that point
-	t_vec3		normal;	// Surface normal at that point
-};
-
 // Data for one render thread.
 struct s_thread
 {
@@ -210,17 +197,11 @@ t_quat		quat(float x, float y, float z, float w);
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
 t_quat		quat_multiply(t_quat a, t_quat b);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
-t_quat		quat_inverse(t_quat q);
 
 // sphere.c
 float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
 t_vec3		sphere_normal(t_object *s, t_vec3 p);
 t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
-
-// shouldn't be here lol
-void		trace_plane(t_ray *ray, t_object *plane);
-void		trace_sphere(t_ray *ray, t_object *sphere);
-void		trace_cylinder(t_ray *r, t_object *s);
 
 // threads.c
 bool		threads_init(t_render *r);
