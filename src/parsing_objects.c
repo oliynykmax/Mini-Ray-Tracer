@@ -15,6 +15,7 @@ bool	parse_sphere(char **line, t_scene *sc)
 	if (!mrt_assert(obj->radius > 0.0f, "Sphere radius must be positive\n"))
 		return (true);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
+	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
 }
@@ -34,6 +35,7 @@ bool	parse_plane(char **line, t_scene *sc)
 			"Plane normal must be a unit vector\n"))
 		return (true);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
+	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
 }
@@ -59,6 +61,7 @@ bool	parse_cone(char **line, t_scene *sc)
 		return (true);
 	obj->angle = atan2(obj->radius, obj->height);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
+	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
 }
