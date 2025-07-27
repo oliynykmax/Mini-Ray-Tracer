@@ -30,6 +30,14 @@ t_quat	quat_multiply(t_quat a, t_quat b)
 	return (quat(imag.x, imag.y, imag.z, real));
 }
 
+// Invert a quaternion. Conceptually, this does the opposite rotation.
+
+t_quat	quat_inverse(t_quat q)
+{
+	q.xyz = vec3_scale(q.xyz, -1.0f);
+	return (q);
+}
+
 // Apply the rotation represented by the quaternion `q` to the 3D vector `v`.
 
 t_vec3	quat_rotate_vec3(t_quat q, t_vec3 v)
