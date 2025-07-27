@@ -5,17 +5,16 @@
 static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
+	t_object *const	object = &r->scene->objects[2];
+	t_quat			rotate;
 
 	pthread_mutex_lock(&r->mutex);
-
-	t_object *cylinder = &r->scene->objects[3];
 	if (mlx_is_key_down(r->mlx, MLX_KEY_J))
 	{
-		t_quat rot = quat_from_axis_angle(r->camera_x, 0.02f);
-		cylinder->rot = quat_multiply(rot, cylinder->rot);
+		rotate = quat_from_axis_angle(vec3(0.0f, 1.0f, 0.0f), 0.03f);
+		object->rot = quat_multiply(rotate, object->rot);
 		r->frame_samples = 0;
 	}
-
 	camera_update(r);
 	show_stats_in_window_title(r);
 	r->jobs_available += THREAD_COUNT;

@@ -161,7 +161,7 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd, int limit)
 	color = object->color;
 	color = vec3_mul(color, texturing(object, point));
 	color = vec3_mul(color, lighting(object, point, s, rd));
-	if (object->type == OBJECT_SPHERE)
+	if (object->type == OBJECT_CYLINDER)
 	{
 		t_vec3 n = object_normal(object, point);
 		n = vec3_scale(n, copysignf(1.0f, -vec3_dot(rd, n)));
