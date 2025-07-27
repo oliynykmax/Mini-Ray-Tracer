@@ -1,12 +1,5 @@
 #include "minirt.h"
 
-// Create a quaternion from imaginary and real coordinates.
-
-t_quat	quat(float x, float y, float z, float w)
-{
-	return ((t_quat){{x, y, z, w}});
-}
-
 // Create a quaternion from an axis and and an angle (in radians).
 
 t_quat	quat_from_axis_angle(t_vec3 axis, float angle)
@@ -14,7 +7,18 @@ t_quat	quat_from_axis_angle(t_vec3 axis, float angle)
 	const float	s = sinf(angle * 0.5f);
 	const float	c = cosf(angle * 0.5f);
 
-	return (quat(axis.x * s, axis.y * s, axis.z * s, c));
+	return ((t_quat){{axis.x * s, axis.y * s, axis.z * s, c}});
+}
+
+// Create a quaternion from a direction vector.
+
+t_quat	quat_from_direction(t_vec3 direction)
+{
+	const t_vec3	up = vec3(0.0f, -1.0f, 0.0f);
+	const t_vec3	axis = vec3_cross(direction, up);
+	const float		angle = acosf(vec3_dot(direction, up));
+
+	return (quat_from_axis_angle(axis, angle));
 }
 
 // Multiply two quaternions. This composes the rotations represented by the two
@@ -27,7 +31,7 @@ t_quat	quat_multiply(t_quat a, t_quat b)
 	const t_vec3	imag = vec3_add(vec3_cross(a.xyz, b.xyz), vec3_add(ab, ba));
 	const float		real = a.w * b.w - vec3_dot(a.xyz, b.xyz);
 
-	return (quat(imag.x, imag.y, imag.z, real));
+	return ((t_quat){{imag.x, imag.y, imag.z, real}});
 }
 
 // Invert a quaternion. Conceptually, this does the opposite rotation.

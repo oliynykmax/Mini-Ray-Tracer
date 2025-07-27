@@ -105,7 +105,6 @@ struct	s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/cone)
 	float			height;	// Height (cylinder/cone)
-	t_vec3			normal;	// Normal/axis (plane/cylinder/cone)
 	float			angle;	// Angle (cone)
 };
 
@@ -194,8 +193,8 @@ t_vec3		plane_normal(t_object *o, t_vec3 p);
 t_vec3		plane_texcoord(t_object *o, t_vec3 p);
 
 // quaternion.c
-t_quat		quat(float x, float y, float z, float w);
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
+t_quat		quat_from_direction(t_vec3 direction);
 t_quat		quat_multiply(t_quat a, t_quat b);
 t_quat		quat_inverse(t_quat q);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
