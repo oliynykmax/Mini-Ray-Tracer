@@ -99,13 +99,14 @@ enum	e_object_type
 // Data describing one geometric object or light in the scene.
 struct	s_object
 {
-	t_object_type	type; // Object type (one of OBJECT_xxx)
-	t_vec3			pos;
-	t_vec3			color; // Color of the object
-	float			radius; // Radius (sphere/cylinder/cone)
-	float			height; // Height (cylinder/cone)
-	t_vec3			normal; // Normal/axis (plane/cylinder/cone)
-	float			angle; // Angle (cone)
+	t_object_type	type;	// Object type (one of OBJECT_xxx)
+	t_vec3			pos;	// Object position in world coordinates
+	t_quat			rot;	// Object rotation relative to world coordinates
+	t_vec3			color;	// Surface color
+	float			radius;	// Radius (sphere/cylinder/cone)
+	float			height;	// Height (cylinder/cone)
+	t_vec3			normal;	// Normal/axis (plane/cylinder/cone)
+	float			angle;	// Angle (cone)
 };
 
 // Data describing the objects in the scene.
@@ -196,6 +197,7 @@ t_vec3		plane_texcoord(t_object *o, t_vec3 p);
 t_quat		quat(float x, float y, float z, float w);
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
 t_quat		quat_multiply(t_quat a, t_quat b);
+t_quat		quat_inverse(t_quat q);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 
 // sphere.c

@@ -40,10 +40,12 @@ static float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
 		cylinder_distance,
 	};
 
+	ro = quat_rotate_vec3(quat_inverse(object->rot), vec3_sub(ro, object->pos));
+	rd = quat_rotate_vec3(quat_inverse(object->rot), rd);
 	return (functions[object->type](object, ro, rd));
 }
 
-static t_vec3	object_normal(t_object *object, t_vec3 point)
+static t_vec3	object_normal(t_object *obj, t_vec3 point)
 {
 	static const t_normal_function	functions[] = {
 		plane_normal,
@@ -51,10 +53,11 @@ static t_vec3	object_normal(t_object *object, t_vec3 point)
 		cylinder_normal,
 	};
 
-	return (functions[object->type](object, point));
+	point = quat_rotate_vec3(quat_inverse(obj->rot), vec3_sub(point, obj->pos));
+	return (quat_rotate_vec3(obj->rot, functions[obj->type](obj, point)));
 }
 
-static t_vec3	object_texcoord(t_object *object, t_vec3 point)
+static t_vec3	object_texcoord(t_object *obj, t_vec3 point)
 {
 	static const t_normal_function	functions[] = {
 		plane_texcoord,
@@ -62,7 +65,8 @@ static t_vec3	object_texcoord(t_object *object, t_vec3 point)
 		cylinder_texcoord,
 	};
 
-	return (functions[object->type](object, point));
+	point = quat_rotate_vec3(quat_inverse(obj->rot), vec3_sub(point, obj->pos));
+	return (functions[obj->type](obj, point));
 }
 
 static t_vec3	single_light(t_object *light, t_vec3 rd, t_vec3 n, t_vec3 p)
@@ -191,5 +195,5 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
 	rd = vec3_normalize(vec3_sub(rt, ro));
-	return (trace_scene(r->scene, ro, rd, 3));
+	return (trace_scene(r->scene, ro, rd, 1));
 }
