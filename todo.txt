@@ -1,4 +1,19 @@
 =========================
+      OTHER TASKS
+=========================
+
+[ ] Shorten vec3 function names
+[ ] Add more parser rules
+	[ ] Camera
+		[ ] Focus depth
+		[ ] Aperture size
+	[ ] Light
+		[ ] Radius
+		[ ] Allow brightness over 1
+[ ] Visualize lights as glowing spheres
+[ ] Draw a grid for move/resize/rotate UI
+
+=========================
      MANDATORY LEVEL
 =========================
 
@@ -9,7 +24,7 @@
 [X] Double-sided intersections
 [X] Ambient lighting
 [X] Diffuse lighting
-[ ] Hard shadows
+[X] Hard shadows
 [ ] Object resizing
 	[ ] Sphere diameter
 	[ ] Cylinder diameter
@@ -51,12 +66,12 @@
 [X] Antialiasing
 [X] Dithering
 [X] Depth of field
-[ ] Soft shadows
+[X] Soft shadows
+[X] Metallic/reflective surfaces
+[ ] Offline rendering
 [ ] Physically based lighting
 [ ] Directional lights
 [ ] Tone mapping
 [ ] Saving a map that's been edited
-[ ] Metallic/reflective surfaces
-[ ] Offline rendering
 [ ] Refractive surfaces (lenses/glass)
 [ ] SIMD optimization?
