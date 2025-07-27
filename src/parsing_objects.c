@@ -23,19 +23,20 @@ bool	parse_sphere(char **line, t_scene *sc)
 bool	parse_plane(char **line, t_scene *sc)
 {
 	t_object	*obj;
+	t_vec3		normal;
 
 	if (array_len(line) != 4 || objects_malloc_manager(sc))
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_PLANE;
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&obj->normal, -1, 1) || !parse_vec3(line[3], &obj->color, 0, 255))
+			&normal, -1, 1) || !parse_vec3(line[3], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec3_length(obj->normal) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"Plane normal must be a unit vector\n"))
 		return (true);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	obj->rot = quat_from_direction(normal);
 	sc->object_count++;
 	return (false);
 }
@@ -43,15 +44,16 @@ bool	parse_plane(char **line, t_scene *sc)
 bool	parse_cone(char **line, t_scene *sc)
 {
 	t_object	*obj;
+	t_vec3		normal;
 
 	if (array_len(line) != 6 || objects_malloc_manager(sc))
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_CONE;
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&obj->normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
+			&normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec3_length(obj->normal) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"Cone axis must be a unit vector\n"))
 		return (true);
 	obj->radius = ft_atof(line[3]) / 2.0;
@@ -61,7 +63,7 @@ bool	parse_cone(char **line, t_scene *sc)
 		return (true);
 	obj->angle = atan2(obj->radius, obj->height);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	obj->rot = quat_from_direction(normal);
 	sc->object_count++;
 	return (false);
 }
@@ -69,15 +71,16 @@ bool	parse_cone(char **line, t_scene *sc)
 bool	parse_cylinder(char **line, t_scene *sc)
 {
 	t_object	*obj;
+	t_vec3		axis;
 
 	if (array_len(line) != 6 || objects_malloc_manager(sc))
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_CYLINDER;
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&obj->normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
+			&axis, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec3_length(obj->normal) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(axis) - 1.0f) < 0.001f,
 			"Cylinder axis must be a unit vector\n"))
 		return (true);
 	obj->radius = ft_atof(line[3]) / 2.0;
@@ -87,7 +90,7 @@ bool	parse_cylinder(char **line, t_scene *sc)
 			"Cylinder height must be positive\n"))
 		return (true);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	obj->rot = quat_from_direction(axis);
 	sc->object_count++;
 	return (false);
 }
