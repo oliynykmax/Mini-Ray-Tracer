@@ -33,6 +33,7 @@ bool	parse_point_light(char **line, t_scene *sc)
 			"Light brightness must be between 0.0 and 1.0\n"))
 		return (true);
 	obj->color = vec3_scale(vec3_scale(obj->color, 1.0 / 255.0), brightness);
+	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
 }
