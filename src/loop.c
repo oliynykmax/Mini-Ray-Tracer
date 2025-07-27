@@ -8,15 +8,13 @@ static void	loop_hook(void *param)
 
 	pthread_mutex_lock(&r->mutex);
 
-	static t_quat orient = {{0.0f, 0.0f, 0.0f, 1.0f}};
+	t_object *cylinder = &r->scene->objects[3];
 	if (mlx_is_key_down(r->mlx, MLX_KEY_J))
 	{
 		t_quat rot = quat_from_axis_angle(r->camera_x, 0.02f);
-		orient = quat_multiply(rot, orient);
+		cylinder->rot = quat_multiply(rot, cylinder->rot);
 		r->frame_samples = 0;
 	}
-	t_object *cylinder = &r->scene->objects[3];
-	cylinder->normal = quat_rotate_vec3(orient, vec3(0,1,0));
 
 	camera_update(r);
 	show_stats_in_window_title(r);

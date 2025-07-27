@@ -84,6 +84,7 @@ bool	parse_cylinder(char **line, t_scene *sc)
 			"Cylinder height must be positive\n"))
 		return (true);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
+	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
 }

@@ -4,17 +4,12 @@
 
 static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	oc = vec3_sub(ro, o->pos);
-	const float		rn = vec3_dot(rd, o->normal);
-	const float		on = vec3_dot(oc, o->normal);
-	const float		c[] = {
-		(vec3_dot(rd, rd) - rn * rn),
-		(vec3_dot(rd, oc) - rn * on) * 2.0f,
-		(vec3_dot(oc, oc) - on * on) - o->radius * o->radius,
-	};
-	const float		t = solve_quadratic(c[0], c[1], c[2]);
+	const float	a = vec3_dot(rd, rd) - rd.y * rd.y;
+	const float	b = (vec3_dot(rd, ro) - rd.y * ro.y) * 2.0f;
+	const float	c = vec3_dot(ro, ro) - ro.y * ro.y - o->radius * o->radius;
+	const float	t = solve_quadratic(a, b, c);
 
-	if (fabsf(on + t * rn) > o->height * 0.5f)
+	if (fabsf(ro.y + t * rd.y) > o->height * 0.5f)
 		return (1e9f);
 	return (t);
 }
@@ -23,12 +18,11 @@ static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 
 static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 {
-	const t_vec3	c = vec3_add(o->pos, vec3_scale(o->normal, h));
-	const float		denom = vec3_dot(o->normal, rd);
-	const float		t = vec3_dot(vec3_sub(c, ro), o->normal) / denom;
-	const t_vec3	p = vec3_sub(c, vec3_add(ro, vec3_scale(rd, t)));
+	const float		t = (h - ro.y) / rd.y;
+	const float		x = ro.x + t * rd.x;
+	const float		z = ro.z + t * rd.z;
 
-	if (t < 0.0f || vec3_dot(p, p) > o->radius * o->radius)
+	if (t < 0.0f || x * x + z * z > o->radius * o->radius)
 		return (1e9f);
 	return (t);
 }
@@ -48,21 +42,16 @@ float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 
 t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 {
-	const float		h = vec3_dot(vec3_sub(p, o->pos), o->normal);
-	const t_vec3	c = vec3_add(o->pos, vec3_scale(o->normal, h));
-
-	if (fabsf(h) >= o->height * 0.5f - 1e-4f)
-		return (o->normal);
-	return (vec3_scale(vec3_sub(p, c), 1.0f / o->radius));
+	if (fabsf(p.y) < o->height * 0.5f - 1e-3f)
+		return (vec3_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius));
+	return (vec3(0.0f, 1.0f, 0.0f));
 }
 
 // Get the texture coordinates of a cylinder at a point `p` on its surface.
 
 t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
 {
-	const t_vec3	d = vec3_sub(p, o->pos);
-	const float		u = vec3_dot(d, o->normal);
-	const float		v = atan2f(d.x, d.z) / M_PI * 0.5f + 0.5f;
-
-	return (vec3(u, v, 0.0f));
+	p.y = clamp(p.y, -o->height * 0.499f, o->height * 0.499f);
+	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
+	return (p);
 }
