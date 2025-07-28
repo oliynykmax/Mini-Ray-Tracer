@@ -34,12 +34,12 @@ t_quat	quat_multiply(t_quat a, t_quat b)
 	return ((t_quat){{imag.x, imag.y, imag.z, real}});
 }
 
-// Invert a quaternion. Conceptually, this does the opposite rotation.
+// Invert a quaternion. Conceptually, this reverses the rotation that the
+// quaternion represents.
 
 t_quat	quat_inverse(t_quat q)
 {
-	q.xyz = vec3_scale(q.xyz, -1.0f);
-	return (q);
+	return ((t_quat){{-q.x, -q.y, -q.z, q.w}});
 }
 
 // Apply the rotation represented by the quaternion `q` to the 3D vector `v`.
