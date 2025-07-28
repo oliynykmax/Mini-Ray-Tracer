@@ -4,9 +4,9 @@
 
 static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
-	const float	a = vec3_dot(rd, rd) - rd.y * rd.y;
-	const float	b = (vec3_dot(rd, ro) - rd.y * ro.y) * 2.0f;
-	const float	c = vec3_dot(ro, ro) - ro.y * ro.y - o->radius * o->radius;
+	const float	a = (rd.x * rd.x + rd.z * rd.z);
+	const float	b = (rd.x * ro.x + rd.z * ro.z) * 2.0f;
+	const float	c = (ro.x * ro.x + ro.z * ro.z) - o->radius * o->radius;
 	const float	t = solve_quadratic(a, b, c);
 
 	if (fabsf(ro.y + t * rd.y) > o->height * 0.5f)
@@ -42,7 +42,7 @@ float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 
 t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 {
-	if (fabsf(p.y) < o->height * 0.5f - 1e-3f)
+	if (fabsf(p.y) < o->height * 0.5f - 1e-6f)
 		return (vec3_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius));
 	return (vec3(0.0f, 1.0f, 0.0f));
 }
@@ -51,7 +51,7 @@ t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 
 t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
 {
-	p.y = clamp(p.y, -o->height * 0.499f, o->height * 0.499f);
+	p.y = clamp(p.y, -o->height * 0.5f, o->height * 0.5f);
 	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 	return (p);
 }
