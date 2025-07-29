@@ -6,6 +6,8 @@ float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
 		plane_distance,
 		sphere_distance,
 		cylinder_distance,
+		NULL,
+		sphere_distance,
 	};
 
 	ro = quat_rotate_vec3(quat_inverse(object->rot), vec3_sub(ro, object->pos));
