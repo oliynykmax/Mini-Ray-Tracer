@@ -59,8 +59,8 @@ static t_vec3	trace_scene(t_ray *r)
 
 t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
 {
-	const float		u = (x + r->jitter_x * jitter) / r->image->width;
-	const float		v = (y + r->jitter_y * jitter) / r->image->height;
+	const float		u = (x + r->jitter.x * jitter) / r->image->width;
+	const float		v = (y + r->jitter.y * jitter) / r->image->height;
 	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
 	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
 

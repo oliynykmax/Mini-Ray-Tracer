@@ -90,7 +90,5 @@ void	camera_update(t_render *r)
 	camera_update_viewport(r);
 	if (camera_keyboard_movement(r))
 		r->frame_samples = 0;
-	r->jitter_x = fract(r->frame_samples * PLASTIC_RATIO_X);
-	r->jitter_y = fract(r->frame_samples * PLASTIC_RATIO_Y);
-	r->frame_samples++;
+	r->jitter = random_point_in_square(r->frame_samples++);
 }
