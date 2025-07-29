@@ -12,8 +12,6 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 	t_min = 1e9f;
 	while (++i < s->object_count)
 	{
-		if (s->objects[i].type == OBJECT_LIGHT)
-			continue ;
 		t = object_distance(&s->objects[i], ro, rd);
 		if (t < 0.0f || t >= t_min)
 			continue ;
@@ -48,6 +46,8 @@ static t_vec3	trace_scene(t_ray *r)
 
 	if (object == NULL)
 		return (r->scene->ambient);
+	if (object->type == OBJECT_LIGHT)
+		return (object->color);
 	point = vec3_add(r->ro, vec3_scale(r->rd, t));
 	color = object->color;
 	color = vec3_mul(color, apply_texture(object, point));
