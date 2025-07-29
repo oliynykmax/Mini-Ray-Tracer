@@ -1,11 +1,13 @@
 #include "minirt.h"
 
-	static _Thread_local uint16_t	i;
+static _Thread_local uint16_t	rng;
+
+// Generate a random point in the unit square [0, 1]².
 
 static t_vec3	random_point_in_square(void)
 {
-	const float	x = fract(PLASTIC_RATIO_X * i);
-	const float	y = fract(PLASTIC_RATIO_Y * i);
+	const float	x = fract(PLASTIC_RATIO_X * rng);
+	const float	y = fract(PLASTIC_RATIO_Y * rng);
 
 	return (vec3(x, y, 0.0f));
 }
@@ -22,7 +24,10 @@ static t_vec3	random_point_in_disk(float radius)
 	return (vec3(x, y, 0.0f));
 }
 
-static t_vec3	random_point_in_sphere(float radius)
+// Generate a random point on a sphere centered at the origin with the given
+// radius.
+
+static t_vec3	random_point_on_sphere(float radius)
 {
 	const t_vec3	p = random_point_in_square();
 	const float		x = sinf(p.x * M_PI) * cosf(p.y * TAU);
@@ -129,14 +134,16 @@ t_vec3	lighting(t_object *object, t_vec3 p, t_scene *s, t_vec3 rd)
 	n = vec3_scale(n, copysignf(1.0f, -vec3_dot(rd, n)));
 	p = vec3_add(p, vec3_scale(n, 1e-5f));
 	while (++i < s->object_count)
+	{
 		if (s->objects[i].type == OBJECT_LIGHT)
 		{
-			t_vec3 rand = random_point_in_sphere(2.0f);
+			t_vec3 rand = random_point_on_sphere(2.0f);
 			t_vec3 light_pos = vec3_add(s->objects[i].pos, rand);
 			t_vec3 light_dir = vec3_sub(light_pos, p);
 			if (scene_distance(s, p, light_dir, NULL) >= 1.0f)
 				light = vec3_add(light, single_light(&s->objects[i], rd, n, p));
 		}
+	}
 	return (light);
 }
 
@@ -167,7 +174,7 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd, int limit)
 		n = vec3_scale(n, copysignf(1.0f, -vec3_dot(rd, n)));
 		t_vec3 p = vec3_add(point, vec3_scale(n, 1e-6f));
 		n = vec3_reflect(rd, n);
-		n = vec3_normalize(vec3_add(n, random_point_in_sphere(0.0f)));
+		n = vec3_normalize(vec3_add(n, random_point_on_sphere(0.0f)));
 		if (limit > 0)
 			color = trace_scene(s, p, n, limit - 1);
 		else
@@ -176,24 +183,30 @@ static t_vec3	trace_scene(t_scene *s, t_vec3 ro, t_vec3 rd, int limit)
 	return (color);
 }
 
+t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
+{
+	const float		u = (x + r->jitter_x * jitter) / r->image->width;
+	const float		v = (y + r->jitter_y * jitter) / r->image->height;
+	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
+	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
+
+	return (vec3_normalize(vec3_lerp(v0, v1, v)));
+}
+
 // Trace the color of the pixel at (x, y) in the image.
 
 t_vec3	trace_pixel(t_render *r, float x, float y)
 {
-	const float		u = (r->jitter_x + x) / r->image->width;
-	const float		v = (r->jitter_y + y) / r->image->height;
-	const t_vec3	v0 = vec3_lerp(r->viewport[0], r->viewport[1], u);
-	const t_vec3	v1 = vec3_lerp(r->viewport[2], r->viewport[3], u);
-	const t_vec3	disk = random_point_in_disk(CAMERA_APERTURE);
-	t_vec3			rd = vec3_lerp(v0, v1, v);
-	t_vec3			rt = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
-	t_vec3			ro;
+	t_vec3	disk;
+	t_vec3	ro;
+	t_vec3	rd;
 
-	const uint32_t	index = (int) x + (int) y * r->image->width;
-	i = index + r->frame_samples;
-
+	rng = r->frame_samples + (int) x + (int) y * r->image->width;
+	disk = random_point_in_disk(CAMERA_APERTURE);
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
-	rd = vec3_normalize(vec3_sub(rt, ro));
+	rd = get_viewport_ray(r, x, y, true);
+	rd = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
+	rd = vec3_normalize(vec3_sub(rd, ro));
 	return (trace_scene(r->scene, ro, rd, 1));
 }
