@@ -30,7 +30,7 @@
 
 // Camera parameters for depth of field.
 # define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
-# define CAMERA_APERTURE 0.05 // Camera aperture size (TODO: Add to parser)
+# define CAMERA_APERTURE 0 // Camera aperture size (TODO: Add to parser)
 
 // Constants used for generating random points. The number 1.324… is the
 // "plastic ratio," which is the solution to the equation x³ = x + 1. This
