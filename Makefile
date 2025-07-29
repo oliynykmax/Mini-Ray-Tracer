@@ -18,14 +18,18 @@ SRCS := \
 	src/cleanup.c \
 	src/cylinder.c \
 	src/input.c \
+	src/lighting.c \
 	src/loop.c \
 	src/main.c \
 	src/math.c \
+	src/object.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/plane.c \
 	src/quaternion.c \
+	src/random.c \
 	src/sphere.c \
+	src/texturing.c \
 	src/threads.c \
 	src/title.c \
 	src/trace.c \
