@@ -61,7 +61,6 @@ bool	parse_cone(char **line, t_scene *sc)
 	if (!mrt_assert(obj->radius > 0.0f, "Cone radius must be positive\n")
 		|| !mrt_assert(obj->height > 0.0f, "Cone height must be positive\n"))
 		return (true);
-	obj->angle = atan2(obj->radius, obj->height);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_direction(normal);
 	sc->object_count++;

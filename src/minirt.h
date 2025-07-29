@@ -106,7 +106,6 @@ struct s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/cone)
 	float			height;	// Height (cylinder/cone)
-	float			angle;	// Angle (cone)
 };
 
 struct s_ray
@@ -177,7 +176,10 @@ struct s_thread
 
 // camera.c
 void		camera_update(t_render *r);
-
+// cone.c
+float		cone_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+t_vec3		cone_normal(t_object *o, t_vec3 p);
+t_vec3		cone_texcoord(t_object *o, t_vec3 p);
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		cylinder_normal(t_object *o, t_vec3 p);
@@ -261,7 +263,7 @@ void		cleanup_scene(t_scene *sc);
 /* array	 utils */
 int			array_len(char **array);
 void		free_array(char **array);
-/* vecto	r parsing utils */
+/* vector parsing utils */
 double		ft_atof(const char *str);
 bool		vec3_in_range(t_vec3 v, float lower, float upper);
 bool		parse_vec3(char *str, t_vec3 *out, float min, float max);
