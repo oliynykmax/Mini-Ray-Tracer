@@ -30,7 +30,7 @@
 
 // Camera parameters for depth of field.
 # define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
-# define CAMERA_APERTURE 0.0 // Camera aperture size (TODO: Add to parser)
+# define CAMERA_APERTURE 0.05 // Camera aperture size (TODO: Add to parser)
 
 // Constants used for generating random points. The number 1.324… is the
 // "plastic ratio," which is the solution to the equation x³ = x + 1. This
@@ -45,6 +45,7 @@
 typedef enum e_object_type	t_object_type;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
+typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
@@ -97,7 +98,7 @@ enum	e_object_type
 };
 
 // Data describing one geometric object or light in the scene.
-struct	s_object
+struct s_object
 {
 	t_object_type	type;	// Object type (one of OBJECT_xxx)
 	t_vec3			pos;	// Object position in world coordinates
@@ -106,6 +107,14 @@ struct	s_object
 	float			radius;	// Radius (sphere/cylinder/cone)
 	float			height;	// Height (cylinder/cone)
 	float			angle;	// Angle (cone)
+};
+
+struct s_ray
+{
+	uint16_t	rng;	// Index used for random number generation
+	t_vec3		ro;		// Ray origin
+	t_vec3		rd;		// Ray direction
+	int			limit;	// Remaining ray bounces
 };
 
 // Data describing the objects in the scene.
