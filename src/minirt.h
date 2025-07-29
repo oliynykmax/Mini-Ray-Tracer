@@ -32,13 +32,6 @@
 # define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
 # define CAMERA_APERTURE 0.0 // Camera aperture size (TODO: Add to parser)
 
-// Constants used for generating random points. The number 1.324… is the
-// "plastic ratio," which is the solution to the equation x³ = x + 1. This
-// number has unique properties that are useful for generating points that look
-// "random" but don't clump together like truly randomly generated points do.
-# define PLASTIC_RATIO_X 0.7548776662466927 // (plastic ratio)¯¹
-# define PLASTIC_RATIO_Y 0.5698402909980532 // (plastic ratio)¯²
-
 # define TAU 6.283185307179586 // 2π
 
 // Typedefs for enum/structure/union types.
@@ -155,8 +148,7 @@ struct s_render
 	t_vec3			*frame;					// Floating point frame buffer
 	size_t			frame_size;				// Allocated size of the frame
 	int				frame_samples;			// Number of accumulated samples
-	float			jitter_x;				// Horizontal subpixel jitter
-	float			jitter_y;				// Vertical subpixel jitter
+	t_vec3			jitter;					// Subpixel jitter
 	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
 	int				threads_started;		// How many threads were initialized
 	bool			threads_stop;			// Set to stop the render threads

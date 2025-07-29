@@ -1,11 +1,17 @@
 #include "minirt.h"
 
-// Generate a random point in the unit square [0, 1]².
+// Generate a random point in the unit square [0, 1]². Uses a low-discrepancy
+// sequence to generate the coordinates of the point. The constants used to
+// randomize the x and y coordinates are equal to p¯¹ and  p¯², where p is the
+// "plastic ratio." The plastic ratio is the unique real solution to the
+// equation x³ = x + 1, a number with properties that are useful for generating
+// numbers that look "random," but don't cluster together like truly random
+// numbers do.
 
 t_vec3	random_point_in_square(uint16_t rng)
 {
-	const float	x = fract(PLASTIC_RATIO_X * rng);
-	const float	y = fract(PLASTIC_RATIO_Y * rng);
+	const float	x = fract(0.7548776662466927 * rng);
+	const float	y = fract(0.5698402909980532 * rng);
 
 	return (vec3(x, y, 0.0f));
 }
