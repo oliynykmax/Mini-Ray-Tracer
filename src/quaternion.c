@@ -14,9 +14,9 @@ t_quat	quat_from_axis_angle(t_vec3 axis, float angle)
 
 t_quat	quat_from_direction(t_vec3 direction)
 {
-	const t_vec3	up = vec3(0.0f, -1.0f, 0.0f);
-	const t_vec3	axis = vec3_cross(direction, up);
-	const float		angle = acosf(vec3_dot(direction, up));
+	const t_vec3	ref = vec3(0.0f, 1.0f, 0.0f);
+	const t_vec3	axis = vec3_cross(direction, ref);
+	const float		angle = acosf(vec3_dot(direction, ref));
 
 	return (quat_from_axis_angle(axis, angle));
 }
