@@ -29,18 +29,18 @@
 	[ ] Sphere diameter
 	[ ] Cylinder diameter
 	[ ] Cylinder height
-	[ ] Cone diameter
-	[ ] Cone height
+	[ ] para diameter
+	[ ] para height
 [ ] Object rotation
 	[ ] Plane
 	[ ] Sphere
 	[ ] Cylinder
-	[ ] Cone
+	[ ] para
 [ ] Object translation
 	[ ] Plane
 	[ ] Sphere
 	[ ] Cylinder
-	[ ] Cone
+	[ ] para
 
 =========================
        BONUS LEVEL
@@ -50,12 +50,12 @@
 [X] Multiple lights
 [X] Colored lights
 [X] Checkboard texture
-[ ] Cone shape
+[ ] para shape
 [ ] UV mapping
 	[ ] Sphere
 	[ ] Plane
 	[ ] Cylinder
-	[ ] Cone
+	[X] para
 [ ] Bump mapping
 
 =========================

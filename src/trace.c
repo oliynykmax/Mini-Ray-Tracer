@@ -43,7 +43,7 @@ static float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
 		plane_distance,
 		sphere_distance,
 		cylinder_distance,
-		cone_distance,
+		para_distance,
 	};
 
 	ro = quat_rotate_vec3(quat_inverse(object->rot), vec3_sub(ro, object->pos));
@@ -57,7 +57,7 @@ static t_vec3	object_normal(t_object *obj, t_vec3 point)
 		plane_normal,
 		sphere_normal,
 		cylinder_normal,
-		cone_normal,
+		para_normal,
 	};
 
 	point = quat_rotate_vec3(quat_inverse(obj->rot), vec3_sub(point, obj->pos));
@@ -70,7 +70,7 @@ static t_vec3	object_texcoord(t_object *obj, t_vec3 point)
 		plane_texcoord,
 		sphere_texcoord,
 		cylinder_texcoord,
-		cone_texcoord,
+		para_texcoord,
 	};
 
 	point = quat_rotate_vec3(quat_inverse(obj->rot), vec3_sub(point, obj->pos));
