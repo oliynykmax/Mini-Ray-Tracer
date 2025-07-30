@@ -16,12 +16,12 @@ SRCS := \
 	src/assert.c \
 	src/camera.c \
 	src/cleanup.c \
-	src/paraboloid.c \
 	src/cylinder.c \
 	src/input.c \
 	src/loop.c \
 	src/main.c \
 	src/math.c \
+	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/plane.c \
@@ -69,7 +69,7 @@ clean:
 	$(MAKE) --no-print-directory -C $(LIBFT_DIR) clean
 
 fclean: clean
-	echo "🗑️  Removing $(NAME)"
+	echo "🗑️ Removing $(NAME)"
 	rm -f $(NAME)
 	$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
 

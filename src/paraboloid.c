@@ -1,22 +1,16 @@
 #include "minirt.h"
 
 // Body intersection: ray vs para shell
-
 static float	body_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
-	float	k;
-	float	a;
-	float	b;
-	float	t;
-	float	y;
+	const float	k = (o->radius * o->radius) / o->height;
+	const float	a = rd.x * rd.x + rd.z * rd.z;
+	const float	b = 2.0f * (ro.x * rd.x + ro.z * rd.z) - k * rd.y;
+	const float	c = (ro.x * ro.x + ro.z * ro.z) - k * (ro.y + 0.5f * o->height);
+	const float	t = solve_quadratic(a, b, c);
 
-	k = (o->radius * o->radius) / o->height;
-	ro.y += 0.5f * o->height;
-	a = rd.x * rd.x + rd.z * rd.z;
-	b = 2.0f * (ro.x * rd.x + ro.z * rd.z) - k * rd.y;
-	t = solve_quadratic(a, b, ro.x * ro.x + ro.z * ro.z - k * ro.y);
-	y = ro.y + t * rd.y;
-	if (t < 0.0f || y < 0.0f || y > o->height)
+	if (t < 0.0f || (ro.y + t * rd.y) < -0.5f * o->height || (ro.y + t
+			* rd.y) > 0.5f * o->height)
 		return (1e9f);
 	return (t);
 }
@@ -36,9 +30,10 @@ static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 // Full intersection function
 float	para_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
-	ro.y -= 0.5f * o->height;
-	return (fminf(body_distance(o, ro, rd), disk_distance(o, ro, rd, +0.5f
-				* o->height)));
+	const float	body = body_distance(o, ro, rd);
+	const float	top_cap = disk_distance(o, ro, rd, +0.5f * o->height);
+
+	return (fminf(body, top_cap));
 }
 
 t_vec3	para_normal(t_object *o, t_vec3 p)
@@ -47,14 +42,12 @@ t_vec3	para_normal(t_object *o, t_vec3 p)
 
 	if (fabsf(p.y - 0.5f * o->height) < 1e-4f)
 		return (vec3(0, 1, 0));
-	p.y += 0.5f * o->height;
-	return (vec3_normalize(vec3(p.x, -k, p.z)));
+	return (vec3_normalize(vec3(2.0f * p.x, -k, 2.0f * p.z)));
 }
 
-// UV: cylindrical mapping
 t_vec3	para_texcoord(t_object *o, t_vec3 p)
 {
-	p.y = clamp(p.y, 0, o->height);
+	p.y = clamp((p.y + 0.5f * o->height) / o->height, 0.0f, 1.0f);
 	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 	return (p);
 }
