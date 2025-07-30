@@ -7,6 +7,7 @@ int	main(int ac, char **av)
 
 	ft_bzero(&scene, sizeof(t_scene));
 	ft_bzero(&render, sizeof(render));
+	scene.focus_depth = 5.0f;
 	if (!validate_input_and_parse_map(ac, av, &scene))
 	{
 		cleanup_scene(&scene);
