@@ -205,11 +205,11 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	t_vec3	rd;
 
 	rng = r->frame_samples + (int) x + (int) y * r->image->width;
-	disk = random_point_in_disk(CAMERA_APERTURE);
+	disk = random_point_in_disk(r->scene->aperture_size);
 	ro = vec3_add(r->scene->pos, vec3_scale(r->camera_x, disk.x));
 	ro = vec3_add(ro, vec3_scale(r->camera_y, disk.y));
 	rd = get_viewport_ray(r, x, y, true);
-	rd = vec3_add(r->scene->pos, vec3_scale(rd, CAMERA_FOCUS));
+	rd = vec3_add(r->scene->pos, vec3_scale(rd, r->scene->focus_depth));
 	rd = vec3_normalize(vec3_sub(rd, ro));
 	return (trace_scene(r->scene, ro, rd, 1));
 }

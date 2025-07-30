@@ -28,10 +28,6 @@
 # define KEY_UP			MLX_KEY_SPACE		// Float up
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
-// Camera parameters for depth of field.
-# define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
-# define CAMERA_APERTURE 0 // Camera aperture size (TODO: Add to parser)
-
 // Constants used for generating random points. The number 1.324… is the
 // "plastic ratio," which is the solution to the equation x³ = x + 1. This
 // number has unique properties that are useful for generating points that look
@@ -124,6 +120,8 @@ struct s_scene
 	t_vec3		pos;			// Camera position
 	t_vec3		dir;			// Camera direction (normalized)
 	float		fov;			// Camera field of view (in degrees)
+	float		focus_depth;	// Camera focus depth
+	float		aperture_size;	// Camera aperture size
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
 };
 
