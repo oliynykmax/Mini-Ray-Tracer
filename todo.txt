@@ -4,9 +4,9 @@
 
 [ ] Shorten vec3 function names
 [ ] Add more parser rules
-	[ ] Camera
-		[ ] Focus depth
-		[ ] Aperture size
+	[X] Camera
+		[X] Focus depth
+		[X] Aperture size
 	[ ] Light
 		[ ] Radius
 		[ ] Allow brightness over 1

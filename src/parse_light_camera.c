@@ -52,8 +52,13 @@ bool	parse_camera(char **line, t_scene *sc)
 {
 	static int	exist = 0;
 
-	if (exist == 1 || array_len(line) != 4)
+	if (exist == 1 || (array_len(line) != 4 && array_len(line) != 6))
 		return (true);
+	if (array_len(line) == 6)
+	{
+		sc->focus_depth = ft_atof(line[4]);
+		sc->aperture_size = ft_atof(line[5]);
+	}
 	sc->fov = ft_atof(line[3]);
 	if (!parse_vec3(line[1], &sc->pos, 0, 0) || !parse_vec3(line[2],
 			&sc->dir, -1, 1))
@@ -62,5 +67,9 @@ bool	parse_camera(char **line, t_scene *sc)
 	return (!mrt_assert(fabsf(vec3_length(sc->dir) - 1.0f) < 0.001f,
 			"Camera direction components must be between -1 and 1\n")
 		|| !mrt_assert(sc->fov >= 0.0f && sc->fov <= 180.0f,
-			"Camera FOV must be between 0 and 180 degrees\n"));
+			"Camera FOV must be between 0 and 180 degrees\n")
+		|| !mrt_assert(sc->focus_depth >= 0.0f,
+			"Camera focus depth must be non-negative\n")
+		|| !mrt_assert(sc->aperture_size >= 0.0f,
+			"Camera aperture size must be non-negative\n"));
 }
