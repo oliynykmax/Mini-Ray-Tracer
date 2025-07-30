@@ -90,11 +90,11 @@ union	u_quat
 // Enumeration for different scene object types.
 enum	e_object_type
 {
+	OBJECT_CYLINDER,
+	OBJECT_LIGHT,
+	OBJECT_PARA,
 	OBJECT_PLANE,
 	OBJECT_SPHERE,
-	OBJECT_CYLINDER,
-	OBJECT_CONE,
-	OBJECT_LIGHT,
 };
 
 // Data describing one geometric object or light in the scene.
@@ -104,8 +104,8 @@ struct s_object
 	t_vec3			pos;	// Object position in world coordinates
 	t_quat			rot;	// Object rotation relative to world coordinates
 	t_vec3			color;	// Surface color
-	float			radius;	// Radius (sphere/cylinder/cone)
-	float			height;	// Height (cylinder/cone)
+	float			radius;	// Radius (sphere/cylinder/para)
+	float			height;	// Height (cylinder/para)
 };
 
 struct s_ray
@@ -176,10 +176,10 @@ struct s_thread
 
 // camera.c
 void		camera_update(t_render *r);
-// cone.c
-float		cone_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		cone_normal(t_object *o, t_vec3 p);
-t_vec3		cone_texcoord(t_object *o, t_vec3 p);
+// para.c
+float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+t_vec3		para_normal(t_object *o, t_vec3 p);
+t_vec3		para_texcoord(t_object *o, t_vec3 p);
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		cylinder_normal(t_object *o, t_vec3 p);
@@ -249,7 +249,7 @@ uint32_t	vec3_to_color(t_vec3 color);
 bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 bool		parse_sphere(char **line, t_scene *sc);
 bool		parse_plane(char **line, t_scene *sc);
-bool		parse_cone(char **line, t_scene *sc);
+bool		parse_para(char **line, t_scene *sc);
 bool		parse_cylinder(char **line, t_scene *sc);
 bool		parse_amb_light(char **line, t_scene *sc);
 bool		parse_point_light(char **line, t_scene *sc);
