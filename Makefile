@@ -16,6 +16,7 @@ SRCS := \
 	src/assert.c \
 	src/camera.c \
 	src/cleanup.c \
+	src/paraboloid.c \
 	src/cylinder.c \
 	src/input.c \
 	src/loop.c \

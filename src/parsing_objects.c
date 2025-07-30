@@ -41,7 +41,7 @@ bool	parse_plane(char **line, t_scene *sc)
 	return (false);
 }
 
-bool	parse_cone(char **line, t_scene *sc)
+bool	parse_para(char **line, t_scene *sc)
 {
 	t_object	*obj;
 	t_vec3		normal;
@@ -49,19 +49,18 @@ bool	parse_cone(char **line, t_scene *sc)
 	if (array_len(line) != 6 || objects_malloc_manager(sc))
 		return (true);
 	obj = &sc->objects[sc->object_count];
-	obj->type = OBJECT_CONE;
+	obj->type = OBJECT_PARA;
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
 			&normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
 		return (true);
 	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
-			"Cone axis must be a unit vector\n"))
+			"para axis must be a unit vector\n"))
 		return (true);
 	obj->radius = ft_atof(line[3]) / 2.0;
 	obj->height = ft_atof(line[4]);
-	if (!mrt_assert(obj->radius > 0.0f, "Cone radius must be positive\n")
-		|| !mrt_assert(obj->height > 0.0f, "Cone height must be positive\n"))
+	if (!mrt_assert(obj->radius > 0.0f, "para radius must be positive\n")
+		|| !mrt_assert(obj->height > 0.0f, "para height must be positive\n"))
 		return (true);
-	obj->angle = atan2(obj->radius, obj->height);
 	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_direction(normal);
 	sc->object_count++;
@@ -108,6 +107,6 @@ bool	parse_object(char **line, t_scene *sc)
 	else if (ft_strcmp(line[0], "cy") == 0)
 		return (parse_cylinder(line, sc));
 	else if (ft_strcmp(line[0], "cn") == 0)
-		return (parse_cone(line, sc));
+		return (parse_para(line, sc));
 	return (true);
 }

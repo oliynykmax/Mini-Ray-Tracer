@@ -30,7 +30,7 @@
 
 // Camera parameters for depth of field.
 # define CAMERA_FOCUS 5.0 // Depth of focus (TODO: Add to parser)
-# define CAMERA_APERTURE 0.05 // Camera aperture size (TODO: Add to parser)
+# define CAMERA_APERTURE 0 // Camera aperture size (TODO: Add to parser)
 
 // Constants used for generating random points. The number 1.324… is the
 // "plastic ratio," which is the solution to the equation x³ = x + 1. This
@@ -90,11 +90,11 @@ union	u_quat
 // Enumeration for different scene object types.
 enum	e_object_type
 {
+	OBJECT_CYLINDER,
+	OBJECT_LIGHT,
+	OBJECT_PARA,
 	OBJECT_PLANE,
 	OBJECT_SPHERE,
-	OBJECT_CYLINDER,
-	OBJECT_CONE,
-	OBJECT_LIGHT,
 };
 
 // Data describing one geometric object or light in the scene.
@@ -104,9 +104,8 @@ struct s_object
 	t_vec3			pos;	// Object position in world coordinates
 	t_quat			rot;	// Object rotation relative to world coordinates
 	t_vec3			color;	// Surface color
-	float			radius;	// Radius (sphere/cylinder/cone)
-	float			height;	// Height (cylinder/cone)
-	float			angle;	// Angle (cone)
+	float			radius;	// Radius (sphere/cylinder/para)
+	float			height;	// Height (cylinder/para)
 };
 
 struct s_ray
@@ -177,7 +176,10 @@ struct s_thread
 
 // camera.c
 void		camera_update(t_render *r);
-
+// para.c
+float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+t_vec3		para_normal(t_object *o, t_vec3 p);
+t_vec3		para_texcoord(t_object *o, t_vec3 p);
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		cylinder_normal(t_object *o, t_vec3 p);
@@ -247,7 +249,7 @@ uint32_t	vec3_to_color(t_vec3 color);
 bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 bool		parse_sphere(char **line, t_scene *sc);
 bool		parse_plane(char **line, t_scene *sc);
-bool		parse_cone(char **line, t_scene *sc);
+bool		parse_para(char **line, t_scene *sc);
 bool		parse_cylinder(char **line, t_scene *sc);
 bool		parse_amb_light(char **line, t_scene *sc);
 bool		parse_point_light(char **line, t_scene *sc);
@@ -261,7 +263,7 @@ void		cleanup_scene(t_scene *sc);
 /* array	 utils */
 int			array_len(char **array);
 void		free_array(char **array);
-/* vecto	r parsing utils */
+/* vector parsing utils */
 double		ft_atof(const char *str);
 bool		vec3_in_range(t_vec3 v, float lower, float upper);
 bool		parse_vec3(char *str, t_vec3 *out, float min, float max);
