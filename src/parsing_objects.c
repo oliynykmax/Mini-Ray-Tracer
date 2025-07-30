@@ -106,7 +106,7 @@ bool	parse_object(char **line, t_scene *sc)
 		return (parse_plane(line, sc));
 	else if (ft_strcmp(line[0], "cy") == 0)
 		return (parse_cylinder(line, sc));
-	else if (ft_strcmp(line[0], "cn") == 0)
+	else if (ft_strcmp(line[0], "pa") == 0)
 		return (parse_para(line, sc));
 	return (true);
 }

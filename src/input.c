@@ -41,7 +41,7 @@ int	process_line(t_scene *sc, char *buff)
 		error = parse_camera(line, sc);
 	else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0
 		|| ft_strcmp(line[0], "sp") == 0 || ft_strcmp(line[0], "pl") == 0
-		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "cn") == 0)
+		|| ft_strcmp(line[0], "cy") == 0 || ft_strcmp(line[0], "pa") == 0)
 		error = parse_object(line, sc);
 	else
 		error = !mrt_assert(false, "Not a valid object type");
