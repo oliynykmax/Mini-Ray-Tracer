@@ -90,11 +90,11 @@ union	u_quat
 // Enumeration for different scene object types.
 enum	e_object_type
 {
-	OBJECT_CYLINDER,
-	OBJECT_LIGHT,
-	OBJECT_PARA,
 	OBJECT_PLANE,
 	OBJECT_SPHERE,
+	OBJECT_CYLINDER,
+	OBJECT_PARA,
+	OBJECT_LIGHT,
 };
 
 // Data describing one geometric object or light in the scene.
