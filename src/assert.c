@@ -1,5 +1,4 @@
 #include "minirt.h"
-#include <stdarg.h>
 
 bool	mrt_assert(bool condition, char *format, ...)
 {
@@ -16,6 +15,22 @@ bool	mrt_assert(bool condition, char *format, ...)
 			ft_putstr_fd(strerror(errno_value), STDERR_FILENO);
 			ft_putstr_fd(": ", STDERR_FILENO);
 		}
+		va_start(args, format);
+		printf_fd(2, format, &args);
+		va_end(args);
+	}
+	return (false);
+}
+
+bool	mrt_warning(bool condition, char *format, ...)
+{
+	va_list		args;
+
+	if (condition == true)
+		return (true);
+	ft_fprintf(2, "Warning\n");
+	if (format != NULL)
+	{
 		va_start(args, format);
 		printf_fd(2, format, &args);
 		va_end(args);

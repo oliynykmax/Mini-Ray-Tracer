@@ -22,19 +22,21 @@ bool	parse_point_light(char **line, t_scene *sc)
 	t_object	*obj;
 	double		brightness;
 
-	if (array_len(line) != 4 || objects_malloc_manager(sc))
+	if ((array_len(line) != 4 && array_len(line) != 5)
+		|| objects_malloc_manager(sc))
 		return (true);
 	brightness = ft_atof(line[2]);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_LIGHT;
+	if (array_len(line) == 5)
+		obj->radius = ft_atof(line[4]);
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[3],
-			&obj->color, 0, 255) || !mrt_assert(brightness >= 0.0f
-			&& brightness <= 1.0f,
-			"Light brightness must be between 0.0 and 1.0\n"))
+			&obj->color, 0, 255) || !mrt_assert(brightness >= 0.0f,
+			"Light brightness must be positive\n"))
 		return (true);
+	mrt_warning(brightness <= 1.0f, "Light brightness is over 1.0\n");
 	obj->color = vec3_scale(vec3_scale(obj->color, 1.0 / 255.0), brightness);
 	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
-	obj->radius = 1.0f;
 	sc->object_count++;
 	return (false);
 }
@@ -61,8 +63,8 @@ bool	parse_camera(char **line, t_scene *sc)
 		sc->aperture_size = ft_atof(line[5]);
 	}
 	sc->fov = ft_atof(line[3]);
-	if (!parse_vec3(line[1], &sc->pos, 0, 0) || !parse_vec3(line[2],
-			&sc->dir, -1, 1))
+	if (!parse_vec3(line[1], &sc->pos, 0, 0) || !parse_vec3(line[2], &sc->dir,
+			-1, 1))
 		return (true);
 	exist = 1;
 	return (!mrt_assert(fabsf(vec3_length(sc->dir) - 1.0f) < 0.001f,
