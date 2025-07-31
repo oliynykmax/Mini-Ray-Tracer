@@ -34,6 +34,7 @@ bool	parse_point_light(char **line, t_scene *sc)
 		return (true);
 	obj->color = vec3_scale(vec3_scale(obj->color, 1.0 / 255.0), brightness);
 	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	obj->radius = 1.0f;
 	sc->object_count++;
 	return (false);
 }
