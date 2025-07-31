@@ -15,8 +15,8 @@ t_quat	quat_from_axis_angle(t_vec3 axis, float angle)
 t_quat	quat_from_direction(t_vec3 direction)
 {
 	const t_vec3	ref = vec3(0.0f, 1.0f, 0.0f);
-	const t_vec3	axis = vec3_cross(direction, ref);
-	const float		angle = acosf(vec3_dot(direction, ref));
+	const t_vec3	axis = vec_cross(direction, ref);
+	const float		angle = acosf(vec_dot(direction, ref));
 
 	return (quat_from_axis_angle(axis, angle));
 }
@@ -26,10 +26,10 @@ t_quat	quat_from_direction(t_vec3 direction)
 
 t_quat	quat_multiply(t_quat a, t_quat b)
 {
-	const t_vec3	ab = vec3_scale(a.xyz, b.w);
-	const t_vec3	ba = vec3_scale(b.xyz, a.w);
-	const t_vec3	imag = vec3_add(vec3_cross(a.xyz, b.xyz), vec3_add(ab, ba));
-	const float		real = a.w * b.w - vec3_dot(a.xyz, b.xyz);
+	const t_vec3	ab = vec_scale(a.xyz, b.w);
+	const t_vec3	ba = vec_scale(b.xyz, a.w);
+	const t_vec3	imag = vec_add(vec_cross(a.xyz, b.xyz), vec_add(ab, ba));
+	const float		real = a.w * b.w - vec_dot(a.xyz, b.xyz);
 
 	return ((t_quat){{imag.x, imag.y, imag.z, real}});
 }
@@ -46,7 +46,7 @@ t_quat	quat_inverse(t_quat q)
 
 t_vec3	quat_rotate_vec3(t_quat q, t_vec3 v)
 {
-	const t_vec3	a = vec3_add(vec3_cross(q.xyz, v), vec3_scale(v, q.w));
+	const t_vec3	a = vec_add(vec_cross(q.xyz, v), vec_scale(v, q.w));
 
-	return (vec3_add(v, vec3_scale(vec3_cross(q.xyz, a), 2.0f)));
+	return (vec_add(v, vec_scale(vec_cross(q.xyz, a), 2.0f)));
 }

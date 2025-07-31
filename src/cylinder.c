@@ -43,7 +43,7 @@ float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 {
 	if (fabsf(p.y) < o->height * 0.5f - 1e-6f)
-		return (vec3_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius));
+		return (vec_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius));
 	return (vec3(0.0f, 1.0f, 0.0f));
 }
 
