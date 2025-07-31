@@ -12,7 +12,7 @@ bool	parse_amb_light(char **line, t_scene *sc)
 			&& ratio <= 1.0f,
 			"Ambient light ratio must be between 0.0 and 1.0\n"))
 		return (true);
-	sc->ambient = vec3_scale(vec3_scale(sc->ambient, 1.0 / 255.0), ratio);
+	sc->ambient = vec_scale(vec_scale(sc->ambient, 1.0 / 255.0), ratio);
 	ambient_exists = true;
 	return (false);
 }
@@ -32,7 +32,7 @@ bool	parse_point_light(char **line, t_scene *sc)
 			&& brightness <= 1.0f,
 			"Light brightness must be between 0.0 and 1.0\n"))
 		return (true);
-	obj->color = vec3_scale(vec3_scale(obj->color, 1.0 / 255.0), brightness);
+	obj->color = vec_scale(vec_scale(obj->color, 1.0 / 255.0), brightness);
 	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
@@ -64,7 +64,8 @@ bool	parse_camera(char **line, t_scene *sc)
 			&sc->dir, -1, 1))
 		return (true);
 	exist = 1;
-	return (!mrt_assert(fabsf(vec3_length(sc->dir) - 1.0f) < 0.001f,
+	return (!mrt_assert(fabsf(vec_length(sc->dir) - 1.0f) < 0.001f,
+
 			"Camera direction components must be between -1 and 1\n")
 		|| !mrt_assert(sc->fov >= 0.0f && sc->fov <= 180.0f,
 			"Camera FOV must be between 0 and 180 degrees\n")

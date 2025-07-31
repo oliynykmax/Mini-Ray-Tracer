@@ -36,7 +36,7 @@ double	ft_atof(const char *str)
  * @param upper Upper boundary (inclusive)
  * @return true if all components are within boundaries, false otherwise
  */
-bool	vec3_in_range(t_vec3 v, float lower, float upper)
+bool	vec_in_range(t_vec3 v, float lower, float upper)
 {
 	float	epsilon;
 
@@ -72,7 +72,7 @@ bool	parse_vec3(char *str, t_vec3 *out, float min, float max)
 	}
 	*out = vec3(ft_atof(split[0]), ft_atof(split[1]), ft_atof(split[2]));
 	free_array(split);
-	if (min != max && !mrt_assert(vec3_in_range(*out, min, max),
+	if (min != max && !mrt_assert(vec_in_range(*out, min, max),
 			"Vector values must be between %d and %d\n", (int)min, (int)max))
 		return (false);
 	return (true);

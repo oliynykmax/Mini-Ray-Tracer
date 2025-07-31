@@ -223,25 +223,25 @@ void		show_stats_in_window_title(t_render *r);
 // trace.c
 t_vec3		trace_pixel(t_render *r, float x, float y);
 
-// vec3_arithmetic.c
-t_vec3		vec3_add(t_vec3 a, t_vec3 b);
-t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3		vec3_div(t_vec3 a, t_vec3 b);
-t_vec3		vec3_scale(t_vec3 v, float s);
+// vec_arithmetic.c
+t_vec3		vec_add(t_vec3 a, t_vec3 b);
+t_vec3		vec_sub(t_vec3 a, t_vec3 b);
+t_vec3		vec_mul(t_vec3 a, t_vec3 b);
+t_vec3		vec_div(t_vec3 a, t_vec3 b);
+t_vec3		vec_scale(t_vec3 v, float s);
 
-// vec3_geometric.c
-float		vec3_dot(t_vec3 a, t_vec3 b);
-float		vec3_length(t_vec3 v);
-t_vec3		vec3_normalize(t_vec3 v);
-t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
-t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
+// vec_geometric.c
+float		vec_dot(t_vec3 a, t_vec3 b);
+float		vec_length(t_vec3 v);
+t_vec3		vec_normalize(t_vec3 v);
+t_vec3		vec_cross(t_vec3 a, t_vec3 b);
+t_vec3		vec_reflect(t_vec3 i, t_vec3 n);
 
-// vec3_utility.c
+// vec_utility.c
 t_vec3		vec3(float x, float y, float z);
-t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
-t_vec3		vec3_to_srgb(t_vec3 color);
-uint32_t	vec3_to_color(t_vec3 color);
+t_vec3		vec_lerp(t_vec3 a, t_vec3 b, float t);
+t_vec3		vec_to_srgb(t_vec3 color);
+uint32_t	vec_to_color(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */
 bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
@@ -263,7 +263,7 @@ int			array_len(char **array);
 void		free_array(char **array);
 /* vector parsing utils */
 double		ft_atof(const char *str);
-bool		vec3_in_range(t_vec3 v, float lower, float upper);
+bool		vec_in_range(t_vec3 v, float lower, float upper);
 bool		parse_vec3(char *str, t_vec3 *out, float min, float max);
 bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 
