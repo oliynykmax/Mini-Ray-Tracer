@@ -35,11 +35,11 @@ static void	threads_render(t_render *r, uint32_t y_min, uint32_t y_max)
 		{
 			index = x + y * r->image->width;
 			color = trace_pixel(r, x, y);
-			r->frame[index] = vec_add(r->frame[index], color);
-			color = vec_scale(r->frame[index], 1.0f / r->frame_samples);
-			color = vec_to_srgb(color);
-			color = vec_add(color, dither(x, y));
-			mlx_put_pixel(r->image, x, y, vec_to_color(color));
+			r->frame[index] = vec3_add(r->frame[index], color);
+			color = vec3_scale(r->frame[index], 1.0f / r->frame_samples);
+			color = vec3_to_srgb(color);
+			color = vec3_add(color, dither(x, y));
+			mlx_put_pixel(r->image, x, y, vec3_to_color(color));
 		}
 	}
 }

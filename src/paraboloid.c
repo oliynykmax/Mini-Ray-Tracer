@@ -42,7 +42,7 @@ t_vec3	para_normal(t_object *o, t_vec3 p)
 
 	if (fabsf(p.y - 0.5f * o->height) < 1e-4f)
 		return (vec3(0, 1, 0));
-	return (vec_normalize(vec3(2.0f * p.x, -k, 2.0f * p.z)));
+	return (vec3_normalize(vec3(2.0f * p.x, -k, 2.0f * p.z)));
 }
 
 t_vec3	para_texcoord(t_object *o, t_vec3 p)
