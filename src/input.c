@@ -30,7 +30,11 @@ int	process_line(t_scene *sc, char *buff)
 {
 	char	**line;
 	bool	error;
+	char	*nl;
 
+	nl = ft_strrchr(buff, '\n');
+	if (nl != NULL)
+		*nl = '\0';
 	line = ft_split(buff, ' ');
 	if (line == NULL || !line[0])
 	{
