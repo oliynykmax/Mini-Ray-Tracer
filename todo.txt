@@ -3,13 +3,13 @@
 =========================
 
 [ ] Shorten vec3 function names
-[ ] Add more parser rules
+[X] Add more parser rules
 	[X] Camera
 		[X] Focus depth
 		[X] Aperture size
-	[ ] Light
-		[ ] Radius
-		[ ] Allow brightness over 1
+	[X] Light
+		[X] Radius
+		[X] Allow brightness over 1
 [ ] Visualize lights as glowing spheres
 [ ] Draw a grid for move/resize/rotate UI
 
@@ -50,12 +50,12 @@
 [X] Multiple lights
 [X] Colored lights
 [X] Checkboard texture
-[ ] para shape
+[X] para shape
 [ ] UV mapping
 	[ ] Sphere
 	[ ] Plane
 	[ ] Cylinder
-	[X] para
+	[ ] para
 [ ] Bump mapping
 
 =========================
