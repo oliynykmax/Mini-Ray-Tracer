@@ -14,7 +14,7 @@ bool	parse_sphere(char **line, t_scene *sc)
 	obj->radius = ft_atof(line[2]) / 2.0;
 	if (!mrt_assert(obj->radius > 0.0f, "Sphere radius must be positive\n"))
 		return (true);
-	obj->color = vec_scale(obj->color, 1.0 / 255.0);
+	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	sc->object_count++;
 	return (false);
@@ -32,10 +32,10 @@ bool	parse_plane(char **line, t_scene *sc)
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
 			&normal, -1, 1) || !parse_vec3(line[3], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec_length(normal) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"Plane normal must be a unit vector\n"))
 		return (true);
-	obj->color = vec_scale(obj->color, 1.0 / 255.0);
+	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_direction(normal);
 	sc->object_count++;
 	return (false);
@@ -53,7 +53,7 @@ bool	parse_para(char **line, t_scene *sc)
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
 			&normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec_length(normal) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"para axis must be a unit vector\n"))
 		return (true);
 	obj->radius = ft_atof(line[3]) / 2.0;
@@ -61,7 +61,7 @@ bool	parse_para(char **line, t_scene *sc)
 	if (!mrt_assert(obj->radius > 0.0f, "para radius must be positive\n")
 		|| !mrt_assert(obj->height > 0.0f, "para height must be positive\n"))
 		return (true);
-	obj->color = vec_scale(obj->color, 1.0 / 255.0);
+	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_direction(normal);
 	sc->object_count++;
 	return (false);
@@ -79,7 +79,7 @@ bool	parse_cylinder(char **line, t_scene *sc)
 	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
 			&axis, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
 		return (true);
-	if (!mrt_assert(fabsf(vec_length(axis) - 1.0f) < 0.001f,
+	if (!mrt_assert(fabsf(vec3_length(axis) - 1.0f) < 0.001f,
 			"Cylinder axis must be a unit vector\n"))
 		return (true);
 	obj->radius = ft_atof(line[3]) / 2.0;
@@ -88,7 +88,7 @@ bool	parse_cylinder(char **line, t_scene *sc)
 		|| !mrt_assert(obj->height > 0.0f,
 			"Cylinder height must be positive\n"))
 		return (true);
-	obj->color = vec_scale(obj->color, 1.0 / 255.0);
+	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
 	obj->rot = quat_from_direction(axis);
 	sc->object_count++;
 	return (false);
