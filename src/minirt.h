@@ -28,13 +28,6 @@
 # define KEY_UP			MLX_KEY_SPACE		// Float up
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
-// Constants used for generating random points. The number 1.324… is the
-// "plastic ratio," which is the solution to the equation x³ = x + 1. This
-// number has unique properties that are useful for generating points that look
-// "random" but don't clump together like truly randomly generated points do.
-# define PLASTIC_RATIO_X 0.7548776662466927 // (plastic ratio)¯¹
-# define PLASTIC_RATIO_Y 0.5698402909980532 // (plastic ratio)¯²
-
 # define TAU 6.283185307179586 // 2π
 
 // Typedefs for enum/structure/union types.
@@ -106,10 +99,11 @@ struct s_object
 
 struct s_ray
 {
+	t_scene		*scene;	// Scene data (read only!)
 	uint16_t	rng;	// Index used for random number generation
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction
-	int			limit;	// Remaining ray bounces
+	int			bounce;	// Remaining ray bounces
 };
 
 // Data describing the objects in the scene.
@@ -151,8 +145,7 @@ struct s_render
 	t_vec3			*frame;					// Floating point frame buffer
 	size_t			frame_size;				// Allocated size of the frame
 	int				frame_samples;			// Number of accumulated samples
-	float			jitter_x;				// Horizontal subpixel jitter
-	float			jitter_y;				// Vertical subpixel jitter
+	t_vec3			jitter;					// Subpixel jitter
 	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
 	int				threads_started;		// How many threads were initialized
 	bool			threads_stop;			// Set to stop the render threads
@@ -183,6 +176,9 @@ float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		cylinder_normal(t_object *o, t_vec3 p);
 t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
 
+// lighting.c
+t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p);
+
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
 
@@ -196,6 +192,11 @@ float		radians(float degrees);
 float		fract(float x);
 float		solve_quadratic(float a, float b, float c);
 
+// object.c
+float		object_distance(t_object *object, t_vec3 ro, t_vec3 rd);
+t_vec3		object_normal(t_object *obj, t_vec3 point);
+t_vec3		object_texcoord(t_object *obj, t_vec3 point);
+
 // plane.c
 float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 t_vec3		plane_normal(t_object *o, t_vec3 p);
@@ -208,10 +209,18 @@ t_quat		quat_multiply(t_quat a, t_quat b);
 t_quat		quat_inverse(t_quat q);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 
+// random.c
+t_vec3		random_point_in_square(uint16_t rng);
+t_vec3		random_point_in_disk(uint16_t rng, float radius);
+t_vec3		random_point_on_sphere(uint16_t rng, float radius);
+
 // sphere.c
 float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
 t_vec3		sphere_normal(t_object *s, t_vec3 p);
 t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
+
+// texturing.c
+t_vec3		apply_texture(t_object *object, t_vec3 point);
 
 // threads.c
 bool		threads_init(t_render *r);
@@ -221,6 +230,8 @@ void		threads_quit(t_render *r);
 void		show_stats_in_window_title(t_render *r);
 
 // trace.c
+float		scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object);
+t_vec3		get_viewport_ray(t_render *r, float x, float y, bool jitter);
 t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
