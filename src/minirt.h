@@ -93,7 +93,7 @@ struct s_object
 	t_vec3			pos;	// Object position in world coordinates
 	t_quat			rot;	// Object rotation relative to world coordinates
 	t_vec3			color;	// Surface color
-	float			radius;	// Radius (sphere/cylinder/para)
+	float			radius;	// Radius (sphere/cylinder/para/light)
 	float			height;	// Height (cylinder/para)
 };
 
@@ -268,6 +268,7 @@ int			objects_malloc_manager(t_scene *sc);
 /* asser	ting function, worth thinking if we want to builtin
  * the e	xiting and cleaning into it*/
 bool		mrt_assert(bool condition, char *format, ...);
+bool		mrt_warning(bool condition, char *format, ...);
 void		cleanup_scene(t_scene *sc);
 /* array	 utils */
 int			array_len(char **array);
