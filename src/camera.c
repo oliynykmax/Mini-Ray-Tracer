@@ -20,8 +20,8 @@ static bool	camera_mouse_movement(t_render *r)
 	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT)
 		&& (delta[0] != 0 || delta[1] != 0))
 	{
-		r->camera_yaw -= sensitivity * delta[0];
-		r->camera_pitch -= sensitivity * delta[1];
+		r->camera_yaw += sensitivity * delta[0];
+		r->camera_pitch += sensitivity * delta[1];
 		r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
 		r->scene->dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
 		r->scene->dir.y = cos(r->camera_pitch);
@@ -50,9 +50,9 @@ static bool	camera_keyboard_movement(t_render *r)
 	keys.right = mlx_is_key_down(r->mlx, KEY_RIGHT);
 	keys.up = mlx_is_key_down(r->mlx, KEY_UP);
 	keys.down = mlx_is_key_down(r->mlx, KEY_DOWN);
-	vec = vec3(0.0f, keys.down - keys.up, 0.0f);
+	vec = vec3(0.0f, keys.up - keys.down, 0.0f);
 	vec = vec3_add(vec, vec3_scale(move_x, keys.right - keys.left));
-	vec = vec3_add(vec, vec3_scale(move_z, keys.forward - keys.back));
+	vec = vec3_add(vec, vec3_scale(move_z, keys.back - keys.forward));
 	vec = vec3_scale(vec, 3.0f * r->mlx->delta_time);
 	r->scene->pos = vec3_add(r->scene->pos, vec);
 	return (vec3_length(vec) > 0.0f);
@@ -67,18 +67,17 @@ static void	camera_update_viewport(t_render *r)
 	const float	view_w = view_h * (float) r->image->width / r->image->height;
 	t_vec3		vec[4];
 
-	r->camera_z = r->scene->dir;
-	r->camera_x = vec3_cross(r->camera_z, vec3(0.0f, -1.0f, 0.0f));
-	r->camera_x = vec3_normalize(r->camera_x);
+	r->camera_z = vec3_scale(r->scene->dir, -1.0f);
+	r->camera_x = vec3_normalize(vec3_cross(vec3(0, 1, 0), r->camera_z));
 	r->camera_y = vec3_cross(r->camera_z, r->camera_x);
 	vec[0] = vec3_scale(r->camera_x, -view_w);
 	vec[1] = vec3_scale(r->camera_x, +view_w);
 	vec[2] = vec3_scale(r->camera_y, -view_h);
 	vec[3] = vec3_scale(r->camera_y, +view_h);
-	r->viewport[0] = vec3_add(vec3_add(vec[0], vec[2]), r->camera_z);
-	r->viewport[1] = vec3_add(vec3_add(vec[1], vec[2]), r->camera_z);
-	r->viewport[2] = vec3_add(vec3_add(vec[0], vec[3]), r->camera_z);
-	r->viewport[3] = vec3_add(vec3_add(vec[1], vec[3]), r->camera_z);
+	r->viewport[0] = vec3_sub(vec3_add(vec[0], vec[2]), r->camera_z);
+	r->viewport[1] = vec3_sub(vec3_add(vec[1], vec[2]), r->camera_z);
+	r->viewport[2] = vec3_sub(vec3_add(vec[0], vec[3]), r->camera_z);
+	r->viewport[3] = vec3_sub(vec3_add(vec[1], vec[3]), r->camera_z);
 }
 
 // Update all camera parameters. Called before rendering a new frame.
