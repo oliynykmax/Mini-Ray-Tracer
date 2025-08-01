@@ -31,7 +31,7 @@ static float	disk_distance(t_object *o, t_vec3 ro, t_vec3 rd, float h)
 float	para_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 {
 	const float	body = body_distance(o, ro, rd);
-	const float	top_cap = disk_distance(o, ro, rd, +0.5f * o->height);
+	const float	top_cap = disk_distance(o, ro, rd, 0.5f * o->height);
 
 	return (fminf(body, top_cap));
 }
@@ -47,7 +47,7 @@ t_vec3	para_normal(t_object *o, t_vec3 p)
 
 t_vec3	para_texcoord(t_object *o, t_vec3 p)
 {
-	p.y = clamp((p.y + 0.5f * o->height) / o->height, 0.0f, 1.0f);
+	p.y = clamp(p.y, -o->height * 0.5f, o->height * 0.5f);
 	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 	return (p);
 }
