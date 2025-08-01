@@ -5,13 +5,13 @@
 static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
-	t_object *const	object = &r->scene->objects[2];
+	t_object *const	object = &r->scene->objects[3];
 	t_quat			rotate;
 
 	pthread_mutex_lock(&r->mutex);
 	if (mlx_is_key_down(r->mlx, MLX_KEY_J))
 	{
-		rotate = quat_from_axis_angle(vec3(0.0f, 1.0f, 0.0f), 0.03f);
+		rotate = quat_from_axis_angle(vec3(1.0f, 0.0f, 0.0f), 0.03f);
 		object->rot = quat_multiply(rotate, object->rot);
 		r->frame_samples = 0;
 	}

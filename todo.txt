@@ -50,12 +50,12 @@
 [X] Multiple lights
 [X] Colored lights
 [X] Checkboard texture
-[X] para shape
-[ ] UV mapping
-	[ ] Sphere
-	[ ] Plane
-	[ ] Cylinder
-	[ ] para
+[X] Paraboloid shape
+[X] UV mapping
+	[X] Sphere
+	[X] Plane
+	[X] Cylinder
+	[X] Paraboloid
 [ ] Bump mapping
 
 =========================

@@ -17,7 +17,7 @@ t_quat	quat_from_direction(t_vec3 dir)
 	t_vec3	ref;
 	t_quat	quat;
 
-	ref = vec3(0.0f, -1.0f, 0.0f);
+	ref = vec3(0.0f, 1.0f, 0.0f);
 	dir = vec3_normalize(dir);
 	if (fabsf(vec3_dot(dir, ref) + 1.0f) < 1e-6f)
 		return ((t_quat){{ref.x, ref.y, ref.z, 0.0f}});
