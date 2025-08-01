@@ -177,7 +177,7 @@ t_vec3		cylinder_normal(t_object *o, t_vec3 p);
 t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
 
 // lighting.c
-t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p);
+t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 color);
 
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
