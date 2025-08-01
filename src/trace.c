@@ -51,8 +51,8 @@ static t_vec3	trace_scene(t_ray *r)
 	point = vec3_add(r->ro, vec3_scale(r->rd, t));
 	color = object->color;
 	color = vec3_mul(color, apply_texture(object, point));
-	color = vec3_mul(color, apply_lighting(r, object, point));
-	if (object->type == OBJECT_CYLINDER)
+	color = apply_lighting(r, object, point, color);
+	if (object->type == OBJECT_CYLINDER && false)
 		color = reflection(r, point, object_normal(object, point));
 	return (color);
 }
