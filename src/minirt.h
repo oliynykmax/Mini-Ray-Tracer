@@ -173,7 +173,7 @@ struct s_pbr
 	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
 	t_vec3	albedo;		// Surface albedo at shaded point
 	float	metallic;	// PBR metallic parameter
-	float	roughness;	// PBR roughness parameter
+	float	rough;		// PBR roughness parameter
 	float	ndotv;		// (surface normal) · (view vector)
 	float	ndotl;		// (surface normal) · (light vector)
 	float	ndoth;		// (surface normal) · (halfway vector)
