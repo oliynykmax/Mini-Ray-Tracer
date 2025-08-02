@@ -10,23 +10,21 @@ t_quat	quat_from_axis_angle(t_vec3 axis, float angle)
 	return ((t_quat){{axis.x * s, axis.y * s, axis.z * s, c}});
 }
 
-// Create a quaternion from a direction vector.
+// Create an orientation quaternion from a (normalized) direction vector.
 
-t_quat	quat_from_direction(t_vec3 dir)
+t_quat	quat_from_direction(t_vec3 d)
 {
-	t_vec3	ref;
-	t_quat	quat;
+	t_vec3	r;
+	t_quat	q;
 
-	ref = vec3(0.0f, 1.0f, 0.0f);
-	dir = vec3_normalize(dir);
-	if (fabsf(vec3_dot(dir, ref) + 1.0f) < 1e-6f)
-		return ((t_quat){{ref.x, ref.y, ref.z, 0.0f}});
-	if (fabsf(vec3_dot(dir, ref) - 1.0f) < 1e-6f)
+	if (fabsf(d.y + 1.0f) < 1e-6f)
+		return ((t_quat){{1.0f, 0.0f, 0.0f, 0.0f}});
+	if (fabsf(d.y - 1.0f) < 1e-6f)
 		return ((t_quat){{0.0f, 0.0f, 0.0f, 1.0f}});
-	ref = vec3_normalize(vec3_add(ref, dir));
-	quat.xyz = vec3_cross(ref, dir);
-	quat.w = vec3_dot(ref, dir);
-	return (quat);
+	r = vec3_normalize(vec3(d.x, d.y + 1.0f, d.z));
+	q.xyz = vec3_cross(r, d);
+	q.w = vec3_dot(r, d);
+	return (q);
 }
 
 // Multiply two quaternions. This composes the rotations represented by the two
