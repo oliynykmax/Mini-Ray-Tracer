@@ -1,14 +1,14 @@
 #include "minirt.h"
 
 const float	metallic = 0.1f;
-const float	roughness = 0.2f;
+const float	roughness = 0.1f;
 
 static float	distribution(t_vec3 n, t_vec3 h, float a)
 {
 	const float	ndoth = fmaxf(0.0f, vec3_dot(n, h));
 	const float	denom = ((ndoth * ndoth) * (a * a - 1.0f) + 1.0f);
 
-	return (a * a) / (M_PI * denom * denom);
+	return ((a * a) / (M_PI * denom * denom));
 }
 
 static t_vec3	fresnel(float cos_theta, t_vec3 f0)
@@ -53,7 +53,7 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_vec3 p, t_vec3 n, t_vec3 f0
 	// Cook-Torrance BRDF
 	float	NDF = distribution(n, H, roughness);
 	float	G = geometry(n, V, L, roughness);
-	t_vec3	F = fresnel(fmaxf(0.0f, vec3_dot(H, V)), f0);
+	t_vec3	F = fresnel(saturate(vec3_dot(H, V)), f0);
 	t_vec3	kD = vec3_sub(vec3(1.0f, 1.0f, 1.0f), F);
 	kD = vec3_scale(kD, 1.0f - metallic);
 	t_vec3	num = vec3_scale(F, NDF * G);
@@ -66,12 +66,12 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_vec3 p, t_vec3 n, t_vec3 f0
 t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 albedo)
 {
 	t_vec3	color;
+	t_vec3	f0;
 	t_vec3	n;
 	size_t	i;
 
-	t_vec3 f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), albedo, metallic);
-
 	i = -1;
+	f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), albedo, metallic);
 	color = vec3_mul(albedo, r->scene->ambient);
 	n = object_normal(object, p);
 	n = vec3_scale(n, copysignf(1.0f, -vec3_dot(r->rd, n)));
