@@ -34,6 +34,7 @@
 typedef enum e_object_type	t_object_type;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
+typedef struct s_pbr		t_pbr;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
@@ -165,6 +166,22 @@ struct s_thread
 	size_t	y_max;	// y-coordinate of bottom scanline of region
 };
 
+// Structure holding PBR lighting parameters during shading.
+
+struct s_pbr
+{
+	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
+	t_vec3	albedo;		// Surface albedo at shaded point
+	float	metallic;	// PBR metallic parameter
+	float	roughness;	// PBR roughness parameter
+	float	ndotv;		// (surface normal) · (view vector)
+	float	ndotl;		// (surface normal) · (light vector)
+	float	ndoth;		// (surface normal) · (halfway vector)
+	float	hdotv;		// (halfway vector) · (view vector)
+	t_vec3	diffuse;	// Diffuse contribution
+	t_vec3	specular;	// Specular contribution
+};
+
 // camera.c
 void		camera_update(t_render *r);
 // para.c
@@ -251,6 +268,7 @@ t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);
 t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
+t_vec3		vec3_tonemap(t_vec3 color);
 t_vec3		vec3_to_srgb(t_vec3 color);
 uint32_t	vec3_to_color(t_vec3 color);
 
