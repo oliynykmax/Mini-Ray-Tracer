@@ -1,7 +1,7 @@
 #include "minirt.h"
 
 const float	metallic = 0.1f;
-const float	roughness = 0.1f;
+const float	roughness = 0.2f;
 
 static float	distribution(t_vec3 n, t_vec3 h, float a)
 {
