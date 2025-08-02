@@ -1,78 +1,69 @@
 #include "minirt.h"
 
-typedef struct s_pbr	t_pbr;
+// Calculate the geometry (G) and normal distribution (D) factors of the
+// Cook-Torrance BRDF.
 
-// Structure holding PBR lighting parameters during shading.
-
-struct s_pbr
+static float	brdf_geo_dist(t_pbr *p)
 {
-	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
-	t_vec3	albedo;		// Surface albedo at shaded point
-	float	metallic;	// PBR metallic parameter
-	float	roughness;	// PBR roughness parameter
-	float	NdotV;		// (surface normal) · (view vector)
-	float	NdotL;		// (surface normal) · (light vector)
-	float	NdotH;		// (surface normal) · (halfway vector)
-	float	HdotV;		// (halfway vector) · (view vector)
-	t_vec3	diffuse;	// Diffuse contribution
-	t_vec3	specular;	// Specular contribution
-};
+	const float	rough2 = p->rough * p->rough;
+	const float	denom = ((p->ndoth * p->ndoth) * (rough2 - 1.0f) + 1.0f);
+	const float	ggx1 = p->ndotv / (p->ndotv * (1.0f - p->rough) + p->rough);
+	const float	ggx2 = p->ndotl / (p->ndotl * (1.0f - p->rough) + p->rough);
+	const float	dist = rough2 / (M_PI * denom * denom);
 
-static float	distribution(float ndoth, float roughness)
-{
-	const float	roughness2 = roughness * roughness;
-	const float	denom = ((ndoth * ndoth) * (roughness2 - 1.0f) + 1.0f);
-
-	return (roughness2 / (M_PI * denom * denom));
+	return (ggx1 * ggx2 * dist);
 }
 
-static t_vec3	fresnel(float hdotv, t_vec3 f0)
+// Calculate the fresnel factor (F) of the Cook-Torrance BRDF.
+
+static t_vec3	brdf_fresnel(float hdotv, t_vec3 f0)
 {
 	const float	factor = powf(1.0f - hdotv, 5.0f);
 
 	return (vec3_add(f0, vec3_scale(vec3_add(vec3(1, 1, 1), f0), factor)));
 }
 
-static float	geometry(float ndotv, float ndotl, float k)
-{
-	const float	ggx1 = ndotv / (ndotv * (1.0f - k) + k);
-	const float	ggx2 = ndotl / (ndotl * (1.0f - k) + k);
+// Check if a light is visible from a shading point (located at `ro`). This is
+// done by tracing a ray toward the light, stopping as soon as an occluding
+// object is hit.
 
-	return (ggx1 * ggx2);
-}
-
-static bool	is_not_in_shadow(t_ray *r, t_object *light, t_vec3 p)
+static bool	light_visible(t_ray *r, t_object *light, t_vec3 ro)
 {
 	const t_vec3	rand = random_point_on_sphere(r->rng, light->radius);
 	const t_vec3	light_pos = vec3_add(light->pos, rand);
-	const t_vec3	light_vec = vec3_sub(light_pos, p);
-	const t_vec3	light_dir = vec3_normalize(light_vec);
+	const t_vec3	rd = vec3_sub(light_pos, ro);
+	float			t;
+	size_t			i;
 
-	return (scene_distance(r->scene, p, light_dir, NULL) >= 1.0f);
+	i = -1;
+	while (++i < r->scene->object_count)
+	{
+		if (r->scene->objects[i].type == OBJECT_LIGHT)
+			continue ;
+		t = object_distance(&r->scene->objects[i], ro, rd);
+		if (t >= 0.0f && t < 1.0f - 1e-3f)
+			return (false);
+	}
+	return (true);
 }
 
 static t_vec3	one_light(t_ray *r, t_object *light, t_vec3 p, t_vec3 n, t_pbr *pbr)
 {
-	// Calculate radiance.
 	t_vec3	lv = vec3_sub(light->pos, p);
-	t_vec3	V = vec3_scale(r->rd, -1.0f);
-	t_vec3	L = vec3_normalize(lv);
-	t_vec3	H = vec3_normalize(vec3_add(V, L));
+	t_vec3	v = vec3_scale(r->rd, -1.0f);
+	t_vec3	l = vec3_normalize(lv);
+	t_vec3	h = vec3_normalize(vec3_add(v, l));
 	t_vec3	radiance = vec3_scale(light->color, 1.0f / vec3_dot(lv, lv));
-
-	// Cook-Torrance BRDF
-	float	ndotv = saturate(vec3_dot(n, V));
-	float	ndotl = saturate(vec3_dot(n, L));
-	float	ndoth = saturate(vec3_dot(n, H));
-	float	hdotv = saturate(vec3_dot(H, V));
-	float	D = distribution(ndoth, pbr->roughness);
-	float	G = geometry(ndotv, ndotl, pbr->roughness);
-	t_vec3	F = fresnel(hdotv, pbr->f0);
-	t_vec3	diffuse = vec3_sub(vec3(1.0f, 1.0f, 1.0f), F);
+	pbr->ndotv = saturate(vec3_dot(n, v));
+	pbr->ndotl = saturate(vec3_dot(n, l));
+	pbr->ndoth = saturate(vec3_dot(n, h));
+	pbr->hdotv = saturate(vec3_dot(h, v));
+	t_vec3	fresnel = brdf_fresnel(pbr->hdotv, pbr->f0);
+	t_vec3	diffuse = vec3_sub(vec3(1.0f, 1.0f, 1.0f), fresnel);
 	diffuse = vec3_scale(diffuse, 1.0f - pbr->metallic);
-	t_vec3	num = vec3_scale(F, D * G);
-	t_vec3	specular = vec3_scale(num, 1.0f / (4.0f * ndotv * ndotl + 1e-4f));
-	return vec3_scale(vec3_mul(vec3_add(vec3_scale(vec3_mul(diffuse, pbr->albedo), 1.0f / M_PI), specular), radiance), ndotl);
+	t_vec3	specular = vec3_scale(fresnel, brdf_geo_dist(pbr));
+	specular = vec3_scale(specular, 1.0f / (4.0f * pbr->ndotv * pbr->ndotl + 1e-4f));
+	return vec3_scale(vec3_mul(vec3_add(vec3_scale(vec3_mul(diffuse, pbr->albedo), 1.0f / M_PI), specular), radiance), pbr->ndotl);
 }
 
 t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 albedo)
@@ -84,8 +75,8 @@ t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 albedo)
 	size_t		i;
 
 	i = -1;
-	pbr.metallic = 0.1f;
-	pbr.roughness = 0.2f;
+	pbr.metallic = 0.9f;
+	pbr.rough = 0.1f;
 	pbr.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), albedo, pbr.metallic);
 	pbr.albedo = albedo;
 	color = vec3_mul(albedo, r->scene->ambient);
@@ -95,7 +86,7 @@ t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 albedo)
 	while (++i < r->scene->object_count)
 	{
 		light = &r->scene->objects[i];
-		if (light->type == OBJECT_LIGHT && is_not_in_shadow(r, light, p))
+		if (light->type == OBJECT_LIGHT && light_visible(r, light, p))
 			color = vec3_add(color, one_light(r, light, p, n, &pbr));
 	}
 	return (color);
