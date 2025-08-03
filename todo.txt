@@ -2,7 +2,6 @@
       OTHER TASKS
 =========================
 
-[ ] Shorten vec3 function names
 [X] Add more parser rules
 	[X] Camera
 		[X] Focus depth
@@ -10,7 +9,8 @@
 	[X] Light
 		[X] Radius
 		[X] Allow brightness over 1
-[ ] Visualize lights as glowing spheres
+[X] Visualize lights as glowing spheres
+[ ] Shorten vec3 function names
 [ ] Draw a grid for move/resize/rotate UI
 
 =========================
@@ -68,10 +68,10 @@
 [X] Depth of field
 [X] Soft shadows
 [X] Metallic/reflective surfaces
+[X] Physically based lighting
+[X] Tone mapping
 [ ] Offline rendering
-[ ] Physically based lighting
 [ ] Directional lights
-[ ] Tone mapping
 [ ] Saving a map that's been edited
 [ ] Refractive surfaces (lenses/glass)
 [ ] SIMD optimization?
