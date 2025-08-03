@@ -51,7 +51,7 @@ t_vec3	cylinder_normal(t_object *o, t_vec3 p)
 
 t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
 {
-	const float	h = o->height * 0.5f - 1e6f;
+	const float	h = o->height * 0.5f - 1e-6f;
 
 	p.y = clamp(p.y, -h, h);
 	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
