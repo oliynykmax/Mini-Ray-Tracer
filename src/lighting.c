@@ -1,41 +1,99 @@
 #include "minirt.h"
 
-static t_vec3	specular(t_vec3 light_dir, t_vec3 ray_dir, t_vec3 normal)
-{
-	const t_vec3	h = vec3_normalize(vec3_sub(light_dir, ray_dir));
-	const float		s = 5.0f * powf(fmaxf(0.0f, vec3_dot(normal, h)), 30);
+// Calculate the geometry (G) and normal distribution (D) factors of the
+// Cook-Torrance BRDF.
 
-	return (vec3(s, s, s));
+static float	brdf_geo_dist(t_pbr *p)
+{
+	const float	rough2 = p->rough * p->rough;
+	const float	denom = ((p->ndoth * p->ndoth) * (rough2 - 1.0f) + 1.0f);
+	const float	ggx1 = p->ndotv / (p->ndotv * (1.0f - p->rough) + p->rough);
+	const float	ggx2 = p->ndotl / (p->ndotl * (1.0f - p->rough) + p->rough);
+	const float	dist = rough2 / (M_PI * denom * denom);
+
+	return (ggx1 * ggx2 * dist);
 }
 
-static t_vec3	one_light(t_ray *r, t_object *light, t_vec3 p, t_vec3 n)
+// Calculate the fresnel factor (F) of the Cook-Torrance BRDF.
+
+static t_vec3	brdf_fresnel(t_pbr *p)
+{
+	const float		factor = powf(1.0f - p->hdotv, 5.0f);
+	const t_vec3	one = vec3(1.0f, 1.0f, 1.0f);
+
+	return (vec3_add(p->f0, vec3_scale(vec3_add(one, p->f0), factor)));
+}
+
+// Check if a light is visible from a shading point (located at `ro`). This is
+// done by tracing a ray toward the light, stopping as soon as an occluding
+// object is hit.
+
+static bool	light_visible(t_ray *r, t_object *light, t_vec3 ro)
 {
 	const t_vec3	rand = random_point_on_sphere(r->rng, light->radius);
 	const t_vec3	light_pos = vec3_add(light->pos, rand);
-	const t_vec3	light_vec = vec3_sub(light_pos, p);
-	const t_vec3	light_dir = vec3_normalize(light_vec);
-	t_vec3			color;
-
-	if (scene_distance(r->scene, p, light_dir, NULL) < 1.0f)
-		return (vec3(0.0f, 0.0f, 0.0f));
-	color = vec3_scale(light->color, saturate(vec3_dot(light_dir, n)));
-	color = vec3_add(color, specular(light_dir, r->rd, n));
-	return (vec3_scale(color, 300.0f / vec3_dot(light_vec, light_vec)));
-}
-
-t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 p)
-{
-	t_vec3	light;
-	t_vec3	n;
-	size_t	i;
+	const t_vec3	rd = vec3_sub(light_pos, ro);
+	float			t;
+	size_t			i;
 
 	i = -1;
-	light = r->scene->ambient;
-	n = object_normal(object, p);
-	n = vec3_scale(n, copysignf(1.0f, -vec3_dot(r->rd, n)));
-	p = vec3_add(p, vec3_scale(n, 1e-5f));
 	while (++i < r->scene->object_count)
+	{
 		if (r->scene->objects[i].type == OBJECT_LIGHT)
-			light = vec3_add(light, one_light(r, &r->scene->objects[i], p, n));
-	return (light);
+			continue ;
+		t = object_distance(&r->scene->objects[i], ro, rd);
+		if (t >= 0.0f && t < 1.0f - 1e-3f)
+			return (false);
+	}
+	return (true);
+}
+
+static t_vec3	one_light(t_ray *r, t_object *light, t_pbr *p)
+{
+	t_vec3	radiance;
+	t_vec3	spec;
+	t_vec3	diff;
+
+	p->view_dir = vec3_scale(r->rd, -1.0f);
+	p->light = vec3_sub(light->pos, p->point);
+	p->light_dir = vec3_normalize(p->light);
+	p->halfway = vec3_normalize(vec3_add(p->view_dir, p->light_dir));
+	p->ndotv = saturate(vec3_dot(p->normal, p->view_dir));
+	p->ndotl = saturate(vec3_dot(p->normal, p->light_dir));
+	p->ndoth = saturate(vec3_dot(p->normal, p->halfway));
+	p->hdotv = saturate(vec3_dot(p->halfway, p->view_dir));
+	spec = brdf_fresnel(p);
+	diff = vec3_sub(vec3(1.0f, 1.0f, 1.0f), spec);
+	diff = vec3_scale(diff, (1.0f - p->metallic) / M_PI);
+	diff = vec3_mul(diff, p->albedo);
+	spec = vec3_scale(spec, brdf_geo_dist(p));
+	spec = vec3_scale(spec, 1.0f / (4.0f * p->ndotv * p->ndotl + 1e-4f));
+	radiance = vec3_scale(light->color, 1.0f / vec3_dot(p->light, p->light));
+	return (vec3_scale(vec3_mul(vec3_add(diff, spec), radiance), p->ndotl));
+}
+
+t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point, t_vec3 albedo)
+{
+	t_pbr		p;
+	t_vec3		color;
+	t_object	*light;
+	size_t		i;
+
+	p.point = point;
+	p.albedo = albedo;
+	p.metallic = 0.9f;
+	p.rough = 0.1f;
+	p.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), p.albedo, p.metallic);
+	p.normal = object_normal(object, p.point);
+	p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
+	p.point = vec3_add(p.point, vec3_scale(p.normal, 1e-5f));
+	color = vec3_mul(albedo, r->scene->ambient);
+	i = -1;
+	while (++i < r->scene->object_count)
+	{
+		light = &r->scene->objects[i];
+		if (light->type == OBJECT_LIGHT && light_visible(r, light, p.point))
+			color = vec3_add(color, one_light(r, light, &p));
+	}
+	return (color);
 }

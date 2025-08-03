@@ -26,12 +26,14 @@ static t_vec3	trace_scene(t_ray *r);
 
 static t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
 {
+	const float	fuzziness = 0.1f;
+
 	if (r->bounce-- == 0)
 		return (vec3(0.0f, 0.0f, 0.0f));
 	n = vec3_scale(n, copysignf(1.0f, -vec3_dot(r->rd, n)));
 	p = vec3_add(p, vec3_scale(n, 1e-6f));
 	n = vec3_reflect(r->rd, n);
-	n = vec3_normalize(vec3_add(n, random_point_on_sphere(r->rng, 0.0f)));
+	n = vec3_normalize(vec3_add(n, random_point_on_sphere(r->rng, fuzziness)));
 	r->ro = p;
 	r->rd = n;
 	return (trace_scene(r));
@@ -51,8 +53,8 @@ static t_vec3	trace_scene(t_ray *r)
 	point = vec3_add(r->ro, vec3_scale(r->rd, t));
 	color = object->color;
 	color = vec3_mul(color, apply_texture(object, point));
-	color = vec3_mul(color, apply_lighting(r, object, point));
-	if (object->type == OBJECT_CYLINDER)
+	color = apply_lighting(r, object, point, color);
+	if (object->type == OBJECT_SPHERE && false)
 		color = reflection(r, point, object_normal(object, point));
 	return (color);
 }

@@ -17,6 +17,13 @@ t_vec3	vec3_lerp(t_vec3 a, t_vec3 b, float t)
 	return (vec3_add(a, b));
 }
 
+// Apply basic Reinhard tone mapping to a color.
+
+t_vec3	vec3_tonemap(t_vec3 v)
+{
+	return (vec3_div(v, vec3_add(v, vec3(1.0f, 1.0f, 1.0f))));
+}
+
 // Convert a color vector to sRGB, applying an approximate gamma curve.
 
 t_vec3	vec3_to_srgb(t_vec3 color)
