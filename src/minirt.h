@@ -170,10 +170,16 @@ struct s_thread
 
 struct s_pbr
 {
+	t_vec3	point;		// Surface point that's being shaded
+	t_vec3	normal;		// Surface normal at shading point
 	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
 	t_vec3	albedo;		// Surface albedo at shaded point
 	float	metallic;	// PBR metallic parameter
 	float	rough;		// PBR roughness parameter
+	t_vec3	view_dir;	// View direction (points toward camera)
+	t_vec3	light;		// Light vector (from light to shading point)
+	t_vec3	light_dir;	// Light direction (normalized light vector)
+	t_vec3	halfway;	// Halfway vector (between normal and light direction)
 	float	ndotv;		// (surface normal) · (view vector)
 	float	ndotl;		// (surface normal) · (light vector)
 	float	ndoth;		// (surface normal) · (halfway vector)
