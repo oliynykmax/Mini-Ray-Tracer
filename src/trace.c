@@ -51,9 +51,7 @@ static t_vec3	trace_scene(t_ray *r)
 	if (object->type == OBJECT_LIGHT)
 		return (object->color);
 	point = vec3_add(r->ro, vec3_scale(r->rd, t));
-	color = object->color;
-	color = vec3_mul(color, apply_texture(object, point));
-	color = apply_lighting(r, object, point, color);
+	color = apply_lighting(r, object, point);
 	if (object->type == OBJECT_SPHERE && false)
 		color = reflection(r, point, object_normal(object, point));
 	return (color);
