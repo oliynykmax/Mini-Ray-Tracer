@@ -15,7 +15,7 @@
 # include "../assets/libft/libft.h"
 
 // The number of rendering threads to use.
-# define THREAD_COUNT 12
+# define THREAD_COUNT 4
 
 // Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
@@ -32,6 +32,7 @@
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
+typedef enum e_texture		t_texture;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
 typedef struct s_pbr		t_pbr;
@@ -46,6 +47,7 @@ typedef union u_vec3		t_vec3;
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
 typedef t_vec3				(*t_normal_function)(t_object*, t_vec3);
 typedef t_vec3				(*t_texcoord_function)(t_object*, t_vec3);
+typedef float				(*t_texture_function)(float, float);
 
 // 3D coordinate vector type (also used for colors).
 union	u_vec3
@@ -85,6 +87,15 @@ enum	e_object_type
 	OBJECT_CYLINDER,
 	OBJECT_PARA,
 	OBJECT_LIGHT,
+};
+
+// Enumeration type for different procedural textures.
+enum	e_texture
+{
+	TEXTURE_NONE,
+	TEXTURE_CHECKED,
+	TEXTURE_ZIGZAG,
+	TEXTURE_POLKADOT,
 };
 
 // Data describing one geometric object or light in the scene.
@@ -200,7 +211,7 @@ t_vec3		cylinder_normal(t_object *o, t_vec3 p);
 t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
 
 // lighting.c
-t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 color);
+t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p);
 
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
@@ -243,7 +254,7 @@ t_vec3		sphere_normal(t_object *s, t_vec3 p);
 t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
 
 // texturing.c
-t_vec3		apply_texture(t_object *object, t_vec3 point);
+float		get_texture(t_texture texture, float u, float v);
 
 // threads.c
 bool		threads_init(t_render *r);
