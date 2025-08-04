@@ -1,14 +1,28 @@
 #include "minirt.h"
 
-static float	zigzag(float u, float v)
+static float	texture_none(float u, float v)
+{
+	(void) u, (void) v;
+	return (0.0f);
+}
+
+static float	texture_checked(float u, float v)
+{
+	u = floorf(u * 10.0f);
+	v = floorf(v * 10.0f);
+	return (fract((u + v) * 0.5f));
+}
+
+static float	texture_zigzag(float u, float v)
 {
 	const float	a = fabsf(fract(u * 3.0f + 0) * 2.0f - 1.0f);
 	const float	b = fabsf(fract(v * 6.0f + a) * 2.0f - 1.0f);
 
+	return (b * b * (3.0 - 2.0 * b));
 	return (b > 0.5f);
 }
 
-static float	polkadot(float u, float v)
+static float	texture_polkadot(float u, float v)
 {
 	const float	r = 0.25f;
 
@@ -17,19 +31,14 @@ static float	polkadot(float u, float v)
 	return (u * u + v * v > r * r);
 }
 
-static float	checkboard(float u, float v)
+float	get_texture(t_texture texture, float u, float v)
 {
-	return (zigzag(u, v));
-	return (polkadot(u, v));
-	u = floorf(u * 10.0f);
-	v = floorf(v * 10.0f);
-	return (fract((u + v) * 0.5f));
-}
+	static const t_texture_function	functions[] = {
+		texture_none,
+		texture_checked,
+		texture_zigzag,
+		texture_polkadot,
+	};
 
-t_vec3	apply_texture(t_object *object, t_vec3 point)
-{
-	const t_vec3	texcoord = object_texcoord(object, point);
-	const float		value = 0.1f + 0.9f * checkboard(texcoord.x, texcoord.y);
-
-	return (vec3(value, value, value));
+	return (0.1f + 0.9f * functions[texture](u, v));
 }

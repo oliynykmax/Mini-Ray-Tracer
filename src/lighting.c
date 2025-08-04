@@ -72,22 +72,40 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_pbr *p)
 	return (vec3_scale(vec3_mul(vec3_add(diff, spec), radiance), p->ndotl));
 }
 
-t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point, t_vec3 albedo)
+t_vec3	apply_bumpmap(t_texture bumpmap, t_vec3 tc, t_vec3 n)
+{
+	const float	eps = 1e-5f;
+	const float	h = get_texture(bumpmap, tc.x, tc.y);
+	const float	dhdu = (get_texture(bumpmap, tc.x + eps, tc.y) - h) / eps;
+	const float dhdv = (get_texture(bumpmap, tc.x, tc.y + eps) - h) / eps;
+	const t_vec3	t = vec3_cross(n, vec3(1,0,0));
+	const t_vec3	b = vec3_cross(t, n);
+	const t_vec3	dqdu = vec3_add(t, vec3_scale(n, dhdu));
+	const t_vec3	dqdv = vec3_add(b, vec3_scale(n, dhdv));
+	return (vec3_normalize(vec3_cross(dqdv, dqdu)));
+
+	// return (vec3_normalize(vec3_add(normal, vec3(du, dv, 0.0f))));
+}
+
+t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
 {
 	t_pbr		p;
 	t_vec3		color;
+	t_vec3		tc;
 	t_object	*light;
 	size_t		i;
 
+	tc = object_texcoord(object, point);
 	p.point = point;
-	p.albedo = albedo;
-	p.metallic = 0.9f;
-	p.rough = 0.1f;
+	p.albedo = vec3_scale(object->color, get_texture(0, tc.x, tc.y));
+	p.metallic = 1.0f;
+	p.rough = 0.3f;
 	p.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), p.albedo, p.metallic);
 	p.normal = object_normal(object, p.point);
+	p.normal = apply_bumpmap(TEXTURE_ZIGZAG, tc, p.normal);
 	p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
 	p.point = vec3_add(p.point, vec3_scale(p.normal, 1e-5f));
-	color = vec3_mul(albedo, r->scene->ambient);
+	color = vec3_mul(p.albedo, r->scene->ambient);
 	i = -1;
 	while (++i < r->scene->object_count)
 	{
