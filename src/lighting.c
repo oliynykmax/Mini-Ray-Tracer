@@ -114,7 +114,8 @@ t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
 #if 0
 	return vec3_add(vec3_scale(p.normal, 0.5f), vec3(0.5f, 0.5f, 0.5f));
 #endif
-	color = vec3_mul(p.albedo, r->scene->ambient);
+	// color = vec3_mul(p.albedo, r->scene->ambient);
+	color = r->scene->ambient;
 	i = -1;
 	while (++i < r->scene->object_count)
 	{
