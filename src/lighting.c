@@ -66,6 +66,7 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_pbr *p)
 	diff = vec3_sub(vec3(1.0f, 1.0f, 1.0f), spec);
 	diff = vec3_scale(diff, (1.0f - p->metallic) / M_PI);
 	diff = vec3_mul(diff, p->albedo);
+	diff = p->albedo;
 	spec = vec3_scale(spec, brdf_geo_dist(p));
 	spec = vec3_scale(spec, 1.0f / (4.0f * p->ndotv * p->ndotl + 1e-4f));
 	radiance = vec3_scale(light->color, 1.0f / vec3_dot(p->light, p->light));
@@ -84,20 +85,12 @@ t_vec3	apply_bumpmap(t_object *object, t_texture bumpmap, t_vec3 tc, t_vec3 n)
 		t = vec3_cross(n, vec3(1,0,0));
 	t = vec3_normalize(t);
 	t_vec3	b = vec3_cross(t, n);
-	b = vec3_normalize(b);
-	if (vec3_dot(vec3_cross(n, t), b) < 0.0f)
-		t = vec3_scale(t, -1.0f);
+	// return (vec3_cross(t, b));
 	n = vec3_add(n, vec3_scale(t, dhdu));
 	n = vec3_add(n, vec3_scale(b, dhdv));
-	n = vec3_add(n, vec3_scale(n, 1.0f));
-	return (vec3_normalize(n));
-	/*
 	const t_vec3	dqdu = vec3_add(t, vec3_scale(n, dhdu));
 	const t_vec3	dqdv = vec3_add(b, vec3_scale(n, dhdv));
 	return (vec3_normalize(vec3_cross(dqdv, dqdu)));
-	*/
-
-	// return (vec3_normalize(vec3_add(normal, vec3(du, dv, 0.0f))));
 }
 
 t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
@@ -110,14 +103,14 @@ t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
 
 	tc = object_texcoord(object, point);
 	p.point = point;
-	p.albedo = vec3_scale(object->color, get_texture(0, tc.x, tc.y));
+	p.albedo = vec3_scale(object->color, get_texture(TEXTURE_NONE, tc.x, tc.y));
 	p.metallic = 0.9f;
 	p.rough = 0.1f;
 	p.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), p.albedo, p.metallic);
 	p.normal = object_normal(object, p.point);
-	p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
 	p.point = vec3_add(p.point, vec3_scale(p.normal, 1e-5f));
 	p.normal = apply_bumpmap(object, TEXTURE_ZIGZAG, tc, p.normal);
+	p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
 #if 0
 	return vec3_add(vec3_scale(p.normal, 0.5f), vec3(0.5f, 0.5f, 0.5f));
 #endif
