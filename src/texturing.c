@@ -3,7 +3,7 @@
 static float	texture_none(float u, float v)
 {
 	(void) u, (void) v;
-	return (0.0f);
+	return (1.0f);
 }
 
 static float	texture_checked(float u, float v)
@@ -19,7 +19,7 @@ static float	texture_zigzag(float u, float v)
 	const float	b = fabsf(fract(v * 6.0f + a) * 2.0f - 1.0f);
 
 	return (b * b * (3.0 - 2.0 * b));
-	return (b > 0.5f);
+	// return (b > 0.5f);
 }
 
 static float	texture_polkadot(float u, float v)
@@ -40,5 +40,5 @@ float	get_texture(t_texture texture, float u, float v)
 		texture_polkadot,
 	};
 
-	return (0.1f + 0.9f * functions[texture](u, v));
+	return (functions[texture](u, v));
 }
