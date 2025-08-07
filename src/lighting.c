@@ -73,24 +73,31 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_pbr *p)
 	return (vec3_scale(vec3_mul(vec3_add(diff, spec), radiance), p->ndotl));
 }
 
+t_vec3	bumpmap_normal(t_texture bumpmap, t_vec3 tc)
+{
+	tc = vec3_scale(tc, 5.0f);
+	const float	eps = 1e-5f;
+	const float	h = get_texture(bumpmap, tc.x, tc.y);
+	const float	du = (get_texture(bumpmap, tc.x + eps, tc.y) - h) / eps;
+	const float dv = (get_texture(bumpmap, tc.x, tc.y + eps) - h) / eps;
+
+	return (vec3_normalize(vec3(du, -dv, 1e2f)));
+}
+
 t_vec3	apply_bumpmap(t_object *object, t_texture bumpmap, t_vec3 tc, t_vec3 n)
 {
 	(void) object;
-	const float	eps = 1e-5f;
-	const float	h = get_texture(bumpmap, tc.x, tc.y);
-	const float	dhdu = (get_texture(bumpmap, tc.x + eps, tc.y) - h) / eps;
-	const float dhdv = (get_texture(bumpmap, tc.x, tc.y + eps) - h) / eps;
 	t_vec3	t = vec3_cross(n, vec3(0,1,0));
 	if (fabsf(n.y) > 1.0f - 1e-5f)
-		t = vec3_cross(n, vec3(1,0,0));
+		t = vec3_cross(n, vec3(0,0,1));
 	t = vec3_normalize(t);
 	t_vec3	b = vec3_cross(t, n);
-	// return (vec3_cross(t, b));
-	n = vec3_add(n, vec3_scale(t, dhdu));
-	n = vec3_add(n, vec3_scale(b, dhdv));
-	const t_vec3	dqdu = vec3_add(t, vec3_scale(n, dhdu));
-	const t_vec3	dqdv = vec3_add(b, vec3_scale(n, dhdv));
-	return (vec3_normalize(vec3_cross(dqdv, dqdu)));
+	t_vec3 m = bumpmap_normal(bumpmap, tc);
+	t_vec3 p;
+	p.x = vec3_dot(m, vec3(t.x, b.x, n.x));
+	p.y = vec3_dot(m, vec3(t.y, b.y, n.y));
+	p.z = vec3_dot(m, vec3(t.z, b.z, n.z));
+	return (vec3_normalize(p));
 }
 
 t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
@@ -104,13 +111,13 @@ t_vec3	apply_lighting(t_ray *r, t_object *object, t_vec3 point)
 	tc = object_texcoord(object, point);
 	p.point = point;
 	p.albedo = vec3_scale(object->color, get_texture(TEXTURE_NONE, tc.x, tc.y));
-	p.metallic = 0.9f;
+	p.metallic = 1.0f;
 	p.rough = 0.1f;
 	p.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), p.albedo, p.metallic);
 	p.normal = object_normal(object, p.point);
 	p.point = vec3_add(p.point, vec3_scale(p.normal, 1e-5f));
-	p.normal = apply_bumpmap(object, TEXTURE_ZIGZAG, tc, p.normal);
-	p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
+	p.normal = apply_bumpmap(object, TEXTURE_POLKADOT, tc, p.normal);
+	// p.normal = vec3_scale(p.normal, copysignf(1, -vec3_dot(r->rd, p.normal)));
 #if 0
 	return vec3_add(vec3_scale(p.normal, 0.5f), vec3(0.5f, 0.5f, 0.5f));
 #endif
