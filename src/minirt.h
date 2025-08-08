@@ -35,7 +35,7 @@ typedef enum e_object_type	t_object_type;
 typedef enum e_texture		t_texture;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
-typedef struct s_pbr		t_pbr;
+typedef struct s_shading	t_shading;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
@@ -45,8 +45,7 @@ typedef union u_vec3		t_vec3;
 
 // Typedefs for function types.
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
-typedef t_vec3				(*t_normal_function)(t_object*, t_vec3);
-typedef t_vec3				(*t_texcoord_function)(t_object*, t_vec3);
+typedef void				(*t_params_function)(t_object*, t_shading*);
 typedef float				(*t_texture_function)(float, float);
 
 // 3D coordinate vector type (also used for colors).
@@ -177,12 +176,14 @@ struct s_thread
 	size_t	y_max;	// y-coordinate of bottom scanline of region
 };
 
-// Structure holding PBR lighting parameters during shading.
-
-struct s_pbr
+// Structure data used during shading.
+struct s_shading
 {
 	t_vec3	point;		// Surface point that's being shaded
 	t_vec3	normal;		// Surface normal at shading point
+	t_vec3	tangent;	// Tangent vector (points along texcoord.x)
+	t_vec3	bitangent;	// Bitangent vector (points along texcoord.y)
+	t_vec3	texcoord;	// Texture coordinate at the shading point
 	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
 	t_vec3	albedo;		// Surface albedo at shaded point
 	float	metallic;	// PBR metallic parameter
@@ -201,17 +202,10 @@ struct s_pbr
 
 // camera.c
 void		camera_update(t_render *r);
-// para.c
-float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		para_normal(t_object *o, t_vec3 p);
-t_vec3		para_texcoord(t_object *o, t_vec3 p);
+
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		cylinder_normal(t_object *o, t_vec3 p);
-t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
-
-// lighting.c
-t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p);
+void		cylinder_params(t_object *o, t_shading *s);
 
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
@@ -228,13 +222,15 @@ float		solve_quadratic(float a, float b, float c);
 
 // object.c
 float		object_distance(t_object *object, t_vec3 ro, t_vec3 rd);
-t_vec3		object_normal(t_object *obj, t_vec3 point);
-t_vec3		object_texcoord(t_object *obj, t_vec3 point);
+void		object_params(t_object *o, t_shading *s);
+
+// para.c
+float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+void		para_params(t_object *o, t_shading *s);
 
 // plane.c
 float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		plane_normal(t_object *o, t_vec3 p);
-t_vec3		plane_texcoord(t_object *o, t_vec3 p);
+void		plane_params(t_object *o, t_shading *s);
 
 // quaternion.c
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
@@ -248,10 +244,12 @@ t_vec3		random_point_in_square(uint16_t rng);
 t_vec3		random_point_in_disk(uint16_t rng, float radius);
 t_vec3		random_point_on_sphere(uint16_t rng, float radius);
 
+// shading.c
+t_vec3		shade_point(t_ray *r, t_object *object, t_vec3 p);
+
 // sphere.c
-float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
-t_vec3		sphere_normal(t_object *s, t_vec3 p);
-t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
+float		sphere_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+void		sphere_params(t_object *o, t_shading *s);
 
 // texturing.c
 float		get_texture(t_texture texture, float u, float v);
