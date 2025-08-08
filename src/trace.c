@@ -24,7 +24,7 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 
 static t_vec3	trace_scene(t_ray *r);
 
-static t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
+t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
 {
 	const float	fuzziness = 0.1f;
 
@@ -51,9 +51,7 @@ static t_vec3	trace_scene(t_ray *r)
 	if (object->type == OBJECT_LIGHT)
 		return (object->color);
 	point = vec3_add(r->ro, vec3_scale(r->rd, t));
-	color = apply_lighting(r, object, point);
-	if (object->type == OBJECT_SPHERE && false)
-		color = reflection(r, point, object_normal(object, point));
+	color = shade_point(r, object, point);
 	return (color);
 }
 

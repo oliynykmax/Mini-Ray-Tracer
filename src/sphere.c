@@ -9,14 +9,12 @@ float	sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd)
 	return (solve_quadratic(a, b, c));
 }
 
-t_vec3	sphere_normal(t_object *s, t_vec3 p)
+void	sphere_params(t_object *o, t_shading *s)
 {
-	return (vec3_scale(p, 1.0f / s->radius));
-}
+	const t_vec3	p = s->point;
 
-t_vec3	sphere_texcoord(t_object *s, t_vec3 p)
-{
-	p.x = fmaxf(0.0f, atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f);
-	p.y = fmaxf(0.0f, asinf(p.y / s->radius) / M_PI + 0.5f);
-	return (p);
+	s->normal = vec3_scale(p, 1.0f / o->radius);
+	s->tangent = vec3_normalize(vec3_cross(s->normal, vec3(0.0f, 1.0f, 0.0f)));
+	s->texcoord.x = fmaxf(0.0f, atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f);
+	s->texcoord.y = fmaxf(0.0f, asinf(p.y / o->radius) / M_PI + 0.5f);
 }
