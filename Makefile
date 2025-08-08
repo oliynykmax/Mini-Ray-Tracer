@@ -18,7 +18,7 @@ SRCS := \
 	src/cleanup.c \
 	src/cylinder.c \
 	src/input.c \
-	src/lighting.c \
+	src/shading.c \
 	src/loop.c \
 	src/main.c \
 	src/math.c \
