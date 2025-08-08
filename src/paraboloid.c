@@ -36,18 +36,15 @@ float	para_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 	return (fminf(body, top_cap));
 }
 
-t_vec3	para_normal(t_object *o, t_vec3 p)
+void	para_params(t_object *o, t_shading *s)
 {
-	const float	k = (o->radius * o->radius) / o->height;
+	const t_vec3	p = s->point;
+	const float		k = (o->radius * o->radius) / o->height;
 
 	if (fabsf(p.y - 0.5f * o->height) < 1e-4f)
-		return (vec3(0, 1, 0));
-	return (vec3_normalize(vec3(2.0f * p.x, -k, 2.0f * p.z)));
-}
-
-t_vec3	para_texcoord(t_object *o, t_vec3 p)
-{
-	p.y = clamp(p.y, -o->height * 0.5f, o->height * 0.5f);
-	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
-	return (p);
+		return (plane_params(o, s));
+	s->normal = vec3_normalize(vec3(2.0f * p.x, -k, 2.0f * p.z));
+	s->tangent = vec3_normalize(vec3_cross(s->normal, vec3(0, 1, 0)));
+	s->texcoord.y = clamp(p.y, -o->height * 0.5f, o->height * 0.5f);
+	s->texcoord.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 }
