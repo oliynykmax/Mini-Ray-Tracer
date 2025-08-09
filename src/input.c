@@ -75,7 +75,7 @@ void	validate_input_and_parse_map(int ac, char **av, t_scene *sc)
 	mrt_assert(&map, ac == 2 && ends_with_rt(av[1]),
 		"usage: ./miniRT <path_to_the_file.rt>\n");
 	map.fd = open(av[1], O_RDONLY);
-	mrt_assert(&map, map.fd < 0, "Error\nCould not open file %s\n", av[1]);
+	mrt_assert(&map, map.fd >= 0, "Error\nCould not open file %s\n", av[1]);
 	read_map_into_scene(&map);
 	get_next_line(-1);
 	close(map.fd);

@@ -22,7 +22,9 @@ t_texture	parse_texture(bool exists, t_parse *map, const char *token)
 
 float	parse_float(bool exists, char *str, float std)
 {
-	return (ft_atof(str) * exists + std * !exists);
+	if (!exists || str == NULL || ft_strcmp(str, "_") == 0)
+		return (std);
+	return (ft_atof(str));
 }
 
 void	parse_sphere(t_parse *m)
