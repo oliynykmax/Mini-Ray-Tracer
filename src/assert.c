@@ -26,6 +26,7 @@ void	mrt_assert(t_parse *map, bool condition, char *format, ...)
 		{
 			ft_putstr_fd(strerror(errno_value), STDERR_FILENO);
 			ft_putstr_fd(": ", STDERR_FILENO);
+			write(2, "\n", 1);
 		}
 		va_start(args, format);
 		printf_fd(2, format, &args);

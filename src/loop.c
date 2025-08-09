@@ -55,11 +55,10 @@ static void	resize_hook(int32_t width, int32_t height, void *param)
 
 // Renderer entry point. Sets up the MLX state and installs all event hooks.
 
-void	render_scene(t_render *r, t_scene *scene)
+void	render_scene(t_render *r)
 {
-	r->scene = scene;
-	r->camera_yaw = atan2(scene->dir.z, scene->dir.x);
-	r->camera_pitch = acos(scene->dir.y);
+	r->camera_yaw = atan2(r->scene->dir.z, r->scene->dir.x);
+	r->camera_pitch = acos(r->scene->dir.y);
 	r->mlx = mlx_init(2 * 480, 2 * 360, "miniRT", true);
 	if (r->mlx != NULL)
 	{

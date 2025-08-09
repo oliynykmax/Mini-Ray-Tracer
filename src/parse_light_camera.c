@@ -35,7 +35,6 @@ void	parse_point_light(t_parse *m)
 	mrt_warning(brightness <= 1.0f, "Light brightness is over 1.0\n");
 	m->obj->color = scale3(m->obj->color, brightness / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
-	m->sc->object_count++;
 }
 
 // Then in read_map_into_scene, when errors occur:

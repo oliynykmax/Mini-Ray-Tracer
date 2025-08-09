@@ -20,7 +20,6 @@ void	parse_sphere(t_parse *m)
 	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	mrt_assert(m, m->obj->radius > 0.0f, "Sphere radius must be positive\n");
-	m->sc->object_count++;
 }
 
 void	parse_plane(t_parse *m)
@@ -44,7 +43,6 @@ void	parse_plane(t_parse *m)
 	mrt_assert(m, fabsf(len3(m->normal) - 1.0f) < 0.001f,
 		"Plane normal must be a unit vector\n");
 	m->obj->rot = quat_from_direction(m->normal);
-	m->sc->object_count++;
 }
 
 void	parse_para(t_parse *m)
@@ -72,7 +70,6 @@ void	parse_para(t_parse *m)
 	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
 		"Para radius and height must be positive\n");
 	m->obj->rot = quat_from_direction(m->normal);
-	m->sc->object_count++;
 }
 
 void	parse_cylinder(t_parse *m)
@@ -100,15 +97,16 @@ void	parse_cylinder(t_parse *m)
 	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
 		"Cylinder radius and height must be positive\n");
 	m->obj->rot = quat_from_direction(m->normal);
-	m->sc->object_count++;
 }
 
-void	parse_object(t_parse *m)
+void	parse_type(t_parse *m)
 {
 	if (ft_strcmp(m->line[0], "A") == 0)
 		parse_amb_light(m);
 	else if (ft_strcmp(m->line[0], "L") == 0)
 		parse_point_light(m);
+	else if (ft_strcmp(m->line[0], "C") == 0)
+		parse_camera(m);
 	else if (ft_strcmp(m->line[0], "sp") == 0)
 		parse_sphere(m);
 	else if (ft_strcmp(m->line[0], "pl") == 0)
@@ -117,4 +115,7 @@ void	parse_object(t_parse *m)
 		parse_cylinder(m);
 	else if (ft_strcmp(m->line[0], "pa") == 0)
 		parse_para(m);
+	else
+		mrt_assert(m, false, "Not a valid type: %s\n", m->line[0]);
+	m->sc->object_count++;
 }
