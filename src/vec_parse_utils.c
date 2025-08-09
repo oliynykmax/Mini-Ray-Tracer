@@ -55,7 +55,7 @@ bool	vec3_in_range(t_vec3 v, float lower, float upper)
  * @param limits  Two-element array {min, max}; if limits[0] == limits[1],
 	range check is skipped
  */
-void	parse3(t_parse *m, const char *str, t_vec3 *out, const float limits[2])
+void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 {
 	char	**split;
 
