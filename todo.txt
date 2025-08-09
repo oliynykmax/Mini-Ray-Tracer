@@ -10,7 +10,7 @@
 		[X] Radius
 		[X] Allow brightness over 1
 [X] Visualize lights as glowing spheres
-[ ] Shorten vec3 function names
+[X] Shorten vec3 function names
 [ ] Draw a grid for move/resize/rotate UI
 
 =========================
