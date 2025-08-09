@@ -211,9 +211,6 @@ void		cylinder_params(t_object *o, t_shading *s);
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
 
-// main.c
-void		parse_scene(t_scene *scene, char *filename);
-
 // math.c
 float		clamp(float value, float lower, float upper);
 float		saturate(float value);
