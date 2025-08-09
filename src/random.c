@@ -38,5 +38,5 @@ t_vec3	random_point_on_sphere(uint16_t rng, float radius)
 	const float		y = sinf(p.x * M_PI) * sinf(p.y * TAU);
 	const float		z = cosf(p.x * M_PI);
 
-	return (vec3_scale(vec3(x, y, z), radius));
+	return (scale3(vec3(x, y, z), radius));
 }

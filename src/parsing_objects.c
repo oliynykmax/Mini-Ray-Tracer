@@ -1,33 +1,5 @@
 #include "minirt.h"
 
-t_texture	parse_texture(bool exists, t_parse *map, const char *token)
-{
-	if (!exists)
-		return (TEXTURE_NONE);
-	if (ft_strcmp(token, "checker") == 0)
-		return (TEXTURE_CHECKED);
-	if (ft_strcmp(token, "zigzag") == 0)
-		return (TEXTURE_ZIGZAG);
-	if (ft_strcmp(token, "polkadot") == 0)
-		return (TEXTURE_POLKADOT);
-	if (ft_strcmp(token, "bump") == 0)
-		return (TEXTURE_BUMP);
-	if (ft_strcmp(token, "_") == 0)
-		return (TEXTURE_NONE);
-	mrt_assert(map,
-		false,
-		"Unknown texture '%s' (expected checker | zigzag | polkadot | bump)\n",
-		token);
-	return (TEXTURE_NONE);
-}
-
-float	parse_float(bool exists, char *str, float std)
-{
-	if (!exists || str == NULL || ft_strcmp(str, "_") == 0)
-		return (std);
-	return (ft_atof(str));
-}
-
 void	parse_sphere(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
@@ -45,7 +17,7 @@ void	parse_sphere(t_parse *m)
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m->line[2]) * 0.5;
-	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	mrt_assert(m, m->obj->radius > 0.0f, "Sphere radius must be positive\n");
 	m->sc->object_count++;
@@ -68,8 +40,8 @@ void	parse_plane(t_parse *m)
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
-	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
-	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(len3(m->normal) - 1.0f) < 0.001f,
 		"Plane normal must be a unit vector\n");
 	m->obj->rot = quat_from_direction(m->normal);
 	m->sc->object_count++;
@@ -94,8 +66,8 @@ void	parse_para(t_parse *m)
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m->line[3]) * 0.5;
 	m->obj->height = ft_atof(m->line[4]);
-	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
-	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(len3(m->normal) - 1.0f) < 0.001f,
 		"Paraboloid axis must be a unit vector\n");
 	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
 		"Para radius and height must be positive\n");
@@ -122,8 +94,8 @@ void	parse_cylinder(t_parse *m)
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m->line[3]) * 0.5;
 	m->obj->height = ft_atof(m->line[4]);
-	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
-	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(len3(m->normal) - 1.0f) < 0.001f,
 		"Cylinder axis must be a unit vector\n");
 	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
 		"Cylinder radius and height must be positive\n");

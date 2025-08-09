@@ -26,6 +26,7 @@ SRCS := \
 	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
+	src/parse_utils.c \
 	src/plane.c \
 	src/quaternion.c \
 	src/random.c \

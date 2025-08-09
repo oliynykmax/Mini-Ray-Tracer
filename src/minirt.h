@@ -282,25 +282,25 @@ t_vec3		get_viewport_ray(t_render *r, float x, float y, bool jitter);
 t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
-t_vec3		vec3_add(t_vec3 a, t_vec3 b);
-t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3		vec3_div(t_vec3 a, t_vec3 b);
-t_vec3		vec3_scale(t_vec3 v, float s);
+t_vec3		add3(t_vec3 a, t_vec3 b);
+t_vec3		sub3(t_vec3 a, t_vec3 b);
+t_vec3		mul3(t_vec3 a, t_vec3 b);
+t_vec3		div3(t_vec3 a, t_vec3 b);
+t_vec3		scale3(t_vec3 v, float s);
 
 // vec3_geometric.c
-float		vec3_dot(t_vec3 a, t_vec3 b);
-float		vec3_length(t_vec3 v);
-t_vec3		vec3_normalize(t_vec3 v);
-t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
-t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
+float		dot3(t_vec3 a, t_vec3 b);
+float		len3(t_vec3 v);
+t_vec3		norm3(t_vec3 v);
+t_vec3		cross3(t_vec3 a, t_vec3 b);
+t_vec3		reflect3(t_vec3 i, t_vec3 n);
 
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);
-t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
-t_vec3		vec3_tonemap(t_vec3 color);
-t_vec3		vec3_to_srgb(t_vec3 color);
-uint32_t	vec3_to_color(t_vec3 color);
+t_vec3		lerp3(t_vec3 a, t_vec3 b, float t);
+t_vec3		tonemap3(t_vec3 color);
+t_vec3		to_srgb3(t_vec3 color);
+uint32_t	to_color3(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */
 void		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
@@ -321,8 +321,10 @@ int			array_len(char **array);
 void		free_array(char **array);
 /* vector parsing utils */
 double		ft_atof(const char *str);
-bool		vec3_in_range(t_vec3 v, float lower, float upper);
+bool		in_range3(t_vec3 v, float lower, float upper);
 void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
+/* parse_utils.c */
 float		parse_float(bool exists, char *str, float std);
+t_texture	parse_texture(bool exists, t_parse *map, const char *token);
 
 #endif
