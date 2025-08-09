@@ -31,6 +31,11 @@ static float	texture_polkadot(float u, float v)
 	return (b * b * (3.0 - 2.0 * b));
 }
 
+static float	texture_bump(float u, float v)
+{
+	return (texture_polkadot(u, v));
+}
+
 float	get_texture(t_texture texture, float u, float v)
 {
 	static const t_texture_function	functions[] = {
@@ -38,6 +43,7 @@ float	get_texture(t_texture texture, float u, float v)
 		texture_checked,
 		texture_zigzag,
 		texture_polkadot,
+		texture_bump,
 	};
 
 	return (functions[texture](u, v));

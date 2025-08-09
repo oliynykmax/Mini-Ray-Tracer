@@ -10,12 +10,13 @@ t_texture	parse_texture(bool exists, t_parse *map, const char *token)
 		return (TEXTURE_ZIGZAG);
 	if (ft_strcmp(token, "polkadot") == 0)
 		return (TEXTURE_POLKADOT);
+	if (ft_strcmp(token, "bump") == 0)
+		return (TEXTURE_BUMP);
 	if (ft_strcmp(token, "_") == 0)
 		return (TEXTURE_NONE);
 	mrt_assert(map,
 		false,
-		"Unknown texture '%s' (expected checker"
-		"| zigzag | polkadot)\n",
+		"Unknown texture '%s' (expected checker | zigzag | polkadot | bump)\n",
 		token);
 	return (TEXTURE_NONE);
 }

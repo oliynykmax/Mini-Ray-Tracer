@@ -98,6 +98,7 @@ enum	e_texture
 	TEXTURE_CHECKED,
 	TEXTURE_ZIGZAG,
 	TEXTURE_POLKADOT,
+	TEXTURE_BUMP,
 };
 
 // Data describing one geometric object or light in the scene.
