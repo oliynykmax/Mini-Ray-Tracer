@@ -20,13 +20,14 @@ void	parse_point_light(t_parse *m)
 	double	brightness;
 
 	m->arrlen = array_len(m->line);
-	mrt_assert(m, m->arrlen != 4 && m->arrlen != 5,
+	mrt_assert(m, (m->arrlen == 4 || m->arrlen == 5),
 		"Invalid point light format\n");
 	objects_malloc_manager(m);
 	brightness = ft_atof(m->line[2]);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_LIGHT;
-	m->obj->radius = ft_atof(m->line[4]) * m->arrlen == 5;
+	if (m->arrlen == 5)
+		m->obj->radius = ft_atof(m->line[4]);
 	mrt_assert(m, m->obj->radius >= 0.0f, "Light radius must be positive\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});

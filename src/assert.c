@@ -8,7 +8,7 @@ static void	cleanup_parsing(t_parse *map)
 	if (map->buff)
 		free(map->buff);
 	if (map->line)
-		free(map->line);
+		free_array(map->line);
 	cleanup_scene(map->sc);
 }
 
