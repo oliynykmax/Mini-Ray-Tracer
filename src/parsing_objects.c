@@ -1,112 +1,145 @@
 #include "minirt.h"
 
-bool	parse_sphere(char **line, t_scene *sc)
+t_texture	parse_texture(bool exists, t_parse *map, const char *token)
 {
-	t_object	*obj;
-
-	if (array_len(line) != 4 || objects_malloc_manager(sc))
-		return (true);
-	obj = &sc->objects[sc->object_count];
-	obj->type = OBJECT_SPHERE;
-	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[3],
-			&obj->color, 0, 255))
-		return (true);
-	obj->radius = ft_atof(line[2]) / 2.0;
-	if (!mrt_assert(obj->radius > 0.0f, "Sphere radius must be positive\n"))
-		return (true);
-	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
-	sc->object_count++;
-	return (false);
+	if (!exists)
+		return (TEXTURE_NONE);
+	if (ft_strcmp(token, "checker") == 0)
+		return (TEXTURE_CHECKED);
+	if (ft_strcmp(token, "zigzag") == 0)
+		return (TEXTURE_ZIGZAG);
+	if (ft_strcmp(token, "polkadot") == 0)
+		return (TEXTURE_POLKADOT);
+	if (ft_strcmp(token, "_") == 0)
+		return (TEXTURE_NONE);
+	mrt_assert(map,
+		false,
+		"Unknown texture '%s' (expected checker"
+		"| zigzag | polkadot)\n",
+		token);
+	return (TEXTURE_NONE);
 }
 
-bool	parse_plane(char **line, t_scene *sc)
+float	parse_float(bool exists, char *str, float std)
 {
-	t_object	*obj;
-	t_vec3		normal;
-
-	if (array_len(line) != 4 || objects_malloc_manager(sc))
-		return (true);
-	obj = &sc->objects[sc->object_count];
-	obj->type = OBJECT_PLANE;
-	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
-			&normal, -1, 1) || !parse3(line[3], &obj->color, 0, 255))
-		return (true);
-	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
-			"Plane normal must be a unit vector\n"))
-		return (true);
-	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_direction(normal);
-	sc->object_count++;
-	return (false);
+	return (ft_atof(str) * exists + std * !exists);
 }
 
-bool	parse_para(char **line, t_scene *sc)
+void	parse_sphere(t_parse *m)
 {
-	t_object	*obj;
-	t_vec3		normal;
-
-	if (array_len(line) != 6 || objects_malloc_manager(sc))
-		return (true);
-	obj = &sc->objects[sc->object_count];
-	obj->type = OBJECT_PARA;
-	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
-			&normal, -1, 1) || !parse3(line[5], &obj->color, 0, 255))
-		return (true);
-	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
-			"para axis must be a unit vector\n"))
-		return (true);
-	obj->radius = ft_atof(line[3]) / 2.0;
-	obj->height = ft_atof(line[4]);
-	if (!mrt_assert(obj->radius > 0.0f, "para radius must be positive\n")
-		|| !mrt_assert(obj->height > 0.0f, "para height must be positive\n"))
-		return (true);
-	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_direction(normal);
-	sc->object_count++;
-	return (false);
+	m->arrlen = array_len(m->line);
+	mrt_assert(m, m->arrlen >= 4 && m->arrlen <= 7, "Invalid sphere format\n");
+	objects_malloc_manager(m);
+	m->obj = &m->sc->objects[m->sc->object_count];
+	m->obj->type = OBJECT_SPHERE;
+	m->obj->texture = parse_texture(m->arrlen > 4, m, m->line[4]);
+	m->obj->rough = parse_float(m->arrlen > 5, m->line[5], DEFAULT_ROUGH);
+	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
+		"Rough must be in [0,1]\n");
+	m->obj->metallic = parse_float(m->arrlen > 6, m->line[6], DEFAULT_METALLIC);
+	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
+		"Metallic must be in [0,1]\n");
+	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
+	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
+	m->obj->radius = ft_atof(m->line[2]) * 0.5;
+	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
+	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	mrt_assert(m, m->obj->radius > 0.0f, "Sphere radius must be positive\n");
+	m->sc->object_count++;
 }
 
-bool	parse_cylinder(char **line, t_scene *sc)
+void	parse_plane(t_parse *m)
 {
-	t_object	*obj;
-	t_vec3		axis;
-
-	if (array_len(line) != 6 || objects_malloc_manager(sc))
-		return (true);
-	obj = &sc->objects[sc->object_count];
-	obj->type = OBJECT_CYLINDER;
-	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
-			&axis, -1, 1) || !parse3(line[5], &obj->color, 0, 255))
-		return (true);
-	if (!mrt_assert(fabsf(vec3_length(axis) - 1.0f) < 0.001f,
-			"Cylinder axis must be a unit vector\n"))
-		return (true);
-	obj->radius = ft_atof(line[3]) / 2.0;
-	obj->height = ft_atof(line[4]);
-	if (!mrt_assert(obj->radius > 0.0f, "Cylinder diameter must be positive\n")
-		|| !mrt_assert(obj->height > 0.0f,
-			"Cylinder height must be positive\n"))
-		return (true);
-	obj->color = vec3_scale(obj->color, 1.0 / 255.0);
-	obj->rot = quat_from_direction(axis);
-	sc->object_count++;
-	return (false);
+	m->arrlen = array_len(m->line);
+	mrt_assert(m, m->arrlen >= 4 && m->arrlen <= 7, "Invalid plane format\n");
+	objects_malloc_manager(m);
+	m->obj = &m->sc->objects[m->sc->object_count];
+	m->obj->type = OBJECT_PLANE;
+	m->obj->texture = parse_texture(m->arrlen > 4, m, m->line[4]);
+	m->obj->rough = parse_float(m->arrlen > 5, m->line[5], DEFAULT_ROUGH);
+	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
+		"Rough must be in [0,1]\n");
+	m->obj->metallic = parse_float(m->arrlen > 6, m->line[6], DEFAULT_METALLIC);
+	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
+		"Metallic must be in [0,1]\n");
+	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
+	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
+	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
+	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+		"Plane normal must be a unit vector\n");
+	m->obj->rot = quat_from_direction(m->normal);
+	m->sc->object_count++;
 }
 
-bool	parse_object(char **line, t_scene *sc)
+void	parse_para(t_parse *m)
 {
-	if (ft_strcmp(line[0], "A") == 0)
-		return (parse_amb_light(line, sc));
-	else if (ft_strcmp(line[0], "L") == 0)
-		return (parse_point_light(line, sc));
-	else if (ft_strcmp(line[0], "sp") == 0)
-		return (parse_sphere(line, sc));
-	else if (ft_strcmp(line[0], "pl") == 0)
-		return (parse_plane(line, sc));
-	else if (ft_strcmp(line[0], "cy") == 0)
-		return (parse_cylinder(line, sc));
-	else if (ft_strcmp(line[0], "pa") == 0)
-		return (parse_para(line, sc));
-	return (true);
+	m->arrlen = array_len(m->line);
+	mrt_assert(m, m->arrlen >= 6 && m->arrlen <= 9, "Invalid para format\n");
+	objects_malloc_manager(m);
+	m->obj = &m->sc->objects[m->sc->object_count];
+	m->obj->type = OBJECT_PARA;
+	m->obj->texture = parse_texture(m->arrlen > 6, m, m->line[6]);
+	m->obj->rough = parse_float(m->arrlen > 7, m->line[7], DEFAULT_ROUGH);
+	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
+		"Rough must be in [0,1]\n");
+	m->obj->metallic = parse_float(m->arrlen > 8, m->line[8], DEFAULT_METALLIC);
+	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
+		"Metallic must be in [0,1]\n");
+	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
+	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
+	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
+	m->obj->radius = ft_atof(m->line[3]) * 0.5;
+	m->obj->height = ft_atof(m->line[4]);
+	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+		"Paraboloid axis must be a unit vector\n");
+	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
+		"Para radius and height must be positive\n");
+	m->obj->rot = quat_from_direction(m->normal);
+	m->sc->object_count++;
+}
+
+void	parse_cylinder(t_parse *m)
+{
+	m->arrlen = array_len(m->line);
+	mrt_assert(m, m->arrlen >= 6 && m->arrlen <= 9, "Invalid Cy format\n");
+	objects_malloc_manager(m);
+	m->obj = &m->sc->objects[m->sc->object_count];
+	m->obj->type = OBJECT_CYLINDER;
+	m->obj->texture = parse_texture(m->arrlen > 6, m, m->line[6]);
+	m->obj->rough = parse_float(m->arrlen > 7, m->line[7], DEFAULT_ROUGH);
+	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
+		"Rough must be in [0,1]\n");
+	m->obj->metallic = parse_float(m->arrlen > 8, m->line[8], DEFAULT_METALLIC);
+	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
+		"Metallic must be in [0,1]\n");
+	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
+	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
+	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
+	m->obj->radius = ft_atof(m->line[3]) * 0.5;
+	m->obj->height = ft_atof(m->line[4]);
+	m->obj->color = vec3_scale(m->obj->color, 1.0 / 255.0);
+	mrt_assert(m, fabsf(vec3_length(m->normal) - 1.0f) < 0.001f,
+		"Cylinder axis must be a unit vector\n");
+	mrt_assert(m, m->obj->radius > 0.0f && m->obj->height > 0.0f,
+		"Cylinder radius and height must be positive\n");
+	m->obj->rot = quat_from_direction(m->normal);
+	m->sc->object_count++;
+}
+
+void	parse_object(t_parse *m)
+{
+	if (ft_strcmp(m->line[0], "A") == 0)
+		parse_amb_light(m);
+	else if (ft_strcmp(m->line[0], "L") == 0)
+		parse_point_light(m);
+	else if (ft_strcmp(m->line[0], "sp") == 0)
+		parse_sphere(m);
+	else if (ft_strcmp(m->line[0], "pl") == 0)
+		parse_plane(m);
+	else if (ft_strcmp(m->line[0], "cy") == 0)
+		parse_cylinder(m);
+	else if (ft_strcmp(m->line[0], "pa") == 0)
+		parse_para(m);
 }
