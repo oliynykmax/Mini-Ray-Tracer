@@ -54,7 +54,7 @@ bool	vec3_in_range(t_vec3 v, float lower, float upper)
  * @param max Maximum allowed value (ignored if min == max)
  * @return true on success, false on failure
  */
-bool	parse_vec3(char *str, t_vec3 *out, float min, float max)
+bool	parse3(char *str, t_vec3 *out, float min, float max)
 {
 	char	**split;
 

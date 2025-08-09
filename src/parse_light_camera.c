@@ -8,7 +8,7 @@ bool	parse_amb_light(char **line, t_scene *sc)
 	if (ambient_exists || array_len(line) != 3)
 		return (true);
 	ratio = ft_atof(line[1]);
-	if (!parse_vec3(line[2], &sc->ambient, 0, 255) || !mrt_assert(ratio >= 0.0f
+	if (!parse3(line[2], &sc->ambient, 0, 255) || !mrt_assert(ratio >= 0.0f
 			&& ratio <= 1.0f,
 			"Ambient light ratio must be between 0.0 and 1.0\n"))
 		return (true);
@@ -30,7 +30,7 @@ bool	parse_point_light(char **line, t_scene *sc)
 	obj->type = OBJECT_LIGHT;
 	if (array_len(line) == 5)
 		obj->radius = ft_atof(line[4]);
-	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[3],
+	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[3],
 			&obj->color, 0, 255) || !mrt_assert(brightness >= 0.0f,
 			"Light brightness must be positive\n"))
 		return (true);
@@ -53,9 +53,9 @@ bool	parse_point_light(char **line, t_scene *sc)
  */
 bool	parse_camera(char **line, t_scene *sc)
 {
-	static int	exist = 0;
+	static bool	camera_exist = false;
 
-	if (exist == 1 || (array_len(line) != 4 && array_len(line) != 6))
+	if (camera_exist || (array_len(line) != 4 && array_len(line) != 6))
 		return (true);
 	if (array_len(line) == 6)
 	{
@@ -63,10 +63,9 @@ bool	parse_camera(char **line, t_scene *sc)
 		sc->aperture_size = ft_atof(line[5]);
 	}
 	sc->fov = ft_atof(line[3]);
-	if (!parse_vec3(line[1], &sc->pos, 0, 0) || !parse_vec3(line[2], &sc->dir,
-			-1, 1))
-		return (true);
-	exist = 1;
+	if (!parse3(line[1], &sc->pos, 0, 0) || !parse3(line[2], &sc->dir, -1, 1))
+	    return (true);
+	camera_exist = true;
 	return (!mrt_assert(fabsf(vec3_length(sc->dir) - 1.0f) < 0.001f,
 			"Camera direction components must be between -1 and 1\n")
 		|| !mrt_assert(sc->fov >= 0.0f && sc->fov <= 180.0f,

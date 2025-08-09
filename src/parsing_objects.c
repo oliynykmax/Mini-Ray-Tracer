@@ -8,7 +8,7 @@ bool	parse_sphere(char **line, t_scene *sc)
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_SPHERE;
-	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[3],
+	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[3],
 			&obj->color, 0, 255))
 		return (true);
 	obj->radius = ft_atof(line[2]) / 2.0;
@@ -29,8 +29,8 @@ bool	parse_plane(char **line, t_scene *sc)
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_PLANE;
-	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&normal, -1, 1) || !parse_vec3(line[3], &obj->color, 0, 255))
+	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
+			&normal, -1, 1) || !parse3(line[3], &obj->color, 0, 255))
 		return (true);
 	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"Plane normal must be a unit vector\n"))
@@ -50,8 +50,8 @@ bool	parse_para(char **line, t_scene *sc)
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_PARA;
-	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&normal, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
+	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
+			&normal, -1, 1) || !parse3(line[5], &obj->color, 0, 255))
 		return (true);
 	if (!mrt_assert(fabsf(vec3_length(normal) - 1.0f) < 0.001f,
 			"para axis must be a unit vector\n"))
@@ -76,8 +76,8 @@ bool	parse_cylinder(char **line, t_scene *sc)
 		return (true);
 	obj = &sc->objects[sc->object_count];
 	obj->type = OBJECT_CYLINDER;
-	if (!parse_vec3(line[1], &obj->pos, 0, 0) || !parse_vec3(line[2],
-			&axis, -1, 1) || !parse_vec3(line[5], &obj->color, 0, 255))
+	if (!parse3(line[1], &obj->pos, 0, 0) || !parse3(line[2],
+			&axis, -1, 1) || !parse3(line[5], &obj->color, 0, 255))
 		return (true);
 	if (!mrt_assert(fabsf(vec3_length(axis) - 1.0f) < 0.001f,
 			"Cylinder axis must be a unit vector\n"))
