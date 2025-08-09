@@ -15,6 +15,5 @@ int	main(int ac, char **av)
 	}
 	render_scene(&render, &scene);
 	cleanup_scene(&scene);
-	free(scene.objects);
 	return (0);
 }

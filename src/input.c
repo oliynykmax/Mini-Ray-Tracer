@@ -26,7 +26,7 @@ int	objects_malloc_manager(t_scene *sc)
 	return (0);
 }
 
-int	process_line(t_scene *sc, char *buff)
+static int	process_line(t_scene *sc, char *buff)
 {
 	char	**line;
 	bool	error;
@@ -36,11 +36,8 @@ int	process_line(t_scene *sc, char *buff)
 	if (nl != NULL)
 		*nl = '\0';
 	line = ft_split(buff, ' ');
-	if (line == NULL || !line[0])
-	{
-		free_array(line);
-		return (1);
-	}
+	if (!line)
+		return (!mrt_assert(false, "Allocation failure during split\n"));
 	if (ft_strcmp(line[0], "C") == 0)
 		error = parse_camera(line, sc);
 	else if (ft_strcmp(line[0], "L") == 0 || ft_strcmp(line[0], "A") == 0
@@ -53,7 +50,7 @@ int	process_line(t_scene *sc, char *buff)
 	return (error);
 }
 
-bool	read_map_into_scene(int fd, t_scene *sc)
+static void	read_map_into_scene(int fd, t_scene *sc)
 {
 	char	*buff;
 
@@ -68,26 +65,21 @@ bool	read_map_into_scene(int fd, t_scene *sc)
 			{
 				free(buff);
 				cleanup_scene(sc);
-				return (false);
+				return ;
 			}
 		}
 		free(buff);
 	}
-	return (sc->object_count > 0);
 }
 
-static bool	ends_with_rt(const char *path)
+static bool	ends_with_rt(const char *p)
 {
-	const char	*dot = ft_strrchr(path, '.');
-
-	if (!dot)
-		return (false);
-	if (dot != NULL && *(dot + 1) != '\0')
-		return (ft_strcmp(dot, ".rt") == 0);
-	return (false);
+	const char *d = ft_strrchr(p, '.');
+	return (d && !ft_strcmp(d, ".rt"));
 }
 
-bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
+
+bool	validate_input_and_parse_map(int ac, char **av, t_scene *sc)
 {
 	int	fd;
 
@@ -100,8 +92,8 @@ bool	validate_input_and_parse_map(int ac, char **av, t_scene *scene)
 		ft_fprintf(2, "Error\nCould not open file %s\n", av[1]);
 		return (false);
 	}
-	read_map_into_scene(fd, scene);
+	read_map_into_scene(fd, sc);
 	get_next_line(-1);
 	close(fd);
-	return (scene->object_count > 0);
+	return (mrt_assert(sc->object_count > 0, "not enough objects provided"));
 }
