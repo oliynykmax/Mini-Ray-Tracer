@@ -106,6 +106,7 @@ struct s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/para/light)
 	float			height;	// Height (cylinder/para)
+	t_texture       texture; // texture(if any)
 };
 
 struct s_ray
@@ -309,7 +310,7 @@ void		free_array(char **array);
 /* vector parsing utils */
 double		ft_atof(const char *str);
 bool		vec3_in_range(t_vec3 v, float lower, float upper);
-bool		parse_vec3(char *str, t_vec3 *out, float min, float max);
+bool		parse3(char *str, t_vec3 *out, float min, float max);
 bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
 
 #endif
