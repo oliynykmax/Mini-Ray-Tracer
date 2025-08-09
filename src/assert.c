@@ -1,12 +1,24 @@
 #include "minirt.h"
 
-bool	mrt_assert(bool condition, char *format, ...)
+static void	cleanup_parsing(t_parse *map)
+{
+	get_next_line(-1);
+	if (map->fd >= 0)
+		close(map->fd);
+	if (map->buff)
+		free(map->buff);
+	if (map->line)
+		free(map->line);
+	cleanup_scene(map->sc);
+}
+
+void	mrt_assert(t_parse *map, bool condition, char *format, ...)
 {
 	const int	errno_value = errno;
 	va_list		args;
 
 	if (condition == true)
-		return (true);
+		return ;
 	ft_fprintf(2, "Error\n");
 	if (format != NULL || errno_value != 0)
 	{
@@ -19,12 +31,13 @@ bool	mrt_assert(bool condition, char *format, ...)
 		printf_fd(2, format, &args);
 		va_end(args);
 	}
-	return (false);
+	cleanup_parsing(map);
+	exit(EXIT_FAILURE);
 }
 
 bool	mrt_warning(bool condition, char *format, ...)
 {
-	va_list		args;
+	va_list	args;
 
 	if (condition == true)
 		return (true);

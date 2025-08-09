@@ -60,11 +60,8 @@ char	*get_next_line(int fd)
 
 	if (fd == -1)
 	{
-		if (res)
-		{
 			free(res);
 			res = NULL;
-		}
 	}
 	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FD_NUM)
 		return (NULL);
