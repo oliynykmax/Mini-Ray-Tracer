@@ -29,6 +29,8 @@
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
 # define TAU 6.283185307179586 // 2π
+# define DEFAULT_ROUGH 0.1
+# define DEFAULT_METALLIC 0.5
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
@@ -40,6 +42,7 @@ typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
+typedef struct s_parse		t_parse;
 typedef union u_quat		t_quat;
 typedef union u_vec3		t_vec3;
 
@@ -106,7 +109,9 @@ struct s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/para/light)
 	float			height;	// Height (cylinder/para)
-	t_texture       texture; // texture(if any)
+	t_texture		texture; // texture(if any)
+	float			rough; // surface roughness
+	float			metallic; // metallic factor
 };
 
 struct s_ray
@@ -200,6 +205,17 @@ struct s_shading
 	t_vec3	diffuse;	// Diffuse contribution
 	t_vec3	specular;	// Specular contribution
 };
+// struct for parsing related things for easy exits
+struct s_parse
+{
+	t_scene		*sc;
+	char		*buff;
+	char		**line;
+	int			fd;
+	t_object	*obj;
+	t_vec3		normal;
+	int			arrlen;
+};
 
 // camera.c
 void		camera_update(t_render *r);
@@ -286,19 +302,17 @@ t_vec3		vec3_to_srgb(t_vec3 color);
 uint32_t	vec3_to_color(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */
-bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
-bool		parse_sphere(char **line, t_scene *sc);
-bool		parse_plane(char **line, t_scene *sc);
-bool		parse_para(char **line, t_scene *sc);
-bool		parse_cylinder(char **line, t_scene *sc);
-bool		parse_amb_light(char **line, t_scene *sc);
-bool		parse_point_light(char **line, t_scene *sc);
-bool		parse_object(char **line, t_scene *sc);
-bool		parse_camera(char **line, t_scene *sc);
-int			objects_malloc_manager(t_scene *sc);
-/* asser	ting function, worth thinking if we want to builtin
- * the e	xiting and cleaning into it*/
-bool		mrt_assert(bool condition, char *format, ...);
+void		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+void		parse_sphere(t_parse *map);
+void		parse_plane(t_parse *map);
+void		parse_para(t_parse *map);
+void		parse_cylinder(t_parse *map);
+void		parse_amb_light(t_parse *map);
+void		parse_point_light(t_parse *map);
+void		parse_object(t_parse *map);
+void		parse_camera(t_parse *map);
+void		objects_malloc_manager(t_parse *map);
+void		mrt_assert(t_parse *map, bool condition, char *format, ...);
 bool		mrt_warning(bool condition, char *format, ...);
 void		cleanup_scene(t_scene *sc);
 /* array	 utils */
@@ -307,7 +321,7 @@ void		free_array(char **array);
 /* vector parsing utils */
 double		ft_atof(const char *str);
 bool		vec3_in_range(t_vec3 v, float lower, float upper);
-bool		parse3(char *str, t_vec3 *out, float min, float max);
-bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
+float		parse_float(bool exists, char *str, float std);
 
 #endif

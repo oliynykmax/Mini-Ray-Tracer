@@ -47,33 +47,26 @@ bool	vec3_in_range(t_vec3 v, float lower, float upper)
 }
 
 /*
- * Parses a string "x,y,z" into a vec3 and checks if values are within range
- * @param str The string to parse in format "x,y,z"
- * @param out Pointer to store the parsed vector
- * @param min Minimum allowed value (ignored if min == max)
- * @param max Maximum allowed value (ignored if min == max)
- * @return true on success, false on failure
+* Parses a string "x,y,z" into a vec3 and (optionally) validates component range.
+ * Exits on failure using mrt_assert (no return value).
+ * @param m       Parsing context (for unified cleanup on error)
+ * @param str     Input string in the form "x,y,z"
+ * @param out     Destination vector
+ * @param limits  Two-element array {min, max}; if limits[0] == limits[1],
+	range check is skipped
  */
-bool	parse3(char *str, t_vec3 *out, float min, float max)
+void	parse3(t_parse *m, const char *str, t_vec3 *out, const float limits[2])
 {
 	char	**split;
 
 	split = ft_split(str, ',');
-	if (!mrt_assert(split != NULL, "Memory allocation failure\n"))
-	{
-		free_array(split);
-		return (false);
-	}
-	if (!mrt_assert(array_len(split) == 3,
-			"Vector format must be 'x,y,z' with 3 values\n"))
-	{
-		free_array(split);
-		return (false);
-	}
+	mrt_assert(m, split != NULL, "Memory allocation failure\n");
+	mrt_assert(m, array_len(split) == 3,
+		"Vector format must be 'x,y,z' with 3 values\n");
 	*out = vec3(ft_atof(split[0]), ft_atof(split[1]), ft_atof(split[2]));
 	free_array(split);
-	if (min != max && !mrt_assert(vec3_in_range(*out, min, max),
-			"Vector values must be between %d and %d\n", (int)min, (int)max))
-		return (false);
-	return (true);
+	if (limits[0] != limits[1])
+		mrt_assert(m, vec3_in_range(*out, limits[0], limits[1]),
+			"Vector values must be between %d and %d\n", (int)limits[0],
+			(int)limits[1]);
 }
