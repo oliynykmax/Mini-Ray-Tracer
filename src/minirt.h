@@ -15,7 +15,7 @@
 # include "../assets/libft/libft.h"
 
 // The number of rendering threads to use.
-# define THREAD_COUNT 12
+# define THREAD_COUNT 4
 
 // Mouse sensitivity (higher values = more sensitive).
 # define MOUSE_SENSITIVITY 0.006
@@ -29,23 +29,27 @@
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
 # define TAU 6.283185307179586 // 2π
+# define DEFAULT_ROUGH 0.1
+# define DEFAULT_METALLIC 0.5
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
+typedef enum e_texture		t_texture;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
-typedef struct s_pbr		t_pbr;
+typedef struct s_shading	t_shading;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
 typedef struct s_thread		t_thread;
+typedef struct s_parse		t_parse;
 typedef union u_quat		t_quat;
 typedef union u_vec3		t_vec3;
 
 // Typedefs for function types.
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
-typedef t_vec3				(*t_normal_function)(t_object*, t_vec3);
-typedef t_vec3				(*t_texcoord_function)(t_object*, t_vec3);
+typedef void				(*t_params_function)(t_object*, t_shading*);
+typedef float				(*t_texture_function)(float, float);
 
 // 3D coordinate vector type (also used for colors).
 union	u_vec3
@@ -87,6 +91,16 @@ enum	e_object_type
 	OBJECT_LIGHT,
 };
 
+// Enumeration type for different procedural textures.
+enum	e_texture
+{
+	TEXTURE_NONE,
+	TEXTURE_CHECKED,
+	TEXTURE_ZIGZAG,
+	TEXTURE_POLKADOT,
+	TEXTURE_BUMP,
+};
+
 // Data describing one geometric object or light in the scene.
 struct s_object
 {
@@ -96,6 +110,9 @@ struct s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/para/light)
 	float			height;	// Height (cylinder/para)
+	t_texture		texture; // texture(if any)
+	float			rough; // surface roughness
+	float			metallic; // metallic factor
 };
 
 struct s_ray
@@ -166,12 +183,14 @@ struct s_thread
 	size_t	y_max;	// y-coordinate of bottom scanline of region
 };
 
-// Structure holding PBR lighting parameters during shading.
-
-struct s_pbr
+// Structure data used during shading.
+struct s_shading
 {
 	t_vec3	point;		// Surface point that's being shaded
 	t_vec3	normal;		// Surface normal at shading point
+	t_vec3	tangent;	// Tangent vector (points along texcoord.x)
+	t_vec3	bitangent;	// Bitangent vector (points along texcoord.y)
+	t_vec3	texcoord;	// Texture coordinate at the shading point
 	t_vec3	f0;			// Surface reflection at zero incidence (for fresnel)
 	t_vec3	albedo;		// Surface albedo at shaded point
 	float	metallic;	// PBR metallic parameter
@@ -187,26 +206,27 @@ struct s_pbr
 	t_vec3	diffuse;	// Diffuse contribution
 	t_vec3	specular;	// Specular contribution
 };
+// struct for parsing related things for easy exits
+struct s_parse
+{
+	t_scene		*sc;
+	char		*buff;
+	char		**line;
+	int			fd;
+	t_object	*obj;
+	t_vec3		normal;
+	int			arrlen;
+};
 
 // camera.c
 void		camera_update(t_render *r);
-// para.c
-float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		para_normal(t_object *o, t_vec3 p);
-t_vec3		para_texcoord(t_object *o, t_vec3 p);
+
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		cylinder_normal(t_object *o, t_vec3 p);
-t_vec3		cylinder_texcoord(t_object *o, t_vec3 p);
-
-// lighting.c
-t_vec3		apply_lighting(t_ray *r, t_object *object, t_vec3 p, t_vec3 color);
+void		cylinder_params(t_object *o, t_shading *s);
 
 // loop.c
 void		render_scene(t_render *r, t_scene *scene);
-
-// main.c
-void		parse_scene(t_scene *scene, char *filename);
 
 // math.c
 float		clamp(float value, float lower, float upper);
@@ -217,13 +237,15 @@ float		solve_quadratic(float a, float b, float c);
 
 // object.c
 float		object_distance(t_object *object, t_vec3 ro, t_vec3 rd);
-t_vec3		object_normal(t_object *obj, t_vec3 point);
-t_vec3		object_texcoord(t_object *obj, t_vec3 point);
+void		object_params(t_object *o, t_shading *s);
+
+// para.c
+float		para_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+void		para_params(t_object *o, t_shading *s);
 
 // plane.c
 float		plane_distance(t_object *o, t_vec3 ro, t_vec3 rd);
-t_vec3		plane_normal(t_object *o, t_vec3 p);
-t_vec3		plane_texcoord(t_object *o, t_vec3 p);
+void		plane_params(t_object *o, t_shading *s);
 
 // quaternion.c
 t_quat		quat_from_axis_angle(t_vec3 axis, float angle);
@@ -237,13 +259,15 @@ t_vec3		random_point_in_square(uint16_t rng);
 t_vec3		random_point_in_disk(uint16_t rng, float radius);
 t_vec3		random_point_on_sphere(uint16_t rng, float radius);
 
+// shading.c
+t_vec3		shade_point(t_ray *r, t_object *object, t_vec3 p);
+
 // sphere.c
-float		sphere_distance(t_object *s, t_vec3 ro, t_vec3 rd);
-t_vec3		sphere_normal(t_object *s, t_vec3 p);
-t_vec3		sphere_texcoord(t_object *s, t_vec3 d);
+float		sphere_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+void		sphere_params(t_object *o, t_shading *s);
 
 // texturing.c
-t_vec3		apply_texture(t_object *object, t_vec3 point);
+float		get_texture(t_texture texture, float u, float v);
 
 // threads.c
 bool		threads_init(t_render *r);
@@ -258,40 +282,38 @@ t_vec3		get_viewport_ray(t_render *r, float x, float y, bool jitter);
 t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
-t_vec3		vec3_add(t_vec3 a, t_vec3 b);
-t_vec3		vec3_sub(t_vec3 a, t_vec3 b);
-t_vec3		vec3_mul(t_vec3 a, t_vec3 b);
-t_vec3		vec3_div(t_vec3 a, t_vec3 b);
-t_vec3		vec3_scale(t_vec3 v, float s);
+t_vec3		add3(t_vec3 a, t_vec3 b);
+t_vec3		sub3(t_vec3 a, t_vec3 b);
+t_vec3		mul3(t_vec3 a, t_vec3 b);
+t_vec3		div3(t_vec3 a, t_vec3 b);
+t_vec3		scale3(t_vec3 v, float s);
 
 // vec3_geometric.c
-float		vec3_dot(t_vec3 a, t_vec3 b);
-float		vec3_length(t_vec3 v);
-t_vec3		vec3_normalize(t_vec3 v);
-t_vec3		vec3_cross(t_vec3 a, t_vec3 b);
-t_vec3		vec3_reflect(t_vec3 i, t_vec3 n);
+float		dot3(t_vec3 a, t_vec3 b);
+float		len3(t_vec3 v);
+t_vec3		norm3(t_vec3 v);
+t_vec3		cross3(t_vec3 a, t_vec3 b);
+t_vec3		reflect3(t_vec3 i, t_vec3 n);
 
 // vec3_utility.c
 t_vec3		vec3(float x, float y, float z);
-t_vec3		vec3_lerp(t_vec3 a, t_vec3 b, float t);
-t_vec3		vec3_tonemap(t_vec3 color);
-t_vec3		vec3_to_srgb(t_vec3 color);
-uint32_t	vec3_to_color(t_vec3 color);
+t_vec3		lerp3(t_vec3 a, t_vec3 b, float t);
+t_vec3		tonemap3(t_vec3 color);
+t_vec3		to_srgb3(t_vec3 color);
+uint32_t	to_color3(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */
-bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
-bool		parse_sphere(char **line, t_scene *sc);
-bool		parse_plane(char **line, t_scene *sc);
-bool		parse_para(char **line, t_scene *sc);
-bool		parse_cylinder(char **line, t_scene *sc);
-bool		parse_amb_light(char **line, t_scene *sc);
-bool		parse_point_light(char **line, t_scene *sc);
-bool		parse_object(char **line, t_scene *sc);
-bool		parse_camera(char **line, t_scene *sc);
-int			objects_malloc_manager(t_scene *sc);
-/* asser	ting function, worth thinking if we want to builtin
- * the e	xiting and cleaning into it*/
-bool		mrt_assert(bool condition, char *format, ...);
+void		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+void		parse_sphere(t_parse *map);
+void		parse_plane(t_parse *map);
+void		parse_para(t_parse *map);
+void		parse_cylinder(t_parse *map);
+void		parse_amb_light(t_parse *map);
+void		parse_point_light(t_parse *map);
+void		parse_object(t_parse *map);
+void		parse_camera(t_parse *map);
+void		objects_malloc_manager(t_parse *map);
+void		mrt_assert(t_parse *map, bool condition, char *format, ...);
 bool		mrt_warning(bool condition, char *format, ...);
 void		cleanup_scene(t_scene *sc);
 /* array	 utils */
@@ -299,8 +321,10 @@ int			array_len(char **array);
 void		free_array(char **array);
 /* vector parsing utils */
 double		ft_atof(const char *str);
-bool		vec3_in_range(t_vec3 v, float lower, float upper);
-bool		parse_vec3(char *str, t_vec3 *out, float min, float max);
-bool		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+bool		in_range3(t_vec3 v, float lower, float upper);
+void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
+/* parse_utils.c */
+float		parse_float(bool exists, char *str, float std);
+t_texture	parse_texture(bool exists, t_parse *map, const char *token);
 
 #endif

@@ -18,7 +18,7 @@ SRCS := \
 	src/cleanup.c \
 	src/cylinder.c \
 	src/input.c \
-	src/lighting.c \
+	src/shading.c \
 	src/loop.c \
 	src/main.c \
 	src/math.c \
@@ -26,6 +26,7 @@ SRCS := \
 	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
+	src/parse_utils.c \
 	src/plane.c \
 	src/quaternion.c \
 	src/random.c \

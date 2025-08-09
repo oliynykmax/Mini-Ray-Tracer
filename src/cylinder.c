@@ -38,22 +38,22 @@ float	cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd)
 	return (fminf(body, fminf(top, bot)));
 }
 
-// Get the normal of a cylinder at a point `p` on its surface.
-
-t_vec3	cylinder_normal(t_object *o, t_vec3 p)
+void	cylinder_params(t_object *o, t_shading *s)
 {
-	if (fabsf(p.y) < o->height * 0.5f - 1e-6f)
-		return (vec3_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius));
-	return (vec3(0.0f, 1.0f, 0.0f));
-}
+	const float		h = o->height * 0.5f - 1e-6f;
+	const t_vec3	p = s->point;
 
-// Get the texture coordinates of a cylinder at a point `p` on its surface.
-
-t_vec3	cylinder_texcoord(t_object *o, t_vec3 p)
-{
-	const float	h = o->height * 0.5f - 1e-6f;
-
-	p.y = clamp(p.y, -h, h);
-	p.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
-	return (p);
+	if (fabsf(p.y) < h)
+	{
+		s->normal = scale3(vec3(p.x, 0.0f, p.z), 1.0f / o->radius);
+		s->tangent = norm3(cross3(s->normal, vec3(0, 1, 0)));
+		s->texcoord.y = clamp(p.y, -h, h);
+		s->texcoord.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
+	}
+	else
+	{
+		s->normal = vec3(0.0f, copysignf(1.0f, p.y), 0.0f);
+		s->tangent = vec3(1.0f, 0.0f, 0.0f);
+		s->texcoord = vec3(-s->point.x, s->point.z, 0.0f);
+	}
 }
