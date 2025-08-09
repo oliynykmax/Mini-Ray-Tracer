@@ -26,58 +26,39 @@ void	objects_malloc_manager(t_parse *m)
 			- (int)m->sc->object_count) * sizeof(t_object));
 }
 
-static void	process_line(t_parse *map)
+static void	read_map_into_scene(t_parse *map)
 {
 	char	*nl;
 
-	nl = ft_strrchr(map->buff, '\n');
-	if (nl != NULL)
-		*nl = '\0';
-	map->line = ft_split(map->buff, ' ');
-	mrt_assert(map, map->line, "Allocation failure during split\n");
-	if (ft_strcmp(map->line[0], "C") == 0)
-		parse_camera(map);
-	else if (ft_strcmp(map->line[0], "L") == 0 || ft_strcmp(map->line[0],
-			"A") == 0 || ft_strcmp(map->line[0], "sp") == 0
-		|| ft_strcmp(map->line[0], "pl") == 0 || ft_strcmp(map->line[0],
-			"cy") == 0 || ft_strcmp(map->line[0], "pa") == 0)
-		parse_object(map);
-	else
-		mrt_assert(map, false, "Not a valid object type");
-	free_array(map->line);
-}
-
-static void	read_map_into_scene(t_parse *map)
-{
 	while (1)
 	{
 		map->buff = get_next_line(map->fd);
 		if (!map->buff)
 			break ;
 		if (!ft_str_is_whitespace(map->buff))
-			process_line(map);
+		{
+			nl = ft_strrchr(map->buff, '\n');
+			if (nl != NULL)
+				*nl = '\0';
+			map->line = ft_split(map->buff, ' ');
+			mrt_assert(map, map->line, "Allocation failure during split\n");
+			if (map->line[0][0] != '#')
+				parse_type(map);
+			free_array(map->line);
+			map->line = NULL;
+		}
 		free(map->buff);
 	}
 }
 
-static bool	ends_with_rt(const char *p)
+void	validate_input_and_parse_map(int ac, char **av, t_parse *m)
 {
-	const char	*d = ft_strrchr(p, '.');
-
-	return (d && !ft_strcmp(d, ".rt"));
-}
-
-void	validate_input_and_parse_map(int ac, char **av, t_scene *sc)
-{
-	t_parse	map;
-
-	map.sc = sc;
-	mrt_assert(&map, ac == 2 && ends_with_rt(av[1]),
-		"usage: ./miniRT <path_to_the_file.rt>\n");
-	map.fd = open(av[1], O_RDONLY);
-	mrt_assert(&map, map.fd >= 0, "Error\nCould not open file %s\n", av[1]);
-	read_map_into_scene(&map);
+	mrt_assert(m, ac == 2, "usage: ./miniRT <path_to_the_file.rt>\n");
+	mrt_assert(m, !ft_strcmp(ft_strrchr(av[1], '.'), ".rt"), "Not .rt file\n");
+	m->fd = open(av[1], O_RDONLY);
+	mrt_assert(m, m->fd >= 0, "Error\nCould not open file %s\n", av[1]);
+	read_map_into_scene(m);
 	get_next_line(-1);
-	close(map.fd);
-	mrt_assert(&map, sc->object_count > 0, "not enough objects provided");
+	close(m->fd);
+	mrt_assert(m, m->sc->object_count > 0, "Not enough objects provided\n");
 }

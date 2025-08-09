@@ -226,7 +226,7 @@ float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 void		cylinder_params(t_object *o, t_shading *s);
 
 // loop.c
-void		render_scene(t_render *r, t_scene *scene);
+void		render_scene(t_render *r);
 
 // math.c
 float		clamp(float value, float lower, float upper);
@@ -303,14 +303,14 @@ t_vec3		to_srgb3(t_vec3 color);
 uint32_t	to_color3(t_vec3 color);
 
 /* parsing of the map and validating the input input.c */
-void		validate_input_and_parse_map(int ac, char **av, t_scene *scene);
+void		validate_input_and_parse_map(int ac, char **av, t_parse *map);
 void		parse_sphere(t_parse *map);
 void		parse_plane(t_parse *map);
 void		parse_para(t_parse *map);
 void		parse_cylinder(t_parse *map);
 void		parse_amb_light(t_parse *map);
 void		parse_point_light(t_parse *map);
-void		parse_object(t_parse *map);
+void		parse_type(t_parse *map);
 void		parse_camera(t_parse *map);
 void		objects_malloc_manager(t_parse *map);
 void		mrt_assert(t_parse *map, bool condition, char *format, ...);
