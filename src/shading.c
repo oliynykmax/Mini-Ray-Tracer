@@ -21,7 +21,7 @@ static t_vec3	brdf_fresnel(t_shading *s)
 	const float		factor = powf(1.0f - s->hdotv, 5.0f);
 	const t_vec3	one = vec3(1.0f, 1.0f, 1.0f);
 
-	return (vec3_add(s->f0, vec3_scale(vec3_add(one, s->f0), factor)));
+	return (add3(s->f0, scale3(add3(one, s->f0), factor)));
 }
 
 // Check if a light is visible from a shading point (located at `ro`). This is
@@ -31,8 +31,8 @@ static t_vec3	brdf_fresnel(t_shading *s)
 static bool	light_visible(t_ray *r, t_object *light, t_vec3 ro)
 {
 	const t_vec3	rand = random_point_on_sphere(r->rng, light->radius);
-	const t_vec3	light_pos = vec3_add(light->pos, rand);
-	const t_vec3	rd = vec3_sub(light_pos, ro);
+	const t_vec3	light_pos = add3(light->pos, rand);
+	const t_vec3	rd = sub3(light_pos, ro);
 	float			t;
 	size_t			i;
 
@@ -54,23 +54,23 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 	t_vec3	spec;
 	t_vec3	diff;
 
-	s->view_dir = vec3_scale(r->rd, -1.0f);
-	s->light = vec3_sub(light->pos, s->point);
-	s->light_dir = vec3_normalize(s->light);
-	s->halfway = vec3_normalize(vec3_add(s->view_dir, s->light_dir));
-	s->ndotv = saturate(vec3_dot(s->normal, s->view_dir));
-	s->ndotl = saturate(vec3_dot(s->normal, s->light_dir));
-	s->ndoth = saturate(vec3_dot(s->normal, s->halfway));
-	s->hdotv = saturate(vec3_dot(s->halfway, s->view_dir));
+	s->view_dir = scale3(r->rd, -1.0f);
+	s->light = sub3(light->pos, s->point);
+	s->light_dir = norm3(s->light);
+	s->halfway = norm3(add3(s->view_dir, s->light_dir));
+	s->ndotv = saturate(dot3(s->normal, s->view_dir));
+	s->ndotl = saturate(dot3(s->normal, s->light_dir));
+	s->ndoth = saturate(dot3(s->normal, s->halfway));
+	s->hdotv = saturate(dot3(s->halfway, s->view_dir));
 	spec = brdf_fresnel(s);
-	diff = vec3_sub(vec3(1.0f, 1.0f, 1.0f), spec);
-	diff = vec3_scale(diff, (1.0f - s->metallic) / M_PI);
-	diff = vec3_mul(diff, s->albedo);
+	diff = sub3(vec3(1.0f, 1.0f, 1.0f), spec);
+	diff = scale3(diff, (1.0f - s->metallic) / M_PI);
+	diff = mul3(diff, s->albedo);
 	diff = s->albedo;
-	spec = vec3_scale(spec, brdf_geo_dist(s));
-	spec = vec3_scale(spec, 1.0f / (4.0f * s->ndotv * s->ndotl + 1e-4f));
-	radiance = vec3_scale(light->color, 1.0f / vec3_dot(s->light, s->light));
-	return (vec3_scale(vec3_mul(vec3_add(diff, spec), radiance), s->ndotl));
+	spec = scale3(spec, brdf_geo_dist(s));
+	spec = scale3(spec, 1.0f / (4.0f * s->ndotv * s->ndotl + 1e-4f));
+	radiance = scale3(light->color, 1.0f / dot3(s->light, s->light));
+	return (scale3(mul3(add3(diff, spec), radiance), s->ndotl));
 }
 
 void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
@@ -79,12 +79,12 @@ void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 	const float		h = get_texture(bumpmap, tc.x, tc.y);
 	const float		du = (get_texture(bumpmap, tc.x + delta, tc.y) - h) / delta;
 	const float		dv = (get_texture(bumpmap, tc.x, tc.y + delta) - h) / delta;
-	const t_vec3	m = vec3_normalize(vec3(du, dv, 100.0f));
+	const t_vec3	m = norm3(vec3(du, dv, 100.0f));
 
-	s->normal.x = vec3_dot(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
-	s->normal.y = vec3_dot(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
-	s->normal.z = vec3_dot(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
-	s->normal = vec3_normalize(s->normal);
+	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
+	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
+	s->normal.z = dot3(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
+	s->normal = norm3(s->normal);
 }
 
 t_vec3	shade_point(t_ray *r, t_object *object, t_vec3 point)
@@ -102,20 +102,20 @@ t_vec3	shade_point(t_ray *r, t_object *object, t_vec3 point)
 	else
 	{
 		float t = get_texture(object->texture, s.texcoord.x, s.texcoord.y);
-		s.albedo = vec3_scale(object->color, 0.5f + 0.5f * t);
+		s.albedo = scale3(object->color, 0.5f + 0.5f * t);
 	}
 	//replace
 	s.metallic = object->metallic;
 	s.rough = object->rough;
-	s.f0 = vec3_lerp(vec3(0.04f, 0.04f, 0.04f), s.albedo, s.metallic);
-	s.point = vec3_add(s.point, vec3_scale(s.normal, 1e-5f));
+	s.f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s.albedo, s.metallic);
+	s.point = add3(s.point, scale3(s.normal, 1e-5f));
 	color = r->scene->ambient;
 	i = -1;
 	while (++i < r->scene->object_count)
 	{
 		light = &r->scene->objects[i];
 		if (light->type == OBJECT_LIGHT && light_visible(r, light, s.point))
-			color = vec3_add(color, one_light(r, light, &s));
+			color = add3(color, one_light(r, light, &s));
 	}
 	return (color);
 }

@@ -45,8 +45,8 @@ void	cylinder_params(t_object *o, t_shading *s)
 
 	if (fabsf(p.y) < h)
 	{
-		s->normal = vec3_scale(vec3(p.x, 0.0f, p.z), 1.0f / o->radius);
-		s->tangent = vec3_normalize(vec3_cross(s->normal, vec3(0, 1, 0)));
+		s->normal = scale3(vec3(p.x, 0.0f, p.z), 1.0f / o->radius);
+		s->tangent = norm3(cross3(s->normal, vec3(0, 1, 0)));
 		s->texcoord.y = clamp(p.y, -h, h);
 		s->texcoord.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 	}

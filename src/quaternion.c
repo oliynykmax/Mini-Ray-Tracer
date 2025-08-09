@@ -21,9 +21,9 @@ t_quat	quat_from_direction(t_vec3 d)
 		return ((t_quat){{1.0f, 0.0f, 0.0f, 0.0f}});
 	if (fabsf(d.y - 1.0f) < 1e-6f)
 		return ((t_quat){{0.0f, 0.0f, 0.0f, 1.0f}});
-	r = vec3_normalize(vec3(d.x, d.y + 1.0f, d.z));
-	q.xyz = vec3_cross(r, d);
-	q.w = vec3_dot(r, d);
+	r = norm3(vec3(d.x, d.y + 1.0f, d.z));
+	q.xyz = cross3(r, d);
+	q.w = dot3(r, d);
 	return (q);
 }
 
@@ -32,10 +32,10 @@ t_quat	quat_from_direction(t_vec3 d)
 
 t_quat	quat_multiply(t_quat a, t_quat b)
 {
-	const t_vec3	ab = vec3_scale(a.xyz, b.w);
-	const t_vec3	ba = vec3_scale(b.xyz, a.w);
-	const t_vec3	imag = vec3_add(vec3_cross(a.xyz, b.xyz), vec3_add(ab, ba));
-	const float		real = a.w * b.w - vec3_dot(a.xyz, b.xyz);
+	const t_vec3	ab = scale3(a.xyz, b.w);
+	const t_vec3	ba = scale3(b.xyz, a.w);
+	const t_vec3	imag = add3(cross3(a.xyz, b.xyz), add3(ab, ba));
+	const float		real = a.w * b.w - dot3(a.xyz, b.xyz);
 
 	return ((t_quat){{imag.x, imag.y, imag.z, real}});
 }
@@ -52,7 +52,7 @@ t_quat	quat_inverse(t_quat q)
 
 t_vec3	quat_rotate_vec3(t_quat q, t_vec3 v)
 {
-	const t_vec3	a = vec3_add(vec3_cross(q.xyz, v), vec3_scale(v, q.w));
+	const t_vec3	a = add3(cross3(q.xyz, v), scale3(v, q.w));
 
-	return (vec3_add(v, vec3_scale(vec3_cross(q.xyz, a), 2.0f)));
+	return (add3(v, scale3(cross3(q.xyz, a), 2.0f)));
 }
