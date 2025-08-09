@@ -11,7 +11,7 @@ void	parse_amb_light(t_parse *m)
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	mrt_assert(m, ratio >= 0.0f && ratio <= 1.0f,
 		"Ambient light ratio must be between 0.0 and 1.0\n");
-	m->sc->ambient = scale3(scale3(m->sc->ambient, 1.0 / 255.0), ratio);
+	m->sc->ambient = scale3(m->sc->ambient, ratio / 255.0);
 	ambient_exists = true;
 }
 
@@ -33,8 +33,7 @@ void	parse_point_light(t_parse *m)
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
 	mrt_assert(m, brightness >= 0.0f, "Light brightness must be positive\n");
 	mrt_warning(brightness <= 1.0f, "Light brightness is over 1.0\n");
-	m->obj->color = scale3(scale3(m->obj->color, 1.0 / 255.0),
-			brightness);
+	m->obj->color = scale3(m->obj->color, brightness / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
 	m->sc->object_count++;
 }
