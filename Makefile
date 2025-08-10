@@ -92,7 +92,7 @@ norm:
 		}'
 
 start: all
-	./$(NAME) maps/subject.rt
+	./$(NAME) maps/std.rt
 
 .SILENT:
 .PHONY: all clean fclean re norm start
