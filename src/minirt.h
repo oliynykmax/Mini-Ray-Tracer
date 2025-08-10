@@ -88,6 +88,7 @@ enum	e_object_type
 	OBJECT_SPHERE,
 	OBJECT_CYLINDER,
 	OBJECT_PARA,
+	OBJECT_BOX,
 	OBJECT_LIGHT,
 };
 
@@ -110,6 +111,7 @@ struct s_object
 	t_vec3			color;	// Surface color
 	float			radius;	// Radius (sphere/cylinder/para/light)
 	float			height;	// Height (cylinder/para)
+	t_vec3			size;	// Full dimensions (box); use for non-uniform boxes
 	t_texture		texture; // texture(if any)
 	float			rough; // surface roughness
 	float			metallic; // metallic factor
@@ -225,6 +227,10 @@ void		camera_update(t_render *r);
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 void		cylinder_params(t_object *o, t_shading *s);
 
+// box.c
+float		box_distance(t_object *o, t_vec3 ro, t_vec3 rd);
+void		box_params(t_object *o, t_shading *s);
+
 // loop.c
 void		render_scene(t_render *r);
 
@@ -308,6 +314,7 @@ void		parse_sphere(t_parse *map);
 void		parse_plane(t_parse *map);
 void		parse_para(t_parse *map);
 void		parse_cylinder(t_parse *map);
+void		parse_box(t_parse *map);
 void		parse_amb_light(t_parse *map);
 void		parse_point_light(t_parse *map);
 void		parse_type(t_parse *map);
