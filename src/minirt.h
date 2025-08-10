@@ -324,7 +324,7 @@ double		ft_atof(const char *str);
 bool		in_range3(t_vec3 v, float lower, float upper);
 void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
 /* parse_utils.c */
-float		parse_float(bool exists, char *str, float std);
-t_texture	parse_texture(bool exists, t_parse *map, const char *token);
+float		parse_float(bool exists, t_parse *map, float std, int i);
+t_texture	parse_texture(bool exists, t_parse *map, int i);
 
 #endif
