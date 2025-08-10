@@ -23,12 +23,20 @@ static float	texture_zigzag(float u, float v)
 
 static float	texture_polkadot(float u, float v)
 {
+#if 0
 	const float	r = 0.5f;
 	const float	x = fract(u * 10.0f) - 0.5f;
 	const float	y = fract(v * 10.0f) - 0.5f;
 	const float	b = 1.0f - saturate(sqrtf(x * x + y * y) / r);
 
 	return (b * b * (3.0 - 2.0 * b));
+#else
+	const float	a = fabsf(fract(u * 3.0f + 0) * 2.0f - 1.0f);
+	float	b = fabsf(fract(v * 6.0f + a) * 2.0f - 1.0f);
+
+	b *= b;
+	return (b * b * (3.0 - 2.0 * b));
+#endif
 }
 
 static float	texture_bump(float u, float v)
