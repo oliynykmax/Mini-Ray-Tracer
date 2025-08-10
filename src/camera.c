@@ -72,8 +72,8 @@ static void	camera_update_viewport(t_render *r)
 	r->camera_y = cross3(r->camera_z, r->camera_x);
 	vec[0] = scale3(r->camera_x, -view_w);
 	vec[1] = scale3(r->camera_x, +view_w);
-	vec[2] = scale3(r->camera_y, -view_h);
-	vec[3] = scale3(r->camera_y, +view_h);
+	vec[2] = scale3(r->camera_y, +view_h);
+	vec[3] = scale3(r->camera_y, -view_h);
 	r->viewport[0] = sub3(add3(vec[0], vec[2]), r->camera_z);
 	r->viewport[1] = sub3(add3(vec[1], vec[2]), r->camera_z);
 	r->viewport[2] = sub3(add3(vec[0], vec[3]), r->camera_z);
