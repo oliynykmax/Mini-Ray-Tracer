@@ -19,6 +19,6 @@ int	main(int ac, char **av)
 	init_structs(&scene, &render, &map);
 	validate_input_and_parse_map(ac, av, &map);
 	render_scene(&render);
-	cleanup_scene(&scene);
+	free(scene.objects);
 	return (0);
 }
