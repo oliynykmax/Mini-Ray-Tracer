@@ -312,10 +312,8 @@ void		parse_amb_light(t_parse *map);
 void		parse_point_light(t_parse *map);
 void		parse_type(t_parse *map);
 void		parse_camera(t_parse *map);
-void		objects_malloc_manager(t_parse *map);
-void		mrt_assert(t_parse *map, bool condition, char *format, ...);
-bool		mrt_warning(bool condition, char *format, ...);
-void		cleanup_scene(t_scene *sc);
+t_object	*object_new(t_parse *map);
+void		fatal_if(t_parse *map, bool condition, char *format, ...);
 /* array	 utils */
 int			array_len(char **array);
 void		free_array(char **array);
