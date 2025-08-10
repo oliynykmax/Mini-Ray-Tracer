@@ -13,7 +13,6 @@ INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
 SRCS := \
 	src/array_utils.c \
-	src/assert.c \
 	src/camera.c \
 	src/cylinder.c \
 	src/input.c \
@@ -22,7 +21,7 @@ SRCS := \
 	src/main.c \
 	src/math.c \
 	src/object.c \
-	src/paraboloid.c \
+ 	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/parse_utils.c \
