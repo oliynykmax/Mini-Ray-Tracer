@@ -12,7 +12,7 @@ t_texture	parse_texture(bool exists, t_parse *map, int i)
 		return (TEXTURE_POLKADOT);
 	if (ft_strcmp(map->line[i], "bump") == 0)
 		return (TEXTURE_BUMP);
-	mrt_assert(map,
+	fatal_if(map,
 		false,
 		"Unknown texture '%s' (expected checker | zigzag | polkadot | bump)\n",
 		map->line[i]);
