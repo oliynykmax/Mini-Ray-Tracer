@@ -34,7 +34,7 @@ static void	threads_render(t_render *r, uint32_t y_min, uint32_t y_max)
 		while (++x < r->image->width)
 		{
 			index = x + y * r->image->width;
-			color = trace_pixel(r, x, r->image->height - 1 - y);
+			color = trace_pixel(r, x, y);
 			color = tonemap3(color);
 			r->frame[index] = add3(r->frame[index], color);
 			color = scale3(r->frame[index], 1.0f / r->frame_samples);
