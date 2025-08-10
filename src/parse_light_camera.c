@@ -54,7 +54,7 @@ void	parse_camera(t_parse *m)
 	m->arrlen = array_len(m->line);
 	mrt_assert(m, m->arrlen >= 4 && m->arrlen <= 6, "Invalid camera format\n");
 	mrt_assert(m, !camera_exist, "Camera already exist\n");
-	m->sc->focus_depth = parse_float(m->arrlen > 4, m, 0.0f, 4);
+	m->sc->focus_depth = parse_float(m->arrlen > 4, m, 5.0f, 4);
 	m->sc->aperture_size = parse_float(m->arrlen > 5, m, 0.0f, 5);
 	m->sc->fov = ft_atof(m->line[3]);
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
