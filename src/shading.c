@@ -66,10 +66,10 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 	diff = sub3(vec3(1.0f, 1.0f, 1.0f), spec);
 	diff = scale3(diff, (1.0f - s->metallic) / M_PI);
 	diff = mul3(diff, s->albedo);
-	diff = s->albedo;
 	spec = scale3(spec, brdf_geo_dist(s));
 	spec = scale3(spec, 1.0f / (4.0f * s->ndotv * s->ndotl + 1e-4f));
-	radiance = scale3(light->color, 1.0f / dot3(s->light, s->light));
+	// radiance = scale3(light->color, 1.0f / dot3(s->light, s->light));
+	radiance = light->color;
 	return (scale3(mul3(add3(diff, spec), radiance), s->ndotl));
 }
 
