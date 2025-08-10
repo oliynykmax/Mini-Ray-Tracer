@@ -6,6 +6,7 @@ void	objects_malloc_manager(t_parse *m)
 	static int	capacity = 64;
 	t_object	*new_objects;
 
+	m->sc->object_count++;
 	if (!is_malloced)
 	{
 		m->sc->objects = malloc(capacity * sizeof(t_object));
