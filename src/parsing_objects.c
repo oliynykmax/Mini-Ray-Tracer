@@ -7,11 +7,11 @@ void	parse_sphere(t_parse *m)
 	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_SPHERE;
-	m->obj->texture = parse_texture(m->arrlen > 4, m, m->line[4]);
-	m->obj->rough = parse_float(m->arrlen > 5, m->line[5], DEFAULT_ROUGH);
+	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
+	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
 	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 6, m->line[6], DEFAULT_METALLIC);
+	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
 	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
 		"Metallic must be in [0,1]\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -29,11 +29,11 @@ void	parse_plane(t_parse *m)
 	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_PLANE;
-	m->obj->texture = parse_texture(m->arrlen > 4, m, m->line[4]);
-	m->obj->rough = parse_float(m->arrlen > 5, m->line[5], DEFAULT_ROUGH);
+	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
+	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
 	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 6, m->line[6], DEFAULT_METALLIC);
+	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
 	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
 		"Metallic must be in [0,1]\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -52,11 +52,11 @@ void	parse_para(t_parse *m)
 	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_PARA;
-	m->obj->texture = parse_texture(m->arrlen > 6, m, m->line[6]);
-	m->obj->rough = parse_float(m->arrlen > 7, m->line[7], DEFAULT_ROUGH);
+	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
+	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
 	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 8, m->line[8], DEFAULT_METALLIC);
+	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
 	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
 		"Metallic must be in [0,1]\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -79,11 +79,11 @@ void	parse_cylinder(t_parse *m)
 	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_CYLINDER;
-	m->obj->texture = parse_texture(m->arrlen > 6, m, m->line[6]);
-	m->obj->rough = parse_float(m->arrlen > 7, m->line[7], DEFAULT_ROUGH);
+	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
+	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
 	mrt_assert(m, m->obj->rough >= 0.0f && m->obj->rough <= 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 8, m->line[8], DEFAULT_METALLIC);
+	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
 	mrt_assert(m, m->obj->metallic >= 0.0f && m->obj->metallic <= 1.0f,
 		"Metallic must be in [0,1]\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
