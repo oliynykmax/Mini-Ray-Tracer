@@ -4,7 +4,6 @@ void	parse_sphere(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
 	mrt_assert(m, m->arrlen >= 4 && m->arrlen <= 7, "Invalid sphere format\n");
-	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_SPHERE;
 	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
@@ -26,7 +25,6 @@ void	parse_plane(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
 	mrt_assert(m, m->arrlen >= 4 && m->arrlen <= 7, "Invalid plane format\n");
-	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_PLANE;
 	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
@@ -49,7 +47,6 @@ void	parse_para(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
 	mrt_assert(m, m->arrlen >= 6 && m->arrlen <= 9, "Invalid para format\n");
-	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_PARA;
 	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
@@ -76,7 +73,6 @@ void	parse_cylinder(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
 	mrt_assert(m, m->arrlen >= 6 && m->arrlen <= 9, "Invalid Cy format\n");
-	objects_malloc_manager(m);
 	m->obj = &m->sc->objects[m->sc->object_count];
 	m->obj->type = OBJECT_CYLINDER;
 	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
@@ -117,5 +113,6 @@ void	parse_type(t_parse *m)
 		parse_para(m);
 	else
 		mrt_assert(m, false, "Not a valid type: %s\n", m->line[0]);
-	m->sc->object_count++;
+	if (ft_strcmp(m->line[0], "A") != 0 && ft_strcmp(m->line[0], "C") != 0)
+		objects_malloc_manager(m);
 }
