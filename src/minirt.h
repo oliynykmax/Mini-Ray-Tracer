@@ -127,14 +127,14 @@ struct s_ray
 // Data describing the objects in the scene.
 struct s_scene
 {
-	t_object	*objects;		// Array of objects in the scene
-	size_t		object_count;	// Length of the objects array
-	t_vec3		pos;			// Camera position
-	t_vec3		dir;			// Camera direction (normalized)
-	float		fov;			// Camera field of view (in degrees)
-	float		focus_depth;	// Camera focus depth
-	float		aperture_size;	// Camera aperture size
-	t_vec3		ambient;		// Ambient color (multiplied by ratio)
+	t_object	*objects;
+	size_t		object_count;
+	t_vec3		pos;
+	t_vec3		dir;
+	float		fov;
+	float		focus_depth;
+	float		aperture_size;
+	t_vec3		ambient;
 };
 
 // Data for the current keyboard state.
@@ -312,8 +312,8 @@ void		parse_amb_light(t_parse *map);
 void		parse_point_light(t_parse *map);
 void		parse_type(t_parse *map);
 void		parse_camera(t_parse *map);
-void		objects_malloc_manager(t_parse *map);
-void		mrt_assert(t_parse *map, bool condition, char *format, ...);
+t_object	*object_new(t_parse *map);
+void		fatal_if(t_parse *map, bool condition, char *format, ...);
 /* array	 utils */
 int			array_len(char **array);
 void		free_array(char **array);
