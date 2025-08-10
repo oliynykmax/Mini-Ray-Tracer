@@ -97,12 +97,12 @@ t_vec3	shade_point(t_ray *r, t_object *object, t_vec3 point)
 	s.point = point;
 	object_params(object, &s);
 	s.albedo.r = get_texture(TEXTURE_CHECKED, s.texcoord.x, s.texcoord.y);
-    s.albedo = scale3(object->color, 0.5f + 0.5f * s.albedo.r);
-    s.metallic = 1.0f;
-    s.rough = 0.1f;
-    s.f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s.albedo, s.metallic);
-    s.point = add3(s.point, scale3(s.normal, 1e-5f));
-    apply_bumpmap(&s, TEXTURE_POLKADOT, scale3(s.texcoord, 5.0f));
+	s.albedo = scale3(object->color, 0.5f + 0.5f * s.albedo.r);
+	s.metallic = 1.0f;
+	s.rough = 0.1f;
+	s.f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s.albedo, s.metallic);
+	s.point = add3(s.point, scale3(s.normal, 1e-5f));
+	apply_bumpmap(&s, TEXTURE_POLKADOT, scale3(s.texcoord, 5.0f));
 	color = r->scene->ambient;
 	i = -1;
 	while (++i < r->scene->object_count)
