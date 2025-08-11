@@ -57,8 +57,8 @@ void	parse_camera(t_parse *m)
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->sc->dir, (float []){-1, 1});
 	camera_exist = true;
-	fatal_if(m, fabsf(len3(m->sc->dir) - 1.0f) >= 0.001f,
-		"Camera direction components must be between -1 and 1\n");
+	// fatal_if(m, fabsf(len3(m->sc->dir) - 1.0f) >= 0.001f,
+	// 	"Camera direction components must be between -1 and 1\n");
 	fatal_if(m, m->sc->fov < 0.0f || m->sc->fov > 180.0f,
 		"Camera FOV must be between 0 and 180 degrees\n");
 	fatal_if(m, m->sc->focus_depth < 0.0f,
