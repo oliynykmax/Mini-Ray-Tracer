@@ -7,6 +7,7 @@ float	object_distance(t_object *object, t_vec3 ro, t_vec3 rd)
 		sphere_distance,
 		cylinder_distance,
 		para_distance,
+		box_distance,
 		sphere_distance,
 	};
 
@@ -23,6 +24,7 @@ void	object_params(t_object *o, t_shading *s)
 		sphere_params,
 		cylinder_params,
 		para_params,
+		box_params,
 	};
 
 	s->point = quat_rotate_vec3(quat_inverse(o->rot), sub3(p, o->pos));

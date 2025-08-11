@@ -21,6 +21,7 @@ SRCS := \
 	src/main.c \
 	src/math.c \
 	src/object.c \
+	src/box.c \
  	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
