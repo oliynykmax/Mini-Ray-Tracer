@@ -2,7 +2,9 @@
 
 static t_vec3	box_entry_exit(t_vec3 h, t_vec3 ro, t_vec3 rd)
 {
-	const t_vec3	m = vec3(1.0f / rd.x, 1.0f / rd.y, 1.0f / rd.z);
+	const t_vec3	m = vec3(1.0f / (rd.x + (rd.x == 0.0f) * 1e-6f), 1.0f
+			/ (rd.y + (rd.y == 0.0f) * 1e-6f), 1.0f / (rd.z + (rd.z == 0.0f)
+				* 1e-6f));
 	const t_vec3	n = mul3(m, ro);
 	const t_vec3	k = mul3(vec3(fabsf(m.x), fabsf(m.y), fabsf(m.z)), h);
 	const t_vec3	t1 = sub3(scale3(n, -1.0f), k);
