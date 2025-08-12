@@ -30,8 +30,15 @@ static void	key_hook(mlx_key_data_t data, void *param)
 {
 	t_render *const	r = (t_render*) param;
 
-	if (data.action == MLX_PRESS && data.key == MLX_KEY_ESCAPE)
+	if (data.action != MLX_PRESS)
+		return ;
+	if (data.key == MLX_KEY_ESCAPE)
 		mlx_close_window(r->mlx);
+	if (data.key == MLX_KEY_F)
+	{
+		r->fancy = !r->fancy;
+		r->frame_samples = 0;
+	}
 }
 
 // MLX window resize hook. Resizes the image to match the new window dimensions.
