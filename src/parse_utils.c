@@ -13,7 +13,7 @@ t_texture	parse_texture(bool exists, t_parse *map, int i)
 	if (ft_strcmp(map->line[i], "bump") == 0)
 		return (TEXTURE_BUMP);
 	fatal_if(map,
-		false,
+		true,
 		"Unknown texture '%s' (expected checker | zigzag | polkadot | bump)\n",
 		map->line[i]);
 	return (TEXTURE_NONE);
