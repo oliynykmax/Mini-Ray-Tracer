@@ -99,7 +99,6 @@ enum	e_texture
 	TEXTURE_CHECKED,
 	TEXTURE_ZIGZAG,
 	TEXTURE_POLKADOT,
-	TEXTURE_BUMP,
 };
 
 // Data describing one geometric object or light in the scene.
@@ -113,6 +112,7 @@ struct s_object
 	float			height;	// Height (cylinder/para)
 	t_vec3			size;	// Full dimensions (box); use for non-uniform boxes
 	t_texture		texture; // texture(if any)
+	t_texture		bump;	// bump map(if any)
 	float			rough; // surface roughness
 	float			metallic; // metallic factor
 };
@@ -331,5 +331,5 @@ void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
 /* parse_utils.c */
 float		parse_float(bool exists, t_parse *map, float std, int i);
 t_texture	parse_texture(bool exists, t_parse *map, int i);
-
+void		parse_optionals(t_parse *m, int texture_index);
 #endif
