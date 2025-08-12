@@ -25,3 +25,19 @@ float	parse_float(bool exists, t_parse *map, float std, int i)
 		return (std);
 	return (ft_atof(map->line[i]));
 }
+
+void	parse_optionals(t_parse *m, int t_index)
+{
+	const int	rough_index = t_index + 1;
+	const int	metal_index = t_index + 2;
+
+	m->obj->texture = parse_texture(m->arrlen > t_index, m, t_index);
+	m->obj->rough = parse_float(m->arrlen > rough_index, m, DEFAULT_ROUGH,
+			rough_index);
+	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
+		"Rough must be in [0,1]\n");
+	m->obj->metallic = parse_float(m->arrlen > metal_index, m,
+			DEFAULT_METALLIC, metal_index);
+	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
+		"Metallic must be in [0,1]\n");
+}

@@ -5,13 +5,7 @@ void	parse_sphere(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->arrlen < 4 || m->arrlen > 7, "Invalid sphere format\n");
 	m->obj->type = OBJECT_SPHERE;
-	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
-	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
-	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
-		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
-	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
-		"Metallic must be in [0,1]\n");
+	parse_optionals(m, 4);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m->line[2]) * 0.5;
@@ -25,13 +19,7 @@ void	parse_plane(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->arrlen < 4 || m->arrlen > 7, "Invalid plane format\n");
 	m->obj->type = OBJECT_PLANE;
-	m->obj->texture = parse_texture(m->arrlen > 4, m, 4);
-	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
-	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
-		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
-	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
-		"Metallic must be in [0,1]\n");
+	parse_optionals(m, 4);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
@@ -46,13 +34,7 @@ void	parse_para(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->arrlen < 6 || m->arrlen > 9, "Invalid para format\n");
 	m->obj->type = OBJECT_PARA;
-	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
-	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
-	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
-		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
-	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
-		"Metallic must be in [0,1]\n");
+	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
@@ -71,13 +53,7 @@ void	parse_cylinder(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->arrlen < 6 || m->arrlen > 9, "Invalid Cy format\n");
 	m->obj->type = OBJECT_CYLINDER;
-	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
-	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
-	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
-		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
-	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
-		"Metallic must be in [0,1]\n");
+	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
@@ -96,13 +72,7 @@ void	parse_box(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->arrlen < 5 || m->arrlen > 8, "Invalid box format\n");
 	m->obj->type = OBJECT_BOX;
-	m->obj->texture = parse_texture(m->arrlen > 5, m, 5);
-	m->obj->rough = parse_float(m->arrlen > 6, m, DEFAULT_ROUGH, 6);
-	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
-		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 7, m, DEFAULT_METALLIC, 7);
-	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
-		"Metallic must be in [0,1]\n");
+	parse_optionals(m, 5);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
 	parse3(m, m->line[3], &m->obj->size, (float []){0, 0});
