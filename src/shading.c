@@ -50,9 +50,8 @@ static bool	light_visible(t_ray *r, t_object *light, t_vec3 ro)
 
 static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 {
-	t_vec3	radiance;
-	t_vec3	spec;
-	t_vec3	diff;
+	t_vec3	specular;
+	t_vec3	diffuse;
 
 	s->view_dir = scale3(r->rd, -1.0f);
 	s->light = sub3(light->pos, s->point);
@@ -62,19 +61,19 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 	s->ndotl = saturate(dot3(s->normal, s->light_dir));
 	s->ndoth = saturate(dot3(s->normal, s->halfway));
 	s->hdotv = saturate(dot3(s->halfway, s->view_dir));
-	spec = brdf_fresnel(s);
-	diff = sub3(vec3(1.0f, 1.0f, 1.0f), spec);
-	diff = scale3(diff, (1.0f - s->metallic) / M_PI);
-	diff = mul3(diff, s->albedo);
-	spec = scale3(spec, brdf_geo_dist(s));
-	spec = scale3(spec, 1.0f / (4.0f * s->ndotv * s->ndotl + 1e-4f));
-	// radiance = scale3(light->color, 1.0f / dot3(s->light, s->light));
-	radiance = light->color;
-	return (scale3(mul3(add3(diff, spec), radiance), s->ndotl));
+	specular = brdf_fresnel(s);
+	diffuse = sub3(vec3(1.0f, 1.0f, 1.0f), specular);
+	diffuse = scale3(diffuse, (1.0f - s->metallic) / M_PI);
+	diffuse = mul3(diffuse, s->albedo);
+	specular = scale3(specular, brdf_geo_dist(s));
+	specular = scale3(specular, 1.0f / (4.0f * s->ndotv * s->ndotl + 1e-4f));
+	return (scale3(mul3(add3(diffuse, specular), scale3(light->color, 1.0f)), s->ndotl));
 }
 
 void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 {
+	return;
+	tc = scale3(tc, 5.0f);
 	const float		delta = 1e-5f;
 	const float		h = get_texture(bumpmap, tc.x, tc.y);
 	const float		du = (get_texture(bumpmap, tc.x + delta, tc.y) - h) / delta;
@@ -87,29 +86,27 @@ void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 	s->normal = norm3(s->normal);
 }
 
-t_vec3	shade_point(t_ray *r, t_object *object, t_vec3 point)
+t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 {
-	t_shading	s;
 	t_vec3		color;
 	t_object	*light;
 	size_t		i;
 
-	s.point = point;
-	object_params(object, &s);
-	s.albedo.r = get_texture(TEXTURE_CHECKED, s.texcoord.x, s.texcoord.y);
-	s.albedo = scale3(object->color, 0.5f + 0.5f * s.albedo.r);
-	s.metallic = 1.0f;
-	s.rough = 0.1f;
-	s.f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s.albedo, s.metallic);
-	s.point = add3(s.point, scale3(s.normal, 1e-5f));
-	apply_bumpmap(&s, TEXTURE_POLKADOT, scale3(s.texcoord, 5.0f));
-	color = r->scene->ambient;
+	s->albedo.r = get_texture(TEXTURE_CHECKED, s->texcoord.x, s->texcoord.y);
+	s->albedo = scale3(object->color, 0.5f + 0.5f * s->albedo.r);
+	s->metallic = object->metallic;
+	s->rough = object->rough;
+	s->f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s->albedo, s->metallic);
+	// s->normal = scale3(s->normal, copysignf(1.0f, -dot3(r->rd, s->normal)));
+	// s->point = add3(s->point, scale3(s->normal, 1e-5f));
+	// apply_bumpmap(s, TEXTURE_POLKADOT, s->texcoord);
+	color = mul3(s->ambient, s->albedo);
 	i = -1;
 	while (++i < r->scene->object_count)
 	{
 		light = &r->scene->objects[i];
-		if (light->type == OBJECT_LIGHT && light_visible(r, light, s.point))
-			color = add3(color, one_light(r, light, &s));
+		if (light->type == OBJECT_LIGHT && light_visible(r, light, s->point))
+			color = add3(color, one_light(r, light, s));
 	}
 	return (color);
 }

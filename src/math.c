@@ -26,7 +26,7 @@ float	radians(float degrees)
 
 float	fract(float x)
 {
-	return (x - (float)((int) x - (x < 0.0f)));
+	return (x - floorf(x));
 }
 
 // Solve the quadratic equation ax² + bx + c. Returns the lower of the two

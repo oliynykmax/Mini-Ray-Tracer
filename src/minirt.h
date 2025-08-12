@@ -29,6 +29,7 @@
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
 # define TAU 6.283185307179586 // 2π
+# define MIN_ROUGH 0.01
 # define DEFAULT_ROUGH 0.1
 # define DEFAULT_METALLIC 0.5
 
@@ -124,6 +125,7 @@ struct s_ray
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction
 	int			bounce;	// Remaining ray bounces
+	bool		fancy;	// Use "fancy" shading
 };
 
 // Data describing the objects in the scene.
@@ -174,6 +176,7 @@ struct s_render
 	pthread_cond_t	available_cond;			// Tells when jobs become available
 	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
 	pthread_mutex_t	mutex;					// Protects common render state
+	bool			fancy;					// Use "fancy" lighting
 };
 
 // Data for one render thread.
@@ -207,7 +210,9 @@ struct s_shading
 	float	hdotv;		// (halfway vector) · (view vector)
 	t_vec3	diffuse;	// Diffuse contribution
 	t_vec3	specular;	// Specular contribution
+	t_vec3	ambient;	// Ambient contribution
 };
+
 // struct for parsing related things for easy exits
 struct s_parse
 {
@@ -266,7 +271,8 @@ t_vec3		random_point_in_disk(uint16_t rng, float radius);
 t_vec3		random_point_on_sphere(uint16_t rng, float radius);
 
 // shading.c
-t_vec3		shade_point(t_ray *r, t_object *object, t_vec3 p);
+void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);
+t_vec3		shade_point(t_shading *s, t_ray *r, t_object *object);
 
 // sphere.c
 float		sphere_distance(t_object *o, t_vec3 ro, t_vec3 rd);
