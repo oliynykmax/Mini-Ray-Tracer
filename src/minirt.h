@@ -99,7 +99,6 @@ enum	e_texture
 	TEXTURE_CHECKED,
 	TEXTURE_ZIGZAG,
 	TEXTURE_POLKADOT,
-	TEXTURE_BUMP,
 };
 
 // Data describing one geometric object or light in the scene.
@@ -113,6 +112,7 @@ struct s_object
 	float			height;	// Height (cylinder/para)
 	t_vec3			size;	// Full dimensions (box); use for non-uniform boxes
 	t_texture		texture; // texture(if any)
+	t_texture		bump;	// bump map(if any)
 	float			rough; // surface roughness
 	float			metallic; // metallic factor
 };
