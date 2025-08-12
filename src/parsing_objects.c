@@ -94,13 +94,13 @@ void	parse_cylinder(t_parse *m)
 void	parse_box(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 6 || m->arrlen > 9, "Invalid box format\n");
+	fatal_if(m, m->arrlen < 5 || m->arrlen > 8, "Invalid box format\n");
 	m->obj->type = OBJECT_BOX;
-	m->obj->texture = parse_texture(m->arrlen > 6, m, 6);
-	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
+	m->obj->texture = parse_texture(m->arrlen > 5, m, 5);
+	m->obj->rough = parse_float(m->arrlen > 6, m, DEFAULT_ROUGH, 6);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
+	m->obj->metallic = parse_float(m->arrlen > 7, m, DEFAULT_METALLIC, 7);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
