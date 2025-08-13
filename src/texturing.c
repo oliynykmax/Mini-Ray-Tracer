@@ -23,7 +23,7 @@ static float	texture_zigzag(float u, float v)
 
 static float	texture_polkadot(float u, float v)
 {
-#if 1
+#if 0
 	const float	r = 0.5f;
 	const float	x = fract(u * 2.0f) - 0.5f;
 	const float	y = fract(v * 2.0f) - 0.5f;
