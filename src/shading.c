@@ -98,8 +98,8 @@ t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 	s->metallic = object->metallic;
 	s->rough = fmaxf(MIN_ROUGHNESS, object->rough);
 	s->f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s->albedo, s->metallic);
-	apply_bumpmap(s, TEXTURE_POLKADOT, s->texcoord);
 	s->normal = scale3(s->normal, copysignf(1.0f, -dot3(r->rd, s->normal)));
+	apply_bumpmap(s, TEXTURE_CHECKED, s->texcoord);
 	color = mul3(s->ambient, s->albedo);
 	i = -1;
 	while (++i < r->scene->object_count)

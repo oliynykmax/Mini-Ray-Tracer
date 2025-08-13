@@ -1,25 +1,22 @@
 #include "minirt.h"
 
-float	waves(t_vec3 x)
+float	cloudy(t_vec3 x, float ampl, float freq)
 {
-    float sum = 0.0f;
-    float a = 3.85f;
-    float f = 4.3f;
-    t_vec3 n = vec3(1.0, 0.0, 0.0f);
-    const float t = radians(180.0) * (3.0 - sqrt(5.0));
-    for (int i = 0; i < 32; i++) {
-        float p = f * dot3(x, n) / (2.0f * M_PI);
-        float y = fract(p) * 2.0f - 1.0f;
-        float v = 4.0f * (fabsf(y) * y - y);
-#if 1
-        v = 1.0 - 2.0 * sqrtf(v * v + 0.003f);
-#endif
-		sum += a * v;
-        f *= 1.15;
-        a *= 0.9;
+	float	sum = 0.0f;
+	t_vec3	n = vec3(1.0, 0.0, 0.0f);
+	const float t = radians(180.0) * (3.0 - sqrt(5.0));
+
+	for (int i = 0; i < 30; i++) {
+		float p = freq * dot3(x, n);
+		float y = fract(p);
+		float v = 4.0f * (fabsf(y) * y - y);
+		v = 1.0f - 2.0f * fabsf(v);
+		sum += ampl * v;
+		freq *= 1.25;
+		ampl *= 0.9;
 		n = vec3(cosf(t) * n.x - sinf(t) * n.y, sin(t) * n.x + cosf(t) * n.y, 0.0f);
-    }
-	return saturate(sum + 16.0f);
+	}
+	return (saturate(sum * 0.1f + 1.5f) * 0.9f + 0.1f);
 }
 
 static float	texture_none(float u, float v)
@@ -30,7 +27,7 @@ static float	texture_none(float u, float v)
 
 static float	texture_checked(float u, float v)
 {
-	return waves(vec3(u, v, 0.0f));
+	return (cloudy(vec3(u, v, 0.0f), 4.0f, 0.5f));
 	u = floorf(u * 10.0f);
 	v = floorf(v * 10.0f);
 	return (fract((u + v) * 0.5f));
@@ -53,8 +50,6 @@ static float	texture_polkadot(float u, float v)
 	const float	b = 1.0f - saturate(sqrtf(x * x + y * y) / r);
 
 	return (b * b * (3.0 - 2.0 * b));
-#elif 1
-	return waves(vec3(u, v, 0.0f));
 #else
 	const float	a = fabsf(fract(u * 3.0f + 0) * 2.0f - 1.0f);
 	float	b = fabsf(fract(v * 6.0f + a) * 2.0f - 1.0f);
