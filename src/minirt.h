@@ -37,7 +37,7 @@
 
 // How much bump mapping affects surface normals. Higher values produce a
 // bumpier, less subtle effect.
-# define BUMP_MAP_STRENGTH 0.001
+# define BUMP_MAP_STRENGTH 0.01
 
 // Maximum number of ray bounces used when reflecting rays off surfaces. Higher
 // values make indirect light and mirror reflections more convincing, but come
@@ -280,6 +280,7 @@ t_quat		quat_inverse(t_quat q);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 
 // random.c
+float		random_float(uint16_t rng);
 t_vec3		random_point_in_square(uint16_t rng);
 t_vec3		random_point_in_disk(uint16_t rng, float radius);
 t_vec3		random_point_on_sphere(uint16_t rng, float radius);

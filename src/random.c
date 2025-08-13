@@ -1,5 +1,12 @@
 #include "minirt.h"
 
+// Generate a random float between 0 and 1.
+
+float	random_float(uint16_t rng)
+{
+	return fract(rng * (1.0f / 1.6180339887498948482f));
+}
+
 // Generate a random point in the unit square [0, 1]². Uses a low-discrepancy
 // sequence to generate the coordinates of the point. The constants used to
 // randomize the x and y coordinates are equal to p¯¹ and  p¯², where p is the
