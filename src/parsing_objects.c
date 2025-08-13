@@ -9,7 +9,6 @@ void	parse_sphere(t_parse *m)
 	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->rough = fmaxf(MIN_ROUGH, m->obj->rough);
 	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
@@ -30,7 +29,6 @@ void	parse_plane(t_parse *m)
 	m->obj->rough = parse_float(m->arrlen > 5, m, DEFAULT_ROUGH, 5);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->rough = fmaxf(MIN_ROUGH, m->obj->rough);
 	m->obj->metallic = parse_float(m->arrlen > 6, m, DEFAULT_METALLIC, 6);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
@@ -52,7 +50,6 @@ void	parse_para(t_parse *m)
 	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->rough = fmaxf(MIN_ROUGH, m->obj->rough);
 	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
@@ -78,7 +75,6 @@ void	parse_cylinder(t_parse *m)
 	m->obj->rough = parse_float(m->arrlen > 7, m, DEFAULT_ROUGH, 7);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->rough = fmaxf(MIN_ROUGH, m->obj->rough);
 	m->obj->metallic = parse_float(m->arrlen > 8, m, DEFAULT_METALLIC, 8);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
@@ -104,7 +100,6 @@ void	parse_box(t_parse *m)
 	m->obj->rough = parse_float(m->arrlen > 6, m, DEFAULT_ROUGH, 6);
 	fatal_if(m, m->obj->rough < 0.0f || m->obj->rough > 1.0f,
 		"Rough must be in [0,1]\n");
-	m->obj->rough = fmaxf(MIN_ROUGH, m->obj->rough);
 	m->obj->metallic = parse_float(m->arrlen > 7, m, DEFAULT_METALLIC, 7);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");

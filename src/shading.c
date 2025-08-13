@@ -74,7 +74,6 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 
 void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 {
-	tc = scale3(tc, 5.0f);
 	const float		delta = 1e-5f;
 	const float		h = get_texture(bumpmap, tc.x, tc.y);
 	const float		du = (get_texture(bumpmap, tc.x + delta, tc.y) - h) / delta;
@@ -95,9 +94,9 @@ t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 	size_t		i;
 
 	s->albedo.r = get_texture(object->texture, s->texcoord.x, s->texcoord.y);
-	s->albedo = scale3(object->color, 0.5f + 0.5f * s->albedo.r);
+	s->albedo = scale3(object->color, s->albedo.r);
 	s->metallic = object->metallic;
-	s->rough = object->rough;
+	s->rough = fmaxf(MIN_ROUGHNESS, object->rough);
 	s->f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s->albedo, s->metallic);
 	apply_bumpmap(s, TEXTURE_POLKADOT, s->texcoord);
 	s->normal = scale3(s->normal, copysignf(1.0f, -dot3(r->rd, s->normal)));
