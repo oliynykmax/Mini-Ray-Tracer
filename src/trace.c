@@ -26,7 +26,7 @@ static t_vec3	trace_scene(t_ray *r);
 
 t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
 {
-	const float	fuzziness = 0.99f;
+	const float	fuzziness = 0.0f;
 
 	if (r->bounce-- == 0)
 		return vec3(0,0,0);
@@ -39,25 +39,23 @@ t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
 
 static t_vec3	trace_scene(t_ray *r)
 {
+	t_shading	s;
 	t_object	*object;
-	t_vec3		point;
-	t_shading	shading;
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
 
 	if (object == NULL)
 		return (r->scene->ambient);
-	if (object->type == OBJECT_LIGHT)
+	if (object->type == OBJECT_LIGHT || !r->fancy)
 		return (object->color);
-	point = add3(r->ro, scale3(r->rd, t));
-	if (!r->fancy)
-		return (object->color);
-	shading.point = point;
-	object_params(object, &shading);
-	shading.normal = scale3(shading.normal, copysignf(1.0f, -dot3(shading.normal, r->rd)));
-	shading.point = add3(shading.point, scale3(shading.normal, 1e-4f));
-	apply_bumpmap(&shading, TEXTURE_POLKADOT, shading.texcoord);
-	shading.ambient = reflection(r, shading.point, shading.normal);
-	return (shade_point(&shading, r, object));
+	s.point = add3(r->ro, scale3(r->rd, t));
+	object_params(object, &s);
+	// s.normal = scale3(s.normal, copysignf(1.0f, -dot3(s.normal, r->rd)));
+	s.point = add3(s.point, scale3(s.normal, 1e-4f));
+	apply_bumpmap(&s, TEXTURE_POLKADOT, s.texcoord);
+	t_ray copy = *r;
+	s.ambient = reflection(r, s.point, s.normal);
+	*r = copy; // FIXME
+	return (shade_point(&s, r, object));
 }
 
 t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
@@ -86,6 +84,6 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	ray.rd = get_viewport_ray(r, x, y, true);
 	ray.rd = add3(r->scene->pos, scale3(ray.rd, r->scene->focus_depth));
 	ray.rd = norm3(sub3(ray.rd, ray.ro));
-	ray.bounce = 1;
+	ray.bounce = 3;
 	return (trace_scene(&ray));
 }
