@@ -14,10 +14,7 @@
 # include "../assets/MLX42/include/MLX42/MLX42.h"
 # include "../assets/libft/libft.h"
 
-// The number of rendering threads to use.
-# define THREAD_COUNT 4
-
-// Mouse sensitivity (higher values = more sensitive).
+// Mouse sensitivity.
 # define MOUSE_SENSITIVITY 0.006
 
 // Key bindings.
@@ -28,10 +25,27 @@
 # define KEY_UP			MLX_KEY_SPACE		// Float up
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
-# define TAU 6.283185307179586 // 2π
+// Minimum roughness value. Roughness values of zero easily make lighting
+// calculations blow up, so we impose an arbitrary limit on how shiny surfaces
+// can be.
 # define MIN_ROUGH 0.01
+
+// Default roughness and metallicness values. These are used for objects that
+// don't set these values in the map file.
 # define DEFAULT_ROUGH 0.1
 # define DEFAULT_METALLIC 0.5
+
+// How much bump mapping affects surface normals. Higher values produce a
+// bumpier, less subtle effect.
+# define BUMP_MAP_STRENGTH 0.003
+
+// Maximum number of ray bounces used when reflecting rays off surfaces. Higher
+// values make indirect light and mirror reflections more convincing, but come
+// at a performance cost.
+# define MAX_RAY_BOUNCES 3
+
+// The number of rendering threads to use.
+# define THREAD_COUNT 12
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;

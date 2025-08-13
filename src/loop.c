@@ -66,7 +66,7 @@ void	render_scene(t_render *r)
 {
 	r->camera_yaw = atan2(r->scene->dir.z, r->scene->dir.x);
 	r->camera_pitch = acos(r->scene->dir.y);
-	r->mlx = mlx_init(2 * 480, 2 * 360, "miniRT", true);
+	r->mlx = mlx_init(1 * 480, 1 * 360, "miniRT", true);
 	if (r->mlx != NULL)
 	{
 		r->image = mlx_new_image(r->mlx, r->mlx->width, r->mlx->height);
