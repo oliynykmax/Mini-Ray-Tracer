@@ -28,7 +28,7 @@
 // Minimum roughness value. Roughness values of zero easily make lighting
 // calculations blow up, so we impose an arbitrary limit on how shiny surfaces
 // can be.
-# define MIN_ROUGH 0.01
+# define MIN_ROUGHNESS 0.01
 
 // Default roughness and metallicness values. These are used for objects that
 // don't set these values in the map file.
@@ -37,7 +37,7 @@
 
 // How much bump mapping affects surface normals. Higher values produce a
 // bumpier, less subtle effect.
-# define BUMP_MAP_STRENGTH 0.003
+# define BUMP_MAP_STRENGTH 0.001
 
 // Maximum number of ray bounces used when reflecting rays off surfaces. Higher
 // values make indirect light and mirror reflections more convincing, but come
