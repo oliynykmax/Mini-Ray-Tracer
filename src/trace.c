@@ -28,8 +28,15 @@ t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n, t_object *o)
 {
 	if (r->bounce-- == 0)
 		return vec3(0,0,0);
-	r->rd = reflect3(r->rd, n);
-	r->rd = norm3(add3(r->rd, random_point_on_sphere(r->rng, o->rough * 2.0f)));
+	if (random_float(r->rng) > o->metallic)
+	{
+		r->rd = random_point_on_sphere(r->rng, 1.0f);
+	}
+	else
+	{
+		r->rd = reflect3(r->rd, n);
+		r->rd = norm3(add3(r->rd, random_point_on_sphere(r->rng, o->rough)));
+	}
 	r->rd = scale3(r->rd, copysignf(1.0f, dot3(r->rd, n)));
 	r->ro = p;
 	return (trace_scene(r));
