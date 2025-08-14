@@ -120,17 +120,17 @@ enum	e_texture
 // Data describing one geometric object or light in the scene.
 struct s_object
 {
-	t_object_type	type;	// Object type (one of OBJECT_xxx)
-	t_vec3			pos;	// Object position in world coordinates
-	t_quat			rot;	// Object rotation relative to world coordinates
-	t_vec3			color;	// Surface color
-	float			radius;	// Radius (sphere/cylinder/para/light)
-	float			height;	// Height (cylinder/para)
-	t_vec3			size;	// Full dimensions (box); use for non-uniform boxes
-	t_texture		texture; // texture(if any)
-	t_texture		bump;	// bump map(if any)
-	float			rough; // surface roughness
-	float			metallic; // metallic factor
+	t_object_type	type;		// Object type (one of OBJECT_xxx)
+	t_vec3			pos;		// Object position in world coordinates
+	t_quat			rot;		// Object rotation relative to world coordinates
+	t_vec3			color;		// Base color (albedo)
+	float			radius;		// Radius (sphere/cylinder/para/light)
+	float			height;		// Height (cylinder/para)
+	t_vec3			size;		// Full dimensions (box)
+	t_texture		texture;	// Texture map (or TEXTURE_NONE )
+	t_texture		bumpmap;	// bump map(if any)
+	float			rough;		// Surface roughness
+	float			metallic;	// Surface metalness
 };
 
 struct s_ray
