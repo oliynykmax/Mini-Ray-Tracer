@@ -10,10 +10,10 @@ void	parse_sphere(t_parse *m)
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m, m->line[2]) * 0.5;
 	fatal_if(m, fabs(m->obj->radius) == HUGE_VAL,
-		"Sphere radius cannot be infinite\n");
+		"Sphere radius can't be inf\n");
+	fatal_if(m, m->obj->radius <= 0.0f, "Sphere radius must be positive\n");
 	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
-	fatal_if(m, m->obj->radius <= 0.0f, "Sphere radius must be positive\n");
 }
 
 void	parse_plane(t_parse *m)
@@ -39,17 +39,17 @@ void	parse_para(t_parse *m)
 	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
+	fatal_if(m, fabsf(len3(m->normal) - 1.0f) >= 0.001f,
+		"Paraboloid axis must be a unit vector\n");
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m, m->line[3]) * 0.5;
 	m->obj->height = ft_atof(m, m->line[4]);
 	fatal_if(m, fabs(m->obj->radius) == HUGE_VAL
 		|| fabs(m->obj->height) == HUGE_VAL,
 		"Object radius and height cannot be infinite\n");
-	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
-	fatal_if(m, fabsf(len3(m->normal) - 1.0f) >= 0.001f,
-		"Paraboloid axis must be a unit vector\n");
 	fatal_if(m, m->obj->radius <= 0.0f || m->obj->height <= 0.0f,
 		"Para radius and height must be positive\n");
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_direction(m->normal);
 }
 
@@ -61,17 +61,17 @@ void	parse_cylinder(t_parse *m)
 	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
+	fatal_if(m, fabsf(len3(m->normal) - 1.0f) >= 0.001f,
+		"Cylinder axis must be a unit vector\n");
 	parse3(m, m->line[5], &m->obj->color, (float []){0, 255});
 	m->obj->radius = ft_atof(m, m->line[3]) * 0.5;
 	m->obj->height = ft_atof(m, m->line[4]);
 	fatal_if(m, fabs(m->obj->radius) == HUGE_VAL
 		|| fabs(m->obj->height) == HUGE_VAL,
 		"Object radius and height cannot be infinite\n");
-	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
-	fatal_if(m, fabsf(len3(m->normal) - 1.0f) >= 0.001f,
-		"Cylinder axis must be a unit vector\n");
 	fatal_if(m, m->obj->radius <= 0.0f || m->obj->height <= 0.0f,
 		"Cylinder radius and height must be positive\n");
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_direction(m->normal);
 }
 
@@ -83,13 +83,13 @@ void	parse_box(t_parse *m)
 	parse_optionals(m, 5);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->normal, (float []){-1, 1});
-	parse3(m, m->line[3], &m->obj->size, (float []){0, 0});
-	parse3(m, m->line[4], &m->obj->color, (float []){0, 255});
-	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	fatal_if(m, fabsf(len3(m->normal) - 1.0f) >= 0.001f,
 		"Box axis must be a unit vector\n");
+	parse3(m, m->line[3], &m->obj->size, (float []){0, 0});
 	fatal_if(m, m->obj->size.x <= 0.0f || m->obj->size.y <= 0.0f
 		|| m->obj->size.z <= 0.0f, "Box dimensions must be positive\n");
+	parse3(m, m->line[4], &m->obj->color, (float []){0, 255});
+	m->obj->color = scale3(m->obj->color, 1.0 / 255.0);
 	m->obj->rot = quat_from_direction(m->normal);
 }
 

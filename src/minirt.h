@@ -237,6 +237,8 @@ struct s_parse
 	t_object	*obj;
 	t_vec3		normal;
 	int			arrlen;
+	bool		ambient_exists;	// moved from static in parser
+	bool		camera_exists;	// moved from static in parser
 };
 
 // camera.c
