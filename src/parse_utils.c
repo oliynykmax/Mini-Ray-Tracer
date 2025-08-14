@@ -36,5 +36,5 @@ void	parse_optionals(t_parse *m, int i)
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
 	m->obj->texture = parse_texture(m->arrlen > i + 2, m, i + 2);
-	m->obj->bumpmap = parse_texture(m->arrlen > i + 3, m, i + 3);
+	m->obj->bump = parse_texture(m->arrlen > i + 3, m, i + 3);
 }
