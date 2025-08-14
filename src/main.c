@@ -7,6 +7,8 @@ void	init_structs(t_scene *scene, t_render *render, t_parse *map)
 	ft_bzero(map, sizeof(t_parse));
 	map->sc = scene;
 	map->fd = -1;
+	map->ambient_exists = false;
+	map->camera_exists = false;
 	render->scene = scene;
 	scene->objects = NULL;
 }
