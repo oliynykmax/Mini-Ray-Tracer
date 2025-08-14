@@ -15,7 +15,6 @@ SRCS := \
 	src/array_utils.c \
 	src/camera.c \
 	src/cylinder.c \
-	src/debug.c \
 	src/input.c \
 	src/shading.c \
 	src/loop.c \
