@@ -25,6 +25,7 @@ double	ft_atof(t_parse *m, const char *str)
 		result += (*str++ - '0') / divisor;
 		divisor *= 10.0;
 	}
+	fatal_if(m, *str != '\0', "Not a number: %s", str);
 	return (result * sign);
 }
 
