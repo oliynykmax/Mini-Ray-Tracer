@@ -2,26 +2,34 @@
 
 static float	cloudy(t_vec3 x, float ampl, float freq)
 {
-	float	sum = 0.0f;
-	t_vec3	n = vec3(1.0, 0.0, 0.0f);
-	const float t = radians(180.0) * (3.0 - sqrt(5.0));
+	float	sum;
+	float	t;
+	float	tmp;
+	t_vec3	n;
+	int		count;
 
-	for (int i = 0; i < 30; i++) {
-		float p = freq * dot3(x, n);
-		float y = fract(p);
-		float v = 4.0f * (fabsf(y) * y - y);
-		v = 1.0f - 2.0f * fabsf(v);
-		sum += ampl * v;
-		freq *= 1.25;
-		ampl *= 0.9;
-		n = vec3(cosf(t) * n.x - sinf(t) * n.y, sin(t) * n.x + cosf(t) * n.y, 0.0f);
+	sum = 0.0f;
+	t = radians(180.0f) * (3.0f - sqrtf(5.0f));
+	n = vec3(1.0f, 0.0f, 0.0f);
+	count = 30;
+	while (count--)
+	{
+		tmp = freq * dot3(x, n);
+		tmp = fract(tmp);
+		tmp = 4.0f * (fabsf(tmp) * tmp - tmp);
+		tmp = 1.0f - 2.0f * fabsf(tmp);
+		sum += ampl * tmp;
+		freq *= 1.25f;
+		ampl *= 0.9f;
+		n = vec3(cosf(t) * n.x - sinf(t) * n.y, sinf(t) * n.x + cosf(t) * n.y,
+				0.0f);
 	}
 	return (saturate(sum * 0.1f + 1.5f) * 0.9f + 0.1f);
 }
 
 static float	texture_none(float u, float v)
 {
-	(void) u, (void) v;
+	(void)u, (void)v;
 	return (1.0f);
 }
 
