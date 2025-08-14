@@ -22,7 +22,7 @@ SRCS := \
 	src/math.c \
 	src/object.c \
 	src/box.c \
- 	src/paraboloid.c \
+	src/paraboloid.c \
 	src/parse_light_camera.c \
 	src/parsing_objects.c \
 	src/parse_utils.c \
@@ -38,6 +38,7 @@ SRCS := \
 	src/vec3_geometric.c \
 	src/vec3_utility.c \
 	src/vec_parse_utils.c \
+
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 

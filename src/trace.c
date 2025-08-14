@@ -2,9 +2,9 @@
 
 float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 {
-	float		t_min;
-	float		t;
-	size_t		i;
+	float	t_min;
+	float	t;
+	size_t	i;
 
 	i = -1;
 	if (object != NULL)
@@ -27,7 +27,7 @@ static t_vec3	trace_scene(t_ray *r);
 t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n, t_object *o)
 {
 	if (r->bounce-- == 0)
-		return vec3(0,0,0);
+		return (vec3(0, 0, 0));
 	if (random_float(r->rng) > o->metallic)
 	{
 		r->rd = random_point_on_sphere(r->rng, 1.0f);
@@ -47,6 +47,7 @@ static t_vec3	trace_scene(t_ray *r)
 	t_shading	s;
 	t_object	*object;
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
+	t_ray		copy;
 
 	if (object == NULL)
 		return (r->scene->ambient);
@@ -55,9 +56,9 @@ static t_vec3	trace_scene(t_ray *r)
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
 	s.point = add3(s.point, scale3(s.normal, 1e-4f));
-	if (object->bumpmap != TEXTURE_NONE)
-		apply_bumpmap(&s, object->bumpmap, s.texcoord);
-	t_ray copy = *r;
+	if (object->bump != TEXTURE_NONE)
+		apply_bumpmap(&s, object->bump, s.texcoord);
+	copy = *r;
 	s.ambient = reflection(r, s.point, s.normal, object);
 	*r = copy; // FIXME
 	return (shade_point(&s, r, object));
@@ -82,7 +83,7 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 
 	ray.fancy = r->fancy;
 	ray.scene = r->scene;
-	ray.rng = r->frame_samples + (int) x + (int) y * r->image->width;
+	ray.rng = r->frame_samples + (int)x + (int)y * r->image->width;
 	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
 	ray.ro = add3(r->scene->pos, scale3(r->camera_x, disk.x));
 	ray.ro = add3(ray.ro, scale3(r->camera_y, disk.y));
