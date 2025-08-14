@@ -8,6 +8,7 @@ void	init_structs(t_scene *scene, t_render *render, t_parse *map)
 	map->sc = scene;
 	map->fd = -1;
 	render->scene = scene;
+	scene->objects = NULL;
 }
 
 int	main(int ac, char **av)
