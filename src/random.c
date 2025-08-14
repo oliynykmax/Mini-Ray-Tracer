@@ -4,7 +4,7 @@
 
 float	random_float(uint16_t rng)
 {
-	return fract(rng * (1.0f / 1.6180339887498948482f));
+	return (fract(rng * (1.0f / 1.6180339887498948482f)));
 }
 
 // Generate a random point in the unit square [0, 1]². Uses a low-discrepancy

@@ -7,7 +7,7 @@ void	parse_amb_light(t_parse *m)
 
 	fatal_if(m, array_len(m->line) != 3, "Invalid ambient light format\n");
 	fatal_if(m, ambient_exists, "Ambient light already exists\n");
-	ratio = ft_atof(m->line[1]);
+	ratio = ft_atof(m, m->line[1]);
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	fatal_if(m, ratio < 0.0f || ratio > 1.0f,
 		"Ambient light ratio must be between 0.0 and 1.0\n");
@@ -22,10 +22,10 @@ void	parse_point_light(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, (m->arrlen != 4 && m->arrlen != 5),
 		"Invalid point light format\n");
-	brightness = ft_atof(m->line[2]);
+	brightness = ft_atof(m, m->line[2]);
 	m->obj->type = OBJECT_LIGHT;
 	if (m->arrlen == 5)
-		m->obj->radius = ft_atof(m->line[4]);
+		m->obj->radius = ft_atof(m, m->line[4]);
 	fatal_if(m, m->obj->radius < 0.0f, "Light radius must be positive\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
@@ -53,7 +53,7 @@ void	parse_camera(t_parse *m)
 	fatal_if(m, camera_exist, "Camera already exist\n");
 	m->sc->focus_depth = parse_float(m->arrlen > 4, m, 5.0f, 4);
 	m->sc->aperture_size = parse_float(m->arrlen > 5, m, 0.0f, 5);
-	m->sc->fov = ft_atof(m->line[3]);
+	m->sc->fov = ft_atof(m, m->line[3]);
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->sc->dir, (float []){-1, 1});
 	camera_exist = true;
