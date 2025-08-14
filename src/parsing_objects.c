@@ -3,7 +3,7 @@
 void	parse_sphere(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 4 || m->arrlen > 7, "Invalid sphere format\n");
+	fatal_if(m, m->arrlen < 4 || m->arrlen > 8, "Invalid sphere format\n");
 	m->obj->type = OBJECT_SPHERE;
 	parse_optionals(m, 4);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -17,7 +17,7 @@ void	parse_sphere(t_parse *m)
 void	parse_plane(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 4 || m->arrlen > 7, "Invalid plane format\n");
+	fatal_if(m, m->arrlen < 4 || m->arrlen > 8, "Invalid plane format\n");
 	m->obj->type = OBJECT_PLANE;
 	parse_optionals(m, 4);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -32,7 +32,7 @@ void	parse_plane(t_parse *m)
 void	parse_para(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 6 || m->arrlen > 9, "Invalid para format\n");
+	fatal_if(m, m->arrlen < 6 || m->arrlen > 10, "Invalid para format\n");
 	m->obj->type = OBJECT_PARA;
 	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -51,7 +51,7 @@ void	parse_para(t_parse *m)
 void	parse_cylinder(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 6 || m->arrlen > 9, "Invalid Cy format\n");
+	fatal_if(m, m->arrlen < 6 || m->arrlen > 10, "Invalid Cy format\n");
 	m->obj->type = OBJECT_CYLINDER;
 	parse_optionals(m, 6);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
@@ -70,7 +70,7 @@ void	parse_cylinder(t_parse *m)
 void	parse_box(t_parse *m)
 {
 	m->arrlen = array_len(m->line);
-	fatal_if(m, m->arrlen < 5 || m->arrlen > 8, "Invalid box format\n");
+	fatal_if(m, m->arrlen < 5 || m->arrlen > 9, "Invalid box format\n");
 	m->obj->type = OBJECT_BOX;
 	parse_optionals(m, 5);
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
