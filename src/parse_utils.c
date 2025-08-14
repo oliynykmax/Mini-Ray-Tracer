@@ -10,6 +10,8 @@ t_texture	parse_texture(bool exists, t_parse *map, int i)
 		return (TEXTURE_ZIGZAG);
 	if (ft_strcmp(map->line[i], "polkadot") == 0)
 		return (TEXTURE_POLKADOT);
+	if (ft_strcmp(map->line[i], "murble") == 0)
+		return (TEXTURE_MURBLE);
 	fatal_if(map,
 		true,
 		"Unknown texture '%s' (expected checker | zigzag | polkadot | bump)\n",
