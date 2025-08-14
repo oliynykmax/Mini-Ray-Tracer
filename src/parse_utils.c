@@ -23,7 +23,7 @@ float	parse_float(bool exists, t_parse *map, float std, int i)
 {
 	if (!exists || map->line[i] == NULL || ft_strcmp(map->line[i], "_") == 0)
 		return (std);
-	return (ft_atof(map->line[i]));
+	return (ft_atof(map, map->line[i]));
 }
 
 void	parse_optionals(t_parse *m, int i)
