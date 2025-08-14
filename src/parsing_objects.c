@@ -101,7 +101,7 @@ void	parse_type(t_parse *m)
 	while (ids[i] && ft_strcmp(id, ids[i]))
 		i++;
 	if (!ids[i])
-		fatal_if(m, false, "Not a valid type: %s\n", id);
+		fatal_if(m, true, "Not a valid type: %s\n", id);
 	if (alloc[i])
 		m->obj = object_new(m);
 	else
