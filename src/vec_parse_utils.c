@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-double	ft_atof(const char *str)
+double	ft_atof(t_parse *m, const char *str)
 {
 	double	result;
 	double	divisor;
@@ -12,19 +12,18 @@ double	ft_atof(const char *str)
 	while (*str == ' ' || *str == '\t' || *str == '\n')
 		str++;
 	if (*str == '+' || *str == '-')
-		if (*str++ == '-')
-			sign = -1;
+		sign = -1 * (*str++ == '-');
 	while (*str >= '0' && *str <= '9')
 		result = result * 10.0 + (*str++ - '0');
+	if (*str == '\0')
+		return (result * sign);
 	if (*str == '.')
-	{
 		str++;
-		while (*str >= '0' && *str <= '9')
-		{
-			result += (*str - '0') / divisor;
-			divisor *= 10.0;
-			str++;
-		}
+	fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", str);
+	while (*str >= '0' && *str <= '9')
+	{
+		result += (*str++ - '0') / divisor;
+		divisor *= 10.0;
 	}
 	return (result * sign);
 }
@@ -63,7 +62,8 @@ void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 	fatal_if(m, split == NULL, "Memory allocation failure\n");
 	fatal_if(m, array_len(split) != 3,
 		"Vector format must be 'x,y,z' with 3 values\n");
-	*out = vec3(ft_atof(split[0]), ft_atof(split[1]), ft_atof(split[2]));
+	*out = vec3(ft_atof(m, split[0]), ft_atof(m, split[1]), ft_atof(m,
+				split[2]));
 	free_array(split);
 	if (limits[0] != limits[1])
 		fatal_if(m, !in_range3(*out, limits[0], limits[1]),

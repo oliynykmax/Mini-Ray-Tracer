@@ -347,9 +347,12 @@ void		fatal_if(t_parse *map, bool condition, char *format, ...);
 int			array_len(char **array);
 void		free_array(char **array);
 /* vector parsing utils */
-double		ft_atof(const char *str);
+double		ft_atof(t_parse *m, const char *str);
 bool		in_range3(t_vec3 v, float lower, float upper);
 void		parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2]);
+/* debug.c */
+void		debug_print_scene(t_scene *scene);
+
 /* parse_utils.c */
 float		parse_float(bool exists, t_parse *map, float std, int i);
 t_texture	parse_texture(bool exists, t_parse *map, int i);
