@@ -25,7 +25,11 @@ void	parse_point_light(t_parse *m)
 	brightness = ft_atof(m, m->line[2]);
 	m->obj->type = OBJECT_LIGHT;
 	if (m->arrlen == 5)
+	{
 		m->obj->radius = ft_atof(m, m->line[4]);
+		fatal_if(m, fabs(m->obj->radius) == HUGE_VAL,
+			"Light radius cant be infinite\n");
+	}
 	fatal_if(m, m->obj->radius < 0.0f, "Light radius must be positive\n");
 	parse3(m, m->line[1], &m->obj->pos, (float []){0, 0});
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
@@ -53,6 +57,9 @@ void	parse_camera(t_parse *m)
 	fatal_if(m, camera_exist, "Camera already exist\n");
 	m->sc->focus_depth = parse_float(m->arrlen > 4, m, 5.0f, 4);
 	m->sc->aperture_size = parse_float(m->arrlen > 5, m, 0.0f, 5);
+	fatal_if(m, fabs(m->sc->focus_depth) == HUGE_VAL
+		|| fabs(m->sc->aperture_size) == HUGE_VAL,
+		"Camera focus depth or aperture cannot be infinite\n");
 	m->sc->fov = ft_atof(m, m->line[3]);
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->sc->dir, (float []){-1, 1});

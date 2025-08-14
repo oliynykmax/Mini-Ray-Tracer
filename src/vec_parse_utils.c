@@ -38,12 +38,41 @@ double	ft_atof(t_parse *m, const char *str)
  */
 bool	in_range3(t_vec3 v, float lower, float upper)
 {
-	float	epsilon;
+	float		epsilon;
 
 	epsilon = 0.001f;
 	return ((v.x >= lower - epsilon) && (v.x <= upper + epsilon)
 		&& (v.y >= lower - epsilon) && (v.y <= upper + epsilon) && (v.z >= lower
 			- epsilon) && (v.z <= upper + epsilon));
+}
+
+/*
+** Splits a string by a comma, strictly for 3 components.
+** Calls fatal_if on error.
+*/
+static char	**ft_split_vec(t_parse *m, const char *str)
+{
+	char		**result;
+	const char	*p1 = ft_strchr(str, ',');
+	const char	*p2;
+
+	p2 = NULL;
+	if (p1)
+		p2 = ft_strchr(p1 + 1, ',');
+	fatal_if(m, p1 == NULL || p2 == NULL || ft_strchr(p2 + 1, ','),
+		"Vector format must be 'x,y,z' with exactly 2 commas\n");
+	result = malloc(sizeof(char *) * 4);
+	fatal_if(m, result == NULL, "Memory allocation failure\n");
+	result[0] = ft_substr(str, 0, p1 - str);
+	result[1] = ft_substr(str, p1 - str + 1, p2 - (p1 + 1));
+	result[2] = ft_substr(p2 + 1, 0, ft_strlen(p2 + 1));
+	result[3] = NULL;
+	if (result[0] == NULL || result[1] == NULL || result[2] == NULL)
+	{
+		free_array(result);
+		fatal_if(m, true, "Memory allocation failure in substr\n");
+	}
+	return (result);
 }
 
 /*
@@ -59,13 +88,13 @@ void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 {
 	char	**split;
 
-	split = ft_split(str, ',');
-	fatal_if(m, split == NULL, "Memory allocation failure\n");
-	fatal_if(m, array_len(split) != 3,
-		"Vector format must be 'x,y,z' with 3 values\n");
+	split = ft_split_vec(m, str);
 	*out = vec3(ft_atof(m, split[0]), ft_atof(m, split[1]), ft_atof(m,
 				split[2]));
 	free_array(split);
+	fatal_if(m, fabs(out->x) == HUGE_VAL || fabs(out->y) == HUGE_VAL
+		|| fabs(out->z) == HUGE_VAL,
+		"Vector component is too large\n");
 	if (limits[0] != limits[1])
 		fatal_if(m, !in_range3(*out, limits[0], limits[1]),
 			"Vector values must be between %d and %d\n", (int)limits[0],
