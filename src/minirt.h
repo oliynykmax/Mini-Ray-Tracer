@@ -106,7 +106,6 @@ enum	e_object_type
 	OBJECT_BOX,
 	OBJECT_LIGHT,
 };
-
 // Enumeration type for different procedural textures.
 enum	e_texture
 {
@@ -128,7 +127,7 @@ struct s_object
 	float			height;		// Height (cylinder/para)
 	t_vec3			size;		// Full dimensions (box)
 	t_texture		texture;	// Texture map (or TEXTURE_NONE )
-	t_texture		bumpmap;	// bump map(if any)
+	t_texture		bump;	// bump map(if any)
 	float			rough;		// Surface roughness
 	float			metallic;	// Surface metalness
 };
