@@ -31,6 +31,5 @@ void	object_params(t_object *o, t_shading *s)
 	functions[o->type](o, s);
 	s->normal = quat_rotate_vec3(o->rot, s->normal);
 	s->tangent = quat_rotate_vec3(o->rot, s->tangent);
-	s->bitangent = cross3(s->normal, s->tangent);
 	s->point = p;
 }

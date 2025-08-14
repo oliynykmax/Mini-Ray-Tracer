@@ -30,8 +30,15 @@ static void	key_hook(mlx_key_data_t data, void *param)
 {
 	t_render *const	r = (t_render*) param;
 
-	if (data.action == MLX_PRESS && data.key == MLX_KEY_ESCAPE)
+	if (data.action != MLX_PRESS)
+		return ;
+	if (data.key == MLX_KEY_ESCAPE)
 		mlx_close_window(r->mlx);
+	if (data.key == MLX_KEY_F)
+	{
+		r->fancy = !r->fancy;
+		r->frame_samples = 0;
+	}
 }
 
 // MLX window resize hook. Resizes the image to match the new window dimensions.
@@ -59,7 +66,7 @@ void	render_scene(t_render *r)
 {
 	r->camera_yaw = atan2(r->scene->dir.z, r->scene->dir.x);
 	r->camera_pitch = acos(r->scene->dir.y);
-	r->mlx = mlx_init(2 * 480, 2 * 360, "miniRT", true);
+	r->mlx = mlx_init(1 * 480, 1 * 360, "miniRT", true);
 	if (r->mlx != NULL)
 	{
 		r->image = mlx_new_image(r->mlx, r->mlx->width, r->mlx->height);

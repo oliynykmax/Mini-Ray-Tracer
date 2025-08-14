@@ -14,10 +14,7 @@
 # include "../assets/MLX42/include/MLX42/MLX42.h"
 # include "../assets/libft/libft.h"
 
-// The number of rendering threads to use.
-# define THREAD_COUNT 4
-
-// Mouse sensitivity (higher values = more sensitive).
+// Mouse sensitivity.
 # define MOUSE_SENSITIVITY 0.006
 
 // Key bindings.
@@ -28,9 +25,27 @@
 # define KEY_UP			MLX_KEY_SPACE		// Float up
 # define KEY_DOWN		MLX_KEY_LEFT_SHIFT	// Sink down
 
-# define TAU 6.283185307179586 // 2π
+// Minimum roughness value. Roughness values of zero easily make lighting
+// calculations blow up, so we impose an arbitrary limit on how shiny surfaces
+// can be.
+# define MIN_ROUGHNESS 0.01
+
+// Default roughness and metallicness values. These are used for objects that
+// don't set these values in the map file.
 # define DEFAULT_ROUGH 0.1
 # define DEFAULT_METALLIC 0.5
+
+// How much bump mapping affects surface normals. Higher values produce a
+// bumpier, less subtle effect.
+# define BUMP_MAP_STRENGTH 0.01
+
+// Maximum number of ray bounces used when reflecting rays off surfaces. Higher
+// values make indirect light and mirror reflections more convincing, but come
+// at a performance cost.
+# define MAX_RAY_BOUNCES 3
+
+// The number of rendering threads to use.
+# define THREAD_COUNT 12
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
@@ -125,6 +140,7 @@ struct s_ray
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction
 	int			bounce;	// Remaining ray bounces
+	bool		fancy;	// Use "fancy" shading
 };
 
 // Data describing the objects in the scene.
@@ -175,6 +191,7 @@ struct s_render
 	pthread_cond_t	available_cond;			// Tells when jobs become available
 	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
 	pthread_mutex_t	mutex;					// Protects common render state
+	bool			fancy;					// Use "fancy" lighting
 };
 
 // Data for one render thread.
@@ -208,7 +225,9 @@ struct s_shading
 	float	hdotv;		// (halfway vector) · (view vector)
 	t_vec3	diffuse;	// Diffuse contribution
 	t_vec3	specular;	// Specular contribution
+	t_vec3	ambient;	// Ambient contribution
 };
+
 // struct for parsing related things for easy exits
 struct s_parse
 {
@@ -262,12 +281,14 @@ t_quat		quat_inverse(t_quat q);
 t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 
 // random.c
+float		random_float(uint16_t rng);
 t_vec3		random_point_in_square(uint16_t rng);
 t_vec3		random_point_in_disk(uint16_t rng, float radius);
 t_vec3		random_point_on_sphere(uint16_t rng, float radius);
 
 // shading.c
-t_vec3		shade_point(t_ray *r, t_object *object, t_vec3 p);
+void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);
+t_vec3		shade_point(t_shading *s, t_ray *r, t_object *object);
 
 // sphere.c
 float		sphere_distance(t_object *o, t_vec3 ro, t_vec3 rd);

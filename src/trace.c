@@ -24,35 +24,43 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 
 static t_vec3	trace_scene(t_ray *r);
 
-t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n)
+t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n, t_object *o)
 {
-	const float	fuzziness = 0.1f;
-
 	if (r->bounce-- == 0)
-		return (vec3(0.0f, 0.0f, 0.0f));
-	n = scale3(n, copysignf(1.0f, -dot3(r->rd, n)));
-	p = add3(p, scale3(n, 1e-6f));
-	n = reflect3(r->rd, n);
-	n = norm3(add3(n, random_point_on_sphere(r->rng, fuzziness)));
+		return vec3(0,0,0);
+	if (random_float(r->rng) > o->metallic)
+	{
+		r->rd = random_point_on_sphere(r->rng, 1.0f);
+	}
+	else
+	{
+		r->rd = reflect3(r->rd, n);
+		r->rd = norm3(add3(r->rd, random_point_on_sphere(r->rng, o->rough)));
+	}
+	r->rd = scale3(r->rd, copysignf(1.0f, dot3(r->rd, n)));
 	r->ro = p;
-	r->rd = n;
 	return (trace_scene(r));
 }
 
 static t_vec3	trace_scene(t_ray *r)
 {
+	t_shading	s;
 	t_object	*object;
-	t_vec3		point;
-	t_vec3		color;
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
 
 	if (object == NULL)
 		return (r->scene->ambient);
-	if (object->type == OBJECT_LIGHT)
+	if (object->type == OBJECT_LIGHT || !r->fancy)
 		return (object->color);
-	point = add3(r->ro, scale3(r->rd, t));
-	color = shade_point(r, object, point);
-	return (color);
+	s.point = add3(r->ro, scale3(r->rd, t));
+	object_params(object, &s);
+	s.point = add3(s.point, scale3(s.normal, 1e-4f));
+	if (object->bump != TEXTURE_NONE)
+		apply_bumpmap(&s, object->bump, s.texcoord);
+	t_ray copy = *r;
+	s.ambient = reflection(r, s.point, s.normal, object);
+	*r = copy; // FIXME
+	return (shade_point(&s, r, object));
 }
 
 t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
@@ -72,6 +80,7 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	t_vec3	disk;
 	t_ray	ray;
 
+	ray.fancy = r->fancy;
 	ray.scene = r->scene;
 	ray.rng = r->frame_samples + (int) x + (int) y * r->image->width;
 	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
@@ -80,6 +89,6 @@ t_vec3	trace_pixel(t_render *r, float x, float y)
 	ray.rd = get_viewport_ray(r, x, y, true);
 	ray.rd = add3(r->scene->pos, scale3(ray.rd, r->scene->focus_depth));
 	ray.rd = norm3(sub3(ray.rd, ray.ro));
-	ray.bounce = 1;
+	ray.bounce = MAX_RAY_BOUNCES;
 	return (trace_scene(&ray));
 }
