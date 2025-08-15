@@ -9,6 +9,7 @@ void	init_structs(t_scene *scene, t_render *render, t_parse *map)
 	map->fd = -1;
 	map->ambient_exists = false;
 	map->camera_exists = false;
+	map->temp_split = NULL;
 	render->scene = scene;
 	scene->objects = NULL;
 }

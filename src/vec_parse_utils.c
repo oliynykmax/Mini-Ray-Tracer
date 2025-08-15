@@ -63,6 +63,7 @@ static char	**ft_split_vec(t_parse *m, const char *str)
 		"Vector format must be 'x,y,z' with exactly 2 commas\n");
 	result = malloc(sizeof(char *) * 4);
 	fatal_if(m, result == NULL, "Memory allocation failure\n");
+	m->temp_split = result;
 	result[0] = ft_substr(str, 0, p1 - str);
 	result[1] = ft_substr(str, p1 - str + 1, p2 - (p1 + 1));
 	result[2] = ft_substr(p2 + 1, 0, ft_strlen(p2 + 1));
@@ -91,6 +92,7 @@ void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 	split = ft_split_vec(m, str);
 	*out = vec3(ft_atof(m, split[0]), ft_atof(m, split[1]), ft_atof(m,
 				split[2]));
+	m->temp_split = NULL;
 	free_array(split);
 	fatal_if(m, fabs(out->x) == HUGE_VAL || fabs(out->y) == HUGE_VAL
 		|| fabs(out->z) == HUGE_VAL,
