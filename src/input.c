@@ -10,6 +10,8 @@ static void	cleanup_parsing(t_parse *ctx)
 		free(ctx->buff);
 	if (ctx->line)
 		free_array(ctx->line);
+	if (ctx->temp_split)
+		free_array(ctx->temp_split);
 	if (ctx->sc->objects)
 		free(ctx->sc->objects);
 }
