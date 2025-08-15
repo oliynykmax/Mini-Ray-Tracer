@@ -74,6 +74,7 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 
 void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 {
+	tc = scale3(tc, 5.0f);
 	const float		delta = 1e-5f;
 	const float		h = get_texture(bumpmap, tc.x, tc.y);
 	const float		du = (get_texture(bumpmap, tc.x + delta, tc.y) - h) / delta;

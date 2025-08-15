@@ -362,4 +362,5 @@ void		debug_print_scene(t_scene *scene);
 float		parse_float(bool exists, t_parse *map, float std, int i);
 t_texture	parse_texture(bool exists, t_parse *map, int i);
 void		parse_optionals(t_parse *m, int texture_index);
+
 #endif

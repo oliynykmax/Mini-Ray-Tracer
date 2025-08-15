@@ -1,30 +1,30 @@
 #include "minirt.h"
 
-static float	cloudy(t_vec3 x, float ampl, float freq)
+static float	cloudy(t_vec3 x, float ampl, float freq, float sum)
 {
-	float	sum;
+	float	norm;
 	float	t;
 	float	tmp;
 	t_vec3	n;
 	int		count;
 
-	sum = 0.0f;
+	norm = 0.0f;
 	t = radians(180.0f) * (3.0f - sqrtf(5.0f));
 	n = vec3(1.0f, 0.0f, 0.0f);
 	count = 30;
 	while (count--)
 	{
 		tmp = freq * dot3(x, n);
-		tmp = fract(tmp);
+		tmp = fract(tmp * 0.5f) * 2.0f - 1.0f;
 		tmp = 4.0f * (fabsf(tmp) * tmp - tmp);
-		tmp = 1.0f - 2.0f * fabsf(tmp);
 		sum += ampl * tmp;
-		freq *= 1.25f;
-		ampl *= 0.9f;
+		norm += ampl;
+		freq *= 1.17f;
+		ampl *= 0.63f;
 		n = vec3(cosf(t) * n.x - sinf(t) * n.y, sinf(t) * n.x + cosf(t) * n.y,
 				0.0f);
 	}
-	return (saturate(sum * 0.1f + 1.5f) * 0.9f + 0.1f);
+	return (saturate(sum / norm * 0.5f + 0.5f));
 }
 
 static float	texture_none(float u, float v)
@@ -68,7 +68,7 @@ static float	texture_polkadot(float u, float v)
 
 static float	texture_marble(float u, float v)
 {
-	return (cloudy(vec3(u, v, 0.0f), 4.0f, 0.5f));
+	return (cloudy(vec3(u, v, 0.0f), 1.0f, 1.0f, 0.0f));
 }
 
 float	get_texture(t_texture texture, float u, float v)
