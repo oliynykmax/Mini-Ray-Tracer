@@ -44,6 +44,7 @@ void	para_params(t_object *o, t_shading *s)
 	if (fabsf(p.y - 0.5f * o->height) < 1e-4f)
 		return (plane_params(o, s));
 	s->normal = norm3(vec3(2.0f * p.x, -k, 2.0f * p.z));
+	s->tangent = norm3(cross3(s->normal, vec3(0, 1, 0)));
 	s->texcoord.y = clamp(p.y, -o->height * 0.5f, o->height * 0.5f);
 	s->texcoord.x = atan2f(p.x, p.z) / M_PI * 0.5f + 0.5f;
 }

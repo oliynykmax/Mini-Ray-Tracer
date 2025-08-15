@@ -53,16 +53,19 @@ static t_vec3	box_face_uv(t_object *o, t_shading *s, t_vec3 p, t_vec3 h)
 
 	if (fabsf(s->normal.x) > 0.5f)
 	{
+		s->tangent = vec3(0.0f, 0.0f, 1.0f);
 		u = (p.z + h.z) / o->size.z;
 		v = (p.y + h.y) / o->size.y;
 	}
 	else if (fabsf(s->normal.y) > 0.5f)
 	{
+		s->tangent = vec3(1.0f, 0.0f, 0.0f);
 		u = (p.x + h.x) / o->size.x;
 		v = (p.z + h.z) / o->size.z;
 	}
 	else
 	{
+		s->tangent = vec3(1.0f, 0.0f, 0.0f);
 		u = (p.x + h.x) / o->size.x;
 		v = (p.y + h.y) / o->size.y;
 	}
