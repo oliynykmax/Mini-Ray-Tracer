@@ -22,32 +22,24 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 	return (t_min);
 }
 
-static t_vec3	trace_scene(t_ray *r);
-
-t_vec3	reflection(t_ray *r, t_vec3 p, t_vec3 n, t_object *o)
+t_vec3	scatter(t_ray r, t_vec3 p, t_vec3 n, t_object *o)
 {
-	if (r->bounce-- == 0)
-		return (vec3(0, 0, 0));
-	if (random_float(r->rng) > o->metallic)
-	{
-		r->rd = random_point_on_sphere(r->rng, 1.0f);
-	}
+	const t_vec3	random = random_point_on_sphere(r.rng, 1.0f);
+
+	if (random_float(r.rng) > o->metallic)
+		r.rd = random;
 	else
-	{
-		r->rd = reflect3(r->rd, n);
-		r->rd = norm3(add3(r->rd, random_point_on_sphere(r->rng, o->rough)));
-	}
-	r->rd = scale3(r->rd, copysignf(1.0f, dot3(r->rd, n)));
-	r->ro = p;
-	return (trace_scene(r));
+		r.rd = norm3(add3(reflect3(r.rd, n), scale3(random, o->rough)));
+	r.rd = scale3(r.rd, copysignf(1.0f, dot3(r.rd, n)));
+	r.ro = p;
+	return (trace_scene(&r));
 }
 
-static t_vec3	trace_scene(t_ray *r)
+t_vec3	trace_scene(t_ray *r)
 {
 	t_shading	s;
 	t_object	*object;
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
-	t_ray		copy;
 
 	if (object == NULL)
 		return (r->scene->ambient);
@@ -58,9 +50,9 @@ static t_vec3	trace_scene(t_ray *r)
 	s.point = add3(s.point, scale3(s.normal, 1e-4f));
 	if (object->bump != TEXTURE_NONE)
 		apply_bumpmap(&s, object->bump, s.texcoord);
-	copy = *r;
-	s.ambient = reflection(r, s.point, s.normal, object);
-	*r = copy; // FIXME
+	s.ambient = vec3(0.0f, 0.0f, 0.0f);
+	if (r->bounce-- > 0)
+		s.ambient = scatter(*r, s.point, s.normal, object);
 	return (shade_point(&s, r, object));
 }
 
