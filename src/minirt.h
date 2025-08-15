@@ -37,7 +37,7 @@
 
 // How much bump mapping affects surface normals. Higher values produce a
 // bumpier, less subtle effect.
-# define BUMP_MAP_STRENGTH 0.015
+# define BUMP_MAP_STRENGTH 0.05
 
 // Maximum number of ray bounces used when reflecting rays off surfaces. Higher
 // values make indirect light and mirror reflections more convincing, but come

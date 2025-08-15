@@ -10,5 +10,6 @@ void	plane_params(t_object *o, t_shading *s)
 {
 	(void) o;
 	s->normal = vec3(0.0f, 1.0f, 0.0f);
+	s->tangent = vec3(1.0f, 0.0f, 0.0f);
 	s->texcoord = vec3(-s->point.x, s->point.z, 0.0f);
 }
