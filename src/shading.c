@@ -80,6 +80,10 @@ void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 	const float		dv = (get_texture(bumpmap, tc.x, tc.y + delta) - h) / delta;
 	const t_vec3	m = norm3(vec3(du, dv, 1.0f / BUMP_MAP_STRENGTH));
 
+	if (fabsf(s->normal.y) < 0.9f)
+		s->tangent = norm3(cross3(s->normal, vec3(0.0f, 1.0f, 0.0f)));
+	else
+		s->tangent = norm3(cross3(s->normal, vec3(1.0f, 0.0f, 0.0f)));
 	s->bitangent = cross3(s->normal, s->tangent);
 	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
 	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
