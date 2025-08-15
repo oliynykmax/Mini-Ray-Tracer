@@ -309,6 +309,7 @@ void		show_stats_in_window_title(t_render *r);
 // trace.c
 float		scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object);
 t_vec3		get_viewport_ray(t_render *r, float x, float y, bool jitter);
+t_vec3		trace_scene(t_ray *r);
 t_vec3		trace_pixel(t_render *r, float x, float y);
 
 // vec3_arithmetic.c
