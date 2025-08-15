@@ -30,6 +30,5 @@ void	object_params(t_object *o, t_shading *s)
 	s->point = quat_rotate_vec3(quat_inverse(o->rot), sub3(p, o->pos));
 	functions[o->type](o, s);
 	s->normal = quat_rotate_vec3(o->rot, s->normal);
-	s->tangent = quat_rotate_vec3(o->rot, s->tangent);
 	s->point = p;
 }
