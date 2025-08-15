@@ -1,5 +1,27 @@
 #include "minirt.h"
 
+static double	parse_number_part(t_parse *m, const char **str,
+		double start_val, double divisor_step)
+{
+	double	result;
+
+	result = start_val;
+	while (**str >= '0' && **str <= '9')
+	{
+		if (divisor_step == 1.0)
+			result = result * 10.0 + (**str - '0');
+		else
+		{
+			result += (**str - '0') / divisor_step;
+			divisor_step *= 10.0;
+		}
+		if (fabs(result) > 1e8f)
+			fatal_if(m, 1, "Overflow in number\n");
+		(*str)++;
+	}
+	return (result);
+}
+
 double	ft_atof(t_parse *m, const char *str)
 {
 	double	result;
@@ -12,20 +34,19 @@ double	ft_atof(t_parse *m, const char *str)
 	while (*str == ' ' || *str == '\t' || *str == '\n')
 		str++;
 	if (*str == '+' || *str == '-')
-		sign = -1 * (*str++ == '-');
-	while (*str >= '0' && *str <= '9')
-		result = result * 10.0 + (*str++ - '0');
+		sign = -2 * (*str++ == '-') + 1;
+	result = parse_number_part(m, &str, 0.0, 1.0);
 	if (*str == '\0')
 		return (result * sign);
 	if (*str == '.')
-		str++;
-	fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", str);
-	while (*str >= '0' && *str <= '9')
 	{
-		result += (*str++ - '0') / divisor;
-		divisor *= 10.0;
+		str++;
+		fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", str);
+		result = parse_number_part(m, &str, result, divisor);
 	}
-	fatal_if(m, *str != '\0', "Not a number: %s", str);
+	fatal_if(m, *str != '\0', "Not a number: %s\n", str);
+	fatal_if(m, result != 0.0 && fabs(result) < 1.0e-6,
+		"Underflow in number\n");
 	return (result * sign);
 }
 
@@ -38,7 +59,7 @@ double	ft_atof(t_parse *m, const char *str)
  */
 bool	in_range3(t_vec3 v, float lower, float upper)
 {
-	float		epsilon;
+	float	epsilon;
 
 	epsilon = 0.001f;
 	return ((v.x >= lower - epsilon) && (v.x <= upper + epsilon)
@@ -95,8 +116,7 @@ void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 	m->temp_split = NULL;
 	free_array(split);
 	fatal_if(m, fabs(out->x) == HUGE_VAL || fabs(out->y) == HUGE_VAL
-		|| fabs(out->z) == HUGE_VAL,
-		"Vector component is too large\n");
+		|| fabs(out->z) == HUGE_VAL, "Vector component is too large\n");
 	if (limits[0] != limits[1])
 		fatal_if(m, !in_range3(*out, limits[0], limits[1]),
 			"Vector values must be between %d and %d\n", (int)limits[0],
