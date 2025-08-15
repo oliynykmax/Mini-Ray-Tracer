@@ -153,6 +153,7 @@ struct s_scene
 	float		focus_depth;	// Camera focus depth
 	float		aperture_size;	// Camera aperture size
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
+	t_vec3		ambient2;
 };
 
 // Data for the current keyboard state.
@@ -239,6 +240,7 @@ struct s_parse
 	t_vec3		normal;
 	int			arrlen;
 	bool		ambient_exists;	// moved from static in parser
+	bool		ambient2_exists;
 	bool		camera_exists;	// moved from static in parser
 };
 
