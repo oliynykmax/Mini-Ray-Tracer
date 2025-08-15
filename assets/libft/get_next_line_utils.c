@@ -6,7 +6,7 @@
 /*   By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 15:09:11 by maoliiny          #+#    #+#             */
-/*   Updated: 2025/05/05 14:30:06 by maoliiny         ###   LAUSANNE.ch       */
+/*   Updated: 2025/08/15 14:04:10 by maoliiny         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,13 +67,13 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	result = malloc(total_len * sizeof(char));
 	if (!result)
 		return (NULL);
-	ft_memcpy(result, s1, len1);
-	ft_memcpy(result + len1, s2, len2);
+	ft_memcpy_gnl(result, s1, len1);
+	ft_memcpy_gnl(result + len1, s2, len2);
 	result[total_len - 1] = '\0';
 	return (result);
 }
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	*ft_memcpy_gnl(void *dest, const void *src, size_t n)
 {
 	unsigned char		*dstp;
 	const unsigned char	*srcp;

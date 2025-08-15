@@ -6,7 +6,7 @@
 /*   By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 17:53:10 by maoliiny          #+#    #+#             */
-/*   Updated: 2025/08/15 12:17:16 by maoliiny         ###   ########.fr       */
+/*   Updated: 2025/08/15 14:03:44 by maoliiny         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int					ft_fnl(char *s, char c);
 size_t				ft_strlen(const char *s);
 int					ft_strcat(char **res, int fd);
 char				*ft_strjoin(char const *s1, char const *s2);
-void				*ft_memcpy(void *dest, const void *src, size_t n);
+void				*ft_memcpy_gnl(void *dest, const void *src, size_t n);
 
 double				ft_strtod(const char *str, char **endptr);
 
