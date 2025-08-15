@@ -5,10 +5,17 @@ void	parse_amb_light(t_parse *m)
 	double		ratio;
 
 	fatal_if(m, array_len(m->line) != 3, "Invalid ambient light format\n");
-	fatal_if(m, m->ambient_exists, "Ambient light already exists\n");
+	fatal_if(m, m->ambient2_exists, "Ambient light already exists\n");
 	ratio = ft_atof(m, m->line[1]);
 	fatal_if(m, ratio < 0.0f || ratio > 1.0f,
 		"Ambient light ratio must be between 0.0 and 1.0\n");
+	if (m->ambient_exists)
+	{
+		parse3(m, m->line[2], &m->sc->ambient2, (float []){0, 255});
+		m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
+		m->ambient2_exists = true;
+		return ;
+	}
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	m->sc->ambient = scale3(m->sc->ambient, ratio / 255.0);
 	m->ambient_exists = true;
