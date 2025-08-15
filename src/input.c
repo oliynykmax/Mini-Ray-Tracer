@@ -59,22 +59,22 @@ t_object	*object_new(t_parse *map)
 	{
 		map->sc->objects = malloc(capacity * sizeof(t_object));
 		fatal_if(map, map->sc->objects == NULL, "Allocation failure\n");
-		memset(map->sc->objects, 0, capacity * sizeof(t_object));
+		ft_memset(map->sc->objects, 0, capacity * sizeof(t_object));
 	}
 	else if (map->sc->object_count == capacity)
 	{
 		capacity *= 2;
 		new_storage = malloc(capacity * sizeof(t_object));
 		fatal_if(map, new_storage == NULL, "Allocation failure\n");
-		memcpy(new_storage, map->sc->objects,
+		ft_memcpy(new_storage, map->sc->objects,
 			map->sc->object_count * sizeof(t_object));
 		free(map->sc->objects);
-		memset(new_storage + map->sc->object_count, 0,
+		ft_memset(new_storage + map->sc->object_count, 0,
 			(capacity - map->sc->object_count) * sizeof(t_object));
 		map->sc->objects = new_storage;
 	}
 	slot = &map->sc->objects[map->sc->object_count++];
-	memset(slot, 0, sizeof(*slot));
+	ft_memset(slot, 0, sizeof(*slot));
 	return (slot);
 }
 
