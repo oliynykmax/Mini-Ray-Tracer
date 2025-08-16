@@ -8,27 +8,18 @@ static bool	camera_mouse_movement(t_render *r)
 {
 	const float		fov = radians(r->scene->fov);
 	const float		sensitivity = MOUSE_SENSITIVITY * sinf(fov * 0.5f);
-	static int32_t	prev[2];
-	int32_t			curr[2];
-	int32_t			delta[2];
 
-	mlx_get_mouse_pos(r->mlx, &curr[0], &curr[1]);
-	delta[0] = curr[0] - prev[0];
-	delta[1] = curr[1] - prev[1];
-	prev[0] = curr[0];
-	prev[1] = curr[1];
-	if (mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT)
-		&& (delta[0] != 0 || delta[1] != 0))
-	{
-		r->camera_yaw += sensitivity * delta[0];
-		r->camera_pitch += sensitivity * delta[1];
-		r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
-		r->scene->dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
-		r->scene->dir.y = cos(r->camera_pitch);
-		r->scene->dir.z = sin(r->camera_pitch) * sin(r->camera_yaw);
-		return (true);
-	}
-	return (false);
+	if (r->mode != MODE_NORMAL)
+		return (false);
+	if (!mlx_is_mouse_down(r->mlx, MLX_MOUSE_BUTTON_LEFT))
+		return (false);
+	r->camera_yaw += sensitivity * r->mouse_delta.x;
+	r->camera_pitch += sensitivity * r->mouse_delta.y;
+	r->camera_pitch = clamp(r->camera_pitch, radians(1), radians(179));
+	r->scene->dir.x = sin(r->camera_pitch) * cos(r->camera_yaw);
+	r->scene->dir.y = cos(r->camera_pitch);
+	r->scene->dir.z = sin(r->camera_pitch) * sin(r->camera_yaw);
+	return (len3(r->mouse_delta) > 0.0f);
 }
 
 // Handle keyboard movement of the camera, moving horizontally with the WASD
@@ -42,6 +33,8 @@ static bool	camera_keyboard_movement(t_render *r)
 	t_vec3	move_z;
 	t_keys	keys;
 
+	if (r->mode != MODE_NORMAL)
+		return (false);
 	move_x = norm3(vec3(r->camera_x.x, 0.0f, r->camera_x.z));
 	move_z = norm3(vec3(r->camera_z.x, 0.0f, r->camera_z.z));
 	keys.forward = mlx_is_key_down(r->mlx, KEY_FORWARD);
