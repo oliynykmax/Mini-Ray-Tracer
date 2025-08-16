@@ -42,7 +42,7 @@ t_vec3	trace_scene(t_ray *r)
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
 
 	if (object == NULL)
-		return (r->scene->ambient);
+		return (lerp3(r->scene->ambient, r->scene->ambient2, fabsf(r->rd.y)));
 	if (object->type == OBJECT_LIGHT || !r->fancy)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));

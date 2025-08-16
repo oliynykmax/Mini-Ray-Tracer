@@ -164,7 +164,7 @@ struct s_scene
 	float		focus_depth;	// Camera focus depth
 	float		aperture_size;	// Camera aperture size
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
-	t_vec3		ambient2;
+	t_vec3		ambient2;		// Secondary ambient color (for color gradients)
 };
 
 // Data for the current keyboard state.
