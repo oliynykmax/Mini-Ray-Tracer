@@ -92,6 +92,7 @@ static char	**ft_split_vec(t_parse *m, const char *str)
 	if (result[0] == NULL || result[1] == NULL || result[2] == NULL)
 	{
 		free_array(result);
+		m->temp_split = NULL;
 		fatal_if(m, true, "Memory allocation failure in substr\n");
 	}
 	return (result);
