@@ -47,7 +47,6 @@ t_vec3	trace_scene(t_ray *r)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
-	s.point = add3(s.point, scale3(s.normal, 1e-4f));
 	if (object->bump != TEXTURE_NONE)
 		apply_bumpmap(&s, object->bump, s.texcoord);
 	s.ambient = vec3(0.0f, 0.0f, 0.0f);
