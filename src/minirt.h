@@ -50,6 +50,7 @@
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
 typedef enum e_texture		t_texture;
+typedef enum e_mode			t_mode;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
 typedef struct s_shading	t_shading;
@@ -106,6 +107,7 @@ enum	e_object_type
 	OBJECT_BOX,
 	OBJECT_LIGHT,
 };
+
 // Enumeration type for different procedural textures.
 enum	e_texture
 {
@@ -114,6 +116,15 @@ enum	e_texture
 	TEXTURE_ZIGZAG,
 	TEXTURE_POLKADOT,
 	TEXTURE_MARBLE,
+};
+
+// Enumeration type for different editing modes.
+enum	e_mode
+{
+	MODE_NORMAL,		// Normal camera movement
+	MODE_TRANSLATE,		// User is moving an object
+	MODE_ROTATE,		// User is rotating an object
+	MODE_SCALE,			// User is scaling an object
 };
 
 // Data describing one geometric object or light in the scene.
@@ -192,6 +203,10 @@ struct s_render
 	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
 	pthread_mutex_t	mutex;					// Protects common render state
 	bool			fancy;					// Use "fancy" lighting
+	t_object		*selection;				// The currently selected object
+	t_vec3			mouse_pos;				// Current mouse position
+	t_vec3			mouse_delta;			// Mouse delta since last frame
+	t_mode			mode;					// The current editing mode
 };
 
 // Data for one render thread.
@@ -250,6 +265,9 @@ void		camera_update(t_render *r);
 // cylinder.c
 float		cylinder_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 void		cylinder_params(t_object *o, t_shading *s);
+
+// editing.c
+void		transform_selection(t_render *r);
 
 // box.c
 float		box_distance(t_object *o, t_vec3 ro, t_vec3 rd);

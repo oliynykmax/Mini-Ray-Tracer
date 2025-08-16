@@ -13,22 +13,23 @@ INCLUDES := -Iassets/libft -Iassets/MLX42/include
 
 SRCS := \
 	src/array_utils.c \
+	src/box.c \
 	src/camera.c \
 	src/cylinder.c \
+	src/editing.c \
 	src/input.c \
-	src/shading.c \
 	src/loop.c \
 	src/main.c \
 	src/math.c \
 	src/object.c \
-	src/box.c \
 	src/paraboloid.c \
 	src/parse_light_camera.c \
-	src/parsing_objects.c \
 	src/parse_utils.c \
+	src/parsing_objects.c \
 	src/plane.c \
 	src/quaternion.c \
 	src/random.c \
+	src/shading.c \
 	src/sphere.c \
 	src/texturing.c \
 	src/threads.c \
@@ -38,7 +39,6 @@ SRCS := \
 	src/vec3_geometric.c \
 	src/vec3_utility.c \
 	src/vec_parse_utils.c \
-
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 

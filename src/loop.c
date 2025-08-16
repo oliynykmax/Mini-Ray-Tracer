@@ -5,16 +5,9 @@
 static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
-	t_object *const	object = &r->scene->objects[3];
-	t_quat			rotate;
 
 	pthread_mutex_lock(&r->mutex);
-	if (mlx_is_key_down(r->mlx, MLX_KEY_J))
-	{
-		rotate = quat_from_axis_angle(vec3(1.0f, 0.0f, 0.0f), 0.03f);
-		object->rot = quat_multiply(rotate, object->rot);
-		r->frame_samples = 0;
-	}
+	transform_selection(r);
 	camera_update(r);
 	show_stats_in_window_title(r);
 	r->jobs_available += THREAD_COUNT;
@@ -39,6 +32,35 @@ static void	key_hook(mlx_key_data_t data, void *param)
 		r->fancy = !r->fancy;
 		r->frame_samples = 0;
 	}
+}
+
+// MLX mouse hook. Used for picking objects with the right mouse button.
+
+static void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *param)
+{
+	t_render *const	r = (t_render*) param;
+	t_vec3			rd;
+	int32_t			x;
+	int32_t			y;
+
+	(void) m;
+	if (b != MLX_MOUSE_BUTTON_LEFT)
+		return ;
+	r->selection = NULL;
+	if (a == MLX_PRESS)
+	{
+		mlx_get_mouse_pos(r->mlx, &x, &y);
+		rd = get_viewport_ray(r, x, y, false);
+		scene_distance(r->scene, r->scene->pos, rd, &r->selection);
+		if (mlx_is_key_down(r->mlx, MLX_KEY_Z))
+			r->mode = MODE_TRANSLATE;
+		if (mlx_is_key_down(r->mlx, MLX_KEY_X))
+			r->mode = MODE_ROTATE;
+		if (mlx_is_key_down(r->mlx, MLX_KEY_C))
+			r->mode = MODE_SCALE;
+	}
+	if (r->selection == NULL)
+		r->mode = MODE_NORMAL;
 }
 
 // MLX window resize hook. Resizes the image to match the new window dimensions.
@@ -77,6 +99,7 @@ void	render_scene(t_render *r)
 			if (r->frame != NULL)
 			{
 				mlx_key_hook(r->mlx, key_hook, r);
+				mlx_mouse_hook(r->mlx, mouse_hook, r);
 				mlx_resize_hook(r->mlx, resize_hook, r);
 				if (mlx_loop_hook(r->mlx, loop_hook, r) && threads_init(r))
 					mlx_loop(r->mlx);
