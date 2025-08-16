@@ -38,6 +38,7 @@ void	parse_point_light(t_parse *m)
 	parse3(m, m->line[3], &m->obj->color, (float []){0, 255});
 	m->obj->color = scale3(m->obj->color, brightness / 255.0);
 	m->obj->rot = quat_from_axis_angle(vec3(0.0f, -1.0f, 0.0f), 0.0f);
+	m->num_of_lights++;
 }
 
 // Then in read_map_into_scene, when errors occur:

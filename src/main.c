@@ -12,6 +12,7 @@ void	init_structs(t_scene *scene, t_render *render, t_parse *map)
 	map->temp_split = NULL;
 	render->scene = scene;
 	scene->objects = NULL;
+	map->num_of_lights = 0;
 }
 
 int	main(int ac, char **av)

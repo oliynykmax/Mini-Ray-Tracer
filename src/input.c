@@ -114,5 +114,8 @@ void	validate_input_and_parse_map(int ac, char **av, t_parse *m)
 	close(m->fd);
 	fatal_if(m, m->camera_exists != true, "Camera doesn't exist\n");
 	fatal_if(m, m->ambient_exists != true, "Ambient doesn't exist\n");
+	fatal_if(m, m->num_of_lights == 0, "Not enough lights provided\n");
+	fatal_if(m, m->num_of_lights == m->sc->object_count,
+		"Not enough objects\n");
 	fatal_if(m, m->sc->object_count <= 0, "Not enough objects provided\n");
 }
