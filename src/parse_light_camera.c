@@ -28,7 +28,8 @@ void	parse_point_light(t_parse *m)
 	m->arrlen = array_len(m->line);
 	fatal_if(m, (m->arrlen != 4 && m->arrlen != 5), "Invalid light format\n");
 	brightness = ft_atof(m, m->line[2]);
-	fatal_if(m, brightness < 0.0f, "Light brightness must be positive\n");
+	fatal_if(m, brightness < 0.0f || brightness > 1.0f,
+		"Light brightness must be between 0.0 and 1.0\n");
 	m->obj->type = OBJECT_LIGHT;
 	m->obj->radius = parse_float(m->arrlen == 5, m, 0.0f, 4);
 	fatal_if(m, fabs(m->obj->radius) == HUGE_VAL, "Light radius cant be inf\n");
@@ -67,6 +68,9 @@ void	parse_camera(t_parse *m)
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->sc->dir, (float []){-1, 1});
 	m->camera_exists = true;
-	// fatal_if(m, fabsf(len3(m->sc->dir) - 1.0f) >= 0.001f,
-	// 	"Camera direction components must be between -1 and 1\n");
+	fatal_if(m, fabsf(len3(m->sc->dir) - 1.0f) >= 0.001f,
+		"Camera direction components must be between -1 and 1\n");
+	if (fabsf(m->sc->dir.y) > 0.999f)
+		m->sc->dir = norm3(vec3(m->sc->dir.x, m->sc->dir.y,
+					m->sc->dir.z - 0.01f));
 }
