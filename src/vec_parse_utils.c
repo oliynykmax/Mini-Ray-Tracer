@@ -27,24 +27,23 @@ double	ft_atof(t_parse *m, const char *str)
 	double	result;
 	double	divisor;
 	int		sign;
+	const char *start = str;
 
 	result = 0.0;
 	divisor = 10.0;
-	sign = 1;
-	while (*str == ' ' || *str == '\t' || *str == '\n')
-		str++;
 	if (*str == '+' || *str == '-')
 		sign = -2 * (*str++ == '-') + 1;
+	fatal_if(m, *str == '\0', "Not a number: %s\n", start);
 	result = parse_number_part(m, &str, 0.0, 1.0);
 	if (*str == '\0')
 		return (result * sign);
 	if (*str == '.')
 	{
 		str++;
-		fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", str);
+		fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", start);
 		result = parse_number_part(m, &str, result, divisor);
 	}
-	fatal_if(m, *str != '\0', "Not a number: %s\n", str);
+	fatal_if(m, *str != '\0', "Not a number: %s\n", start);
 	fatal_if(m, result != 0.0 && fabs(result) < 1.0e-6,
 		"Underflow in number\n");
 	return (result * sign);
@@ -89,12 +88,11 @@ static char	**ft_split_vec(t_parse *m, const char *str)
 	result[1] = ft_substr(str, p1 - str + 1, p2 - (p1 + 1));
 	result[2] = ft_substr(p2 + 1, 0, ft_strlen(p2 + 1));
 	result[3] = NULL;
+	fatal_if(m, (p1 - str) == 0 || (p2 - (p1 + 1)) == 0
+		|| ft_strlen(p2 + 1) == 0,
+		"Vector components must not be empty\n");
 	if (result[0] == NULL || result[1] == NULL || result[2] == NULL)
-	{
-		free_array(result);
-		m->temp_split = NULL;
 		fatal_if(m, true, "Memory allocation failure in substr\n");
-	}
 	return (result);
 }
 
