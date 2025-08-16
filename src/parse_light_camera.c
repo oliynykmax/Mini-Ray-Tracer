@@ -4,21 +4,25 @@ void	parse_amb_light(t_parse *m)
 {
 	double		ratio;
 
-	fatal_if(m, array_len(m->line) != 3, "Invalid ambient light format\n");
-	fatal_if(m, m->ambient2_exists, "Ambient light already exists\n");
+	m->arrlen = array_len(m->line);
+	fatal_if(m, m->ambient_exists, "Ambient light already exists\n");
+	fatal_if(m, m->arrlen != 3 && m->arrlen != 4, "Invalid ambient light format\n");
 	ratio = ft_atof(m, m->line[1]);
 	fatal_if(m, ratio < 0.0f || ratio > 1.0f,
 		"Ambient light ratio must be between 0.0 and 1.0\n");
-	if (m->ambient_exists)
-	{
-		parse3(m, m->line[2], &m->sc->ambient2, (float []){0, 255});
-		m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
-		m->ambient2_exists = true;
-		return ;
-	}
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	m->sc->ambient = scale3(m->sc->ambient, ratio / 255.0);
+	if (m->arrlen == 4)
+	{
+		parse3(m, m->line[3], &m->sc->ambient2, (float []){0, 255});
+		m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
+	}
+	else
+		m->sc->ambient2 = m->sc->ambient;
 	m->ambient_exists = true;
+	printf("Ambient light parsed successfully\n");
+	printf("Ambient light: (%f, %f, %f)\n", m->sc->ambient.x, m->sc->ambient.y, m->sc->ambient.z);
+	printf("Ambient light2: (%f, %f, %f)\n", m->sc->ambient2.x, m->sc->ambient2.y, m->sc->ambient2.z);
 }
 
 void	parse_point_light(t_parse *m)
