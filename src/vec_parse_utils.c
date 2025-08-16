@@ -24,13 +24,12 @@ static double	parse_number_part(t_parse *m, const char **str,
 
 double	ft_atof(t_parse *m, const char *str)
 {
-	double	result;
-	double	divisor;
-	int		sign;
-	const char *start = str;
+	double			result;
+	int				sign;
+	const char		*start = str;
 
 	result = 0.0;
-	divisor = 10.0;
+	sign = 1;
 	if (*str == '+' || *str == '-')
 		sign = -2 * (*str++ == '-') + 1;
 	fatal_if(m, *str == '\0', "Not a number: %s\n", start);
@@ -41,7 +40,7 @@ double	ft_atof(t_parse *m, const char *str)
 	{
 		str++;
 		fatal_if(m, *str < '0' || *str > '9', "Bad number: %s\n", start);
-		result = parse_number_part(m, &str, result, divisor);
+		result = parse_number_part(m, &str, result, 10.0);
 	}
 	fatal_if(m, *str != '\0', "Not a number: %s\n", start);
 	fatal_if(m, result != 0.0 && fabs(result) < 1.0e-6,
@@ -58,12 +57,9 @@ double	ft_atof(t_parse *m, const char *str)
  */
 bool	in_range3(t_vec3 v, float lower, float upper)
 {
-	float	epsilon;
-
-	epsilon = 0.001f;
-	return ((v.x >= lower - epsilon) && (v.x <= upper + epsilon)
-		&& (v.y >= lower - epsilon) && (v.y <= upper + epsilon) && (v.z >= lower
-			- epsilon) && (v.z <= upper + epsilon));
+	return ((v.x >= lower - 0.001f) && (v.x <= upper + 0.001f)
+		&& (v.y >= lower - 0.001f) && (v.y <= upper + 0.001f) && (v.z >= lower
+			- 0.001f) && (v.z <= upper + 0.001f));
 }
 
 /*
@@ -91,8 +87,8 @@ static char	**ft_split_vec(t_parse *m, const char *str)
 	fatal_if(m, (p1 - str) == 0 || (p2 - (p1 + 1)) == 0
 		|| ft_strlen(p2 + 1) == 0,
 		"Vector components must not be empty\n");
-	if (result[0] == NULL || result[1] == NULL || result[2] == NULL)
-		fatal_if(m, true, "Memory allocation failure in substr\n");
+	fatal_if(m, result[0] == NULL || result[1] == NULL
+		|| result[2] == NULL, "Memory allocation failure in substr\n");
 	return (result);
 }
 
