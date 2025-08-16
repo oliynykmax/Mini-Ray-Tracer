@@ -1,10 +1,10 @@
 # Camera: Positioned to give a good overview of the islands.
-C 5,21,-14  0,-0.5,1  80 5.0 0
+C 5,21,-14  0,0,1  80 5.0 0
 
 # Lights: A bright primary light and soft ambient light.
 # format: L [position] [intensity] [color]
-L -8,20,-8 50 255,255,255 1
-L 5,15,5 50 255,255,255 1
+L -8,20,-8 1 255,255,255 1
+L 5,15,5 1 255,255,255 1
 # format: A [intensity] [color]
 A 0.01 255,255,255
 
