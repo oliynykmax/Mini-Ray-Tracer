@@ -242,6 +242,7 @@ struct s_parse
 	bool		ambient_exists;	// moved from static in parser
 	bool		ambient2_exists;
 	bool		camera_exists;	// moved from static in parser
+	size_t		num_of_lights;
 };
 
 // camera.c
