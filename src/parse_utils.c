@@ -39,3 +39,31 @@ void	parse_optionals(t_parse *m, int i)
 	m->obj->texture = parse_texture(m->arrlen > i + 2, m, i + 2);
 	m->obj->bump = parse_texture(m->arrlen > i + 3, m, i + 3);
 }
+
+/*
+ * Dispatcher moved here from separate file (parse_type.c) to consolidate
+ * parsing helpers in a single compilation unit.
+ */
+void	parse_type(t_parse *m)
+{
+	const char			*id = m->line[0];
+	static const char	*ids[] = {"sp", "pl", "cy", "pa", "bx", "L", "A", "C",
+		NULL};
+	static const char	alloc[] = {1, 1, 1, 1, 1, 1, 0, 0};
+	int					i;
+	static void (*const	f[])(t_parse *) = {
+		parse_sphere, parse_plane, parse_cylinder,
+		parse_para, parse_box, parse_point_light,
+		parse_amb_light, parse_camera};
+
+	i = 0;
+	while (ids[i] && ft_strcmp(id, ids[i]))
+		i++;
+	if (!ids[i])
+		fatal_if(m, true, "Not a valid type: %s\n", id);
+	if (alloc[i])
+		m->obj = object_new(m);
+	else
+		m->obj = NULL;
+	f[i](m);
+}
