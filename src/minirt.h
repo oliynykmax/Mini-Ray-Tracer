@@ -255,7 +255,6 @@ struct s_parse
 	t_vec3		normal;
 	int			arrlen;
 	bool		ambient_exists;	// moved from static in parser
-	bool		ambient2_exists;
 	bool		camera_exists;	// moved from static in parser
 	size_t		num_of_lights;
 };
