@@ -155,7 +155,6 @@ struct s_ray
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction
 	int			bounce;	// Remaining ray bounces
-	bool		fancy;	// Use "fancy" shading
 };
 
 // Data describing the objects in the scene.
@@ -209,7 +208,6 @@ struct s_render
 	int				tiles_x;				// Width of the frame in tiles
 	int				tiles_y;				// Height of the frame in tiles
 	int				tiles_per_frame;		// Total number of tiles per frame
-	bool			fancy;					// Use "fancy" lighting
 	t_object		*selection;				// The currently selected object
 	t_vec3			mouse_pos;				// Current mouse position
 	t_vec3			mouse_delta;			// Mouse delta since last frame

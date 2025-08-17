@@ -43,7 +43,7 @@ t_vec3	trace_scene(t_ray *r)
 
 	if (object == NULL)
 		return (lerp3(r->scene->ambient, r->scene->ambient2, fabsf(r->rd.y)));
-	if (object->type == OBJECT_LIGHT || !r->fancy)
+	if (object->type == OBJECT_LIGHT)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
@@ -75,7 +75,6 @@ t_vec3	trace_pixel(t_render *r, float x, float y, int frame)
 	t_vec3	disk;
 	t_ray	ray;
 
-	ray.fancy = r->fancy;
 	ray.scene = r->scene;
 	ray.rng = frame + (int)x + (int)y * r->image->width;
 	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
