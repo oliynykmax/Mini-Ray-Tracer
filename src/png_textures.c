@@ -1,17 +1,5 @@
 #include "minirt.h"
 
-static bool	validate_png_extension(const char *name)
-{
-	size_t	len;
-
-	if (!name)
-		return (false);
-	len = ft_strlen(name);
-	if (len < 4)
-		return (false);
-	return (ft_strcmp(name + len - 4, ".png") == 0);
-}
-
 /* Build path "textures/<filename>".
  * Caller owns returned malloc'd string.
  */
@@ -45,8 +33,6 @@ bool	load_png_texture(t_parse *map, const char *filename,
 
 	fatal_if(map, out == NULL, "Internal: NULL output texture pointer\n");
 	*out = NULL;
-	fatal_if(map, !validate_png_extension(filename),
-		"Expected a .png texture file, got '%s'\n", filename);
 	full = build_texture_path(map, filename);
 	tex = mlx_load_png(full);
 	if (tex == NULL)
