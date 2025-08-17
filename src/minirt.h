@@ -329,7 +329,6 @@ bool		load_png_texture(t_parse *map, const char *filename,
 float		sample_lumin(const mlx_texture_t *tex, float u, float v);
 t_vec3		sample_png_color(const mlx_texture_t *tex, float u, float v);
 void		free_object_textures(t_object *obj);
-
 // threads.c
 bool		threads_init(t_render *r);
 void		threads_quit(t_render *r);
