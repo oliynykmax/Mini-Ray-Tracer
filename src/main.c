@@ -1,6 +1,21 @@
 #include "minirt.h"
 
-void	init_structs(t_scene *scene, t_render *render, t_parse *map)
+static void	free_scene_objects(t_scene *scene)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < scene->object_count)
+	{
+		free_object_textures(&scene->objects[i]);
+		++i;
+	}
+	free(scene->objects);
+	scene->objects = NULL;
+	scene->object_count = 0;
+}
+
+static void	init_structs(t_scene *scene, t_render *render, t_parse *map)
 {
 	ft_bzero(scene, sizeof(t_scene));
 	ft_bzero(render, sizeof(t_render));
@@ -24,8 +39,6 @@ int	main(int ac, char **av)
 	init_structs(&scene, &render, &map);
 	validate_input_and_parse_map(ac, av, &map);
 	render_scene(&render);
-	for (size_t i = 0; i < scene.object_count; ++i)
-		free_object_textures(&scene.objects[i]);
-	free(scene.objects);
+	free_scene_objects(&scene);
 	return (0);
 }

@@ -3,6 +3,8 @@
 /* Inline fatal_if implementation (previously mrt_assert) */
 static void	cleanup_parsing(t_parse *ctx)
 {
+	size_t	i = 0;
+
 	get_next_line(-1);
 	if (ctx->fd >= 0)
 		close(ctx->fd);
@@ -12,8 +14,17 @@ static void	cleanup_parsing(t_parse *ctx)
 		free_array(ctx->line);
 	if (ctx->temp_split)
 		free_array(ctx->temp_split);
-	if (ctx->sc->objects)
+	if (ctx->sc && ctx->sc->objects)
+	{
+		while (i < ctx->sc->object_count)
+		{
+			free_object_textures(&ctx->sc->objects[i]);
+			++i;
+		}
 		free(ctx->sc->objects);
+		ctx->sc->objects = NULL;
+		ctx->sc->object_count = 0;
+	}
 }
 
 void	fatal_if(t_parse *ctx, bool condition, char *format, ...)
