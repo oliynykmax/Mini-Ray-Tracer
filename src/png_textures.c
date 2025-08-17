@@ -5,7 +5,7 @@
  */
 static char	*build_texture_path(t_parse *map, const char *filename)
 {
-	const char	*prefix = "textures/";
+	const char	*prefix = "assets/textures/";
 	size_t		len_prefix;
 	size_t		len_file;
 	char		*out;
