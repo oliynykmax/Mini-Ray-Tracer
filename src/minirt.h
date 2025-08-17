@@ -313,6 +313,7 @@ t_vec3		random_point_on_sphere(uint16_t rng, float radius);
 
 // shading.c
 void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);
+void		apply_image_bumpmap(t_shading *s, t_object *object);
 t_vec3		shade_point(t_shading *s, t_ray *r, t_object *object);
 
 // sphere.c
@@ -325,7 +326,7 @@ float		get_texture(t_texture texture, float u, float v);
 // png_textures.c (image texture support)
 bool		load_png_texture(t_parse *map, const char *filename,
 				mlx_texture_t **out);
-float		sample_png_luminance(const mlx_texture_t *tex, float u, float v);
+float		sample_lumin(const mlx_texture_t *tex, float u, float v);
 t_vec3		sample_png_color(const mlx_texture_t *tex, float u, float v);
 void		free_object_textures(t_object *obj);
 
