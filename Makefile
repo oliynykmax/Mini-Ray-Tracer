@@ -6,7 +6,7 @@ HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := clang
 CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -flto -march=native -ffast-math
-CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include -g
+CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include -Iassets/MLX42/include/lodepng -g
 LDFLAGS := -ldl -lglfw -pthread -lm -flto
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
@@ -32,6 +32,7 @@ SRCS := \
 	src/shading.c \
 	src/sphere.c \
 	src/texturing.c \
+	src/png_textures.c \
 	src/threads.c \
 	src/title.c \
 	src/trace.c \

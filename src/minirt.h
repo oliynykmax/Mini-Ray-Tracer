@@ -108,7 +108,7 @@ enum	e_object_type
 	OBJECT_LIGHT,
 };
 
-// Enumeration type for different procedural textures.
+// Enumeration type for textures (procedural + image)
 enum	e_texture
 {
 	TEXTURE_NONE,
@@ -116,6 +116,7 @@ enum	e_texture
 	TEXTURE_ZIGZAG,
 	TEXTURE_POLKADOT,
 	TEXTURE_MARBLE,
+	TEXTURE_IMAGE, // Loaded from a PNG file
 };
 
 // Enumeration type for different editing modes.
@@ -137,10 +138,12 @@ struct s_object
 	float			radius;		// Radius (sphere/cylinder/para/light)
 	float			height;		// Height (cylinder/para)
 	t_vec3			size;		// Full dimensions (box)
-	t_texture		texture;	// Texture map (or TEXTURE_NONE )
-	t_texture		bump;	// bump map(if any)
-	float			rough;		// Surface roughness
-	float			metallic;	// Surface metalness
+	t_texture		texture;
+	t_texture		bump;
+	mlx_texture_t	*texture_img;
+	mlx_texture_t	*bump_img;
+	float			rough;			// Surface roughness
+	float			metallic;		// Surface metalness
 };
 
 struct s_ray
@@ -319,6 +322,13 @@ void		sphere_params(t_object *o, t_shading *s);
 // texturing.c
 float		get_texture(t_texture texture, float u, float v);
 
+// png_textures.c (image texture support)
+bool		load_png_texture(t_parse *map, const char *filename,
+				mlx_texture_t **out);
+float		sample_png_luminance(const mlx_texture_t *tex, float u, float v);
+t_vec3		sample_png_color(const mlx_texture_t *tex, float u, float v);
+void		free_object_textures(t_object *obj);
+
 // threads.c
 bool		threads_init(t_render *r);
 void		threads_quit(t_render *r);
@@ -378,6 +388,7 @@ void		debug_print_scene(t_scene *scene);
 
 /* parse_utils.c */
 float		parse_float(bool exists, t_parse *map, float std, int i);
-t_texture	parse_texture(bool exists, t_parse *map, int i);
+t_texture	parse_texture(bool exists, t_parse *map, int i,
+				mlx_texture_t **img_slot);
 void		parse_optionals(t_parse *m, int texture_index);
 #endif
