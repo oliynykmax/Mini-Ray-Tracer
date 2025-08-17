@@ -31,8 +31,11 @@ static char	*add_int(char *buffer, int value)
 
 static void	update_window_title(t_render *r)
 {
-	char	title[256];
-	char	*buffer;
+	const size_t	tiles_x = (r->image->width + TILE_SIZE - 1) / TILE_SIZE;
+	const size_t	tiles_y = (r->image->height + TILE_SIZE - 1) / TILE_SIZE;
+	const size_t	tiles_xy = tiles_x * tiles_y;
+	char			title[256];
+	char			*buffer;
 
 	ft_bzero(title, sizeof(title));
 	buffer = title;
@@ -48,7 +51,7 @@ static void	update_window_title(t_render *r)
 	buffer = add_string(buffer, " x ");
 	buffer = add_int(buffer, r->image->height);
 	buffer = add_string(buffer, " | samples: ");
-	buffer = add_int(buffer, r->frame_samples);
+	buffer = add_int(buffer, (r->jobs_started - r->last_reset) / tiles_xy);
 	mlx_set_window_title(r->mlx, title);
 }
 

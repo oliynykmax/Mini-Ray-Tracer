@@ -45,7 +45,9 @@
 # define MAX_RAY_BOUNCES 2
 
 // The number of rendering threads to use.
-# define THREAD_COUNT 24
+# define THREAD_COUNT 6
+
+# define TILE_SIZE 16
 
 // Typedefs for enum/structure/union types.
 typedef enum e_object_type	t_object_type;
@@ -199,12 +201,14 @@ struct s_render
 	t_vec3			jitter;					// Subpixel jitter
 	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
 	int				threads_started;		// How many threads were initialized
-	bool			threads_stop;			// Set to stop the render threads
-	size_t			jobs_available;			// Available render jobs
-	size_t			jobs_finished;			// Finished render jobs
-	pthread_cond_t	available_cond;			// Tells when jobs become available
-	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
-	pthread_mutex_t	mutex;					// Protects common render state
+	_Atomic bool	threads_stop;			// Set to stop the render threads
+	_Atomic bool	threads_pause;			// Set to pause the render threads
+	_Atomic size_t	jobs_started;
+	_Atomic size_t	jobs_finished;
+	_Atomic size_t	last_reset;
+	int				tiles_x;				// Width of the frame in tiles
+	int				tiles_y;				// Height of the frame in tiles
+	int				tiles_per_frame;		// Total number of tiles per frame
 	bool			fancy;					// Use "fancy" lighting
 	t_object		*selection;				// The currently selected object
 	t_vec3			mouse_pos;				// Current mouse position
@@ -339,9 +343,9 @@ void		show_stats_in_window_title(t_render *r);
 
 // trace.c
 float		scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object);
-t_vec3		get_viewport_ray(t_render *r, float x, float y, bool jitter);
+t_vec3		get_viewport_ray(t_render *r, t_vec3 xy, uint16_t rng, int frame);
 t_vec3		trace_scene(t_ray *r);
-t_vec3		trace_pixel(t_render *r, float x, float y);
+t_vec3		trace_pixel(t_render *r, float x, float y, int frame);
 
 // vec3_arithmetic.c
 t_vec3		add3(t_vec3 a, t_vec3 b);
