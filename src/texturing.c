@@ -71,6 +71,14 @@ static float	texture_marble(float u, float v)
 	return (cloudy(vec3(u, v, 0.0f), 4.0f, 0.5f));
 }
 
+/* Placeholder for image textures (actual sampling handled elsewhere) */
+static float	texture_image(float u, float v)
+{
+	(void)u;
+	(void)v;
+	return (1.0f);
+}
+
 float	get_texture(t_texture texture, float u, float v)
 {
 	static const t_texture_function	functions[] = {
@@ -79,6 +87,7 @@ float	get_texture(t_texture texture, float u, float v)
 		texture_zigzag,
 		texture_polkadot,
 		texture_marble,
+		texture_image,
 	};
 
 	return (functions[texture](u, v));

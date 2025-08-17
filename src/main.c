@@ -24,6 +24,8 @@ int	main(int ac, char **av)
 	init_structs(&scene, &render, &map);
 	validate_input_and_parse_map(ac, av, &map);
 	render_scene(&render);
+	for (size_t i = 0; i < scene.object_count; ++i)
+		free_object_textures(&scene.objects[i]);
 	free(scene.objects);
 	return (0);
 }

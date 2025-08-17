@@ -47,7 +47,23 @@ t_vec3	trace_scene(t_ray *r)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
-	if (object->bump != TEXTURE_NONE)
+	if (object->bump == TEXTURE_IMAGE && object->bump_img)
+	{
+		const float	delta = 1e-5f;
+		const float	h = sample_png_luminance(object->bump_img,
+				s.texcoord.x, s.texcoord.y);
+		const float	du = (sample_png_luminance(object->bump_img,
+					s.texcoord.x + delta, s.texcoord.y) - h) / delta;
+		const float	dv = (sample_png_luminance(object->bump_img,
+					s.texcoord.x, s.texcoord.y + delta) - h) / delta;
+		const t_vec3	m = norm3(vec3(du, dv, 1.0f / BUMP_MAP_STRENGTH));
+		s.bitangent = cross3(s.normal, s.tangent);
+		s.normal.x = dot3(m, vec3(s.tangent.x, s.bitangent.x, s.normal.x));
+		s.normal.y = dot3(m, vec3(s.tangent.y, s.bitangent.y, s.normal.y));
+		s.normal.z = dot3(m, vec3(s.tangent.z, s.bitangent.z, s.normal.z));
+		s.normal = norm3(s.normal);
+	}
+	else if (object->bump != TEXTURE_NONE && object->bump != TEXTURE_IMAGE)
 		apply_bumpmap(&s, object->bump, s.texcoord);
 	s.ambient = vec3(0.0f, 0.0f, 0.0f);
 	if (r->bounce-- > 0)
