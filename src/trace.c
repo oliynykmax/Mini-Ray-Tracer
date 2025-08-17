@@ -55,10 +55,11 @@ t_vec3	trace_scene(t_ray *r)
 	return (shade_point(&s, r, object));
 }
 
-t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
+t_vec3	get_viewport_ray(t_render *r, t_vec3 coord, uint16_t rng, int frame)
 {
-	const float		u = (x + r->jitter.x * jitter) / r->image->width;
-	const float		v = (y + r->jitter.y * jitter) / r->image->height;
+	const t_vec3	jitter = random_point_in_square(rng);
+	const float		u = (coord.x + jitter.x * !!frame) / r->image->width;
+	const float		v = (coord.y + jitter.y * !!frame) / r->image->height;
 	const t_vec3	v0 = lerp3(r->viewport[0], r->viewport[1], u);
 	const t_vec3	v1 = lerp3(r->viewport[2], r->viewport[3], u);
 
@@ -67,18 +68,19 @@ t_vec3	get_viewport_ray(t_render *r, float x, float y, bool jitter)
 
 // Trace the color of the pixel at (x, y) in the image.
 
-t_vec3	trace_pixel(t_render *r, float x, float y)
+t_vec3	trace_pixel(t_render *r, float x, float y, int frame)
 {
 	t_vec3	disk;
 	t_ray	ray;
 
 	ray.fancy = r->fancy;
 	ray.scene = r->scene;
-	ray.rng = r->frame_samples + (int)x + (int)y * r->image->width;
+	ray.rng = frame + (int)x + (int)y * r->image->width;
 	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
-	ray.ro = add3(r->scene->pos, scale3(r->camera_x, disk.x));
+	ray.ro = r->scene->pos;
+	ray.ro = add3(ray.ro, scale3(r->camera_x, disk.x));
 	ray.ro = add3(ray.ro, scale3(r->camera_y, disk.y));
-	ray.rd = get_viewport_ray(r, x, y, true);
+	ray.rd = get_viewport_ray(r, vec3(x, y, 0.0f), ray.rng, frame);
 	ray.rd = add3(r->scene->pos, scale3(ray.rd, r->scene->focus_depth));
 	ray.rd = norm3(sub3(ray.rd, ray.ro));
 	ray.bounce = MAX_RAY_BOUNCES;

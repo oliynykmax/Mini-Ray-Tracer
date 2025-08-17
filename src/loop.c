@@ -6,15 +6,9 @@ static void	loop_hook(void *param)
 {
 	t_render *const	r = (t_render*) param;
 
-	pthread_mutex_lock(&r->mutex);
 	transform_selection(r);
 	camera_update(r);
 	show_stats_in_window_title(r);
-	r->jobs_available += THREAD_COUNT;
-	pthread_cond_broadcast(&r->available_cond);
-	while (r->jobs_finished < r->jobs_available)
-		pthread_cond_wait(&r->finished_cond, &r->mutex);
-	pthread_mutex_unlock(&r->mutex);
 }
 
 // MLX key hook. Used to quit when the escape key is pressed.
@@ -30,7 +24,7 @@ static void	key_hook(mlx_key_data_t data, void *param)
 	if (data.key == MLX_KEY_F)
 	{
 		r->fancy = !r->fancy;
-		r->frame_samples = 0;
+		r->last_reset = r->job_counter;
 	}
 }
 
@@ -50,7 +44,7 @@ static void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *param)
 	if (a == MLX_PRESS)
 	{
 		mlx_get_mouse_pos(r->mlx, &x, &y);
-		rd = get_viewport_ray(r, x, y, false);
+		rd = get_viewport_ray(r, vec3(x, y, 0.0f), 0, 0);
 		scene_distance(r->scene, r->scene->pos, rd, &r->selection);
 		if (mlx_is_key_down(r->mlx, MLX_KEY_Z))
 			r->mode = MODE_TRANSLATE;
@@ -68,7 +62,9 @@ static void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *param)
 static void	resize_hook(int32_t width, int32_t height, void *param)
 {
 	t_render *const	r = (t_render*) param;
-	const size_t	min_size = width * height * sizeof(t_vec3);
+	const size_t	tiles_x = (width + TILE_SIZE - 1) / TILE_SIZE * TILE_SIZE;
+	const size_t	tiles_y = (height + TILE_SIZE - 1) / TILE_SIZE * TILE_SIZE;
+	const size_t	min_size = tiles_x * tiles_y * sizeof(t_vec3);
 
 	mlx_resize_image(r->image, width, height);
 	if (min_size > r->frame_size)
@@ -79,7 +75,7 @@ static void	resize_hook(int32_t width, int32_t height, void *param)
 		if (r->frame == NULL)
 			mlx_close_window(r->mlx);
 	}
-	r->frame_samples = 0;
+	r->last_reset = r->job_counter;
 }
 
 // Renderer entry point. Sets up the MLX state and installs all event hooks.
@@ -88,7 +84,7 @@ void	render_scene(t_render *r)
 {
 	r->camera_yaw = atan2(r->scene->dir.z, r->scene->dir.x);
 	r->camera_pitch = acos(r->scene->dir.y);
-	r->mlx = mlx_init(1 * 480, 1 * 360, "miniRT", true);
+	r->mlx = mlx_init(4 * 480, 4 * 360, "miniRT", true);
 	if (r->mlx != NULL)
 	{
 		r->image = mlx_new_image(r->mlx, r->mlx->width, r->mlx->height);

@@ -70,5 +70,5 @@ void	transform_selection(t_render *r)
 		rotate_selection(r, r->selection);
 	if (r->mode == MODE_SCALE)
 		scale_selection(r, r->selection);
-	r->frame_samples = 0;
+	r->last_reset = r->job_counter;
 }
