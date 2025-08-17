@@ -30,8 +30,8 @@ t_vec3	scatter(t_ray r, t_vec3 p, t_vec3 n, t_object *o)
 		r.rd = random;
 	else
 		r.rd = norm3(add3(reflect3(r.rd, n), scale3(random, o->rough)));
+	r.ro = add3(p, scale3(n, 1e-4f));
 	r.rd = scale3(r.rd, copysignf(1.0f, dot3(r.rd, n)));
-	r.ro = p;
 	return (trace_scene(&r));
 }
 
