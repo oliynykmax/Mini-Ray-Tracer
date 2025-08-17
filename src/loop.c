@@ -21,11 +21,6 @@ static void	key_hook(mlx_key_data_t data, void *param)
 		return ;
 	if (data.key == MLX_KEY_ESCAPE)
 		mlx_close_window(r->mlx);
-	if (data.key == MLX_KEY_F)
-	{
-		r->fancy = !r->fancy;
-		r->last_reset = r->jobs_started;
-	}
 }
 
 // MLX mouse hook. Used for picking objects with the right mouse button.
@@ -90,7 +85,7 @@ void	render_scene(t_render *r)
 {
 	r->camera_yaw = atan2(r->scene->dir.z, r->scene->dir.x);
 	r->camera_pitch = acos(r->scene->dir.y);
-	r->mlx = mlx_init(4 * 480, 4 * 360, "miniRT", true);
+	r->mlx = mlx_init(1920, 1440, "miniRT", true);
 	if (r->mlx != NULL)
 	{
 		r->image = mlx_new_image(r->mlx, r->mlx->width, r->mlx->height);
