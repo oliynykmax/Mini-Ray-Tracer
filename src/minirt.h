@@ -42,7 +42,7 @@
 // Maximum number of ray bounces used when reflecting rays off surfaces. Higher
 // values make indirect light and mirror reflections more convincing, but come
 // at a performance cost.
-# define MAX_RAY_BOUNCES 2
+# define MAX_RAY_BOUNCES 3
 
 // The number of rendering threads to use.
 # define THREAD_COUNT 6
