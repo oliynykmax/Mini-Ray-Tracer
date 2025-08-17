@@ -24,7 +24,7 @@ t_texture	parse_texture(bool exists, t_parse *map, int i,
 		return (TEXTURE_MARBLE);
 	fatal_if(map, true,
 		"Unknown texture '%s' (expected checked | zigzag | polkadot |"
-		"marble | <file>.png)\n",
+		" marble | <file>.png)\n",
 		map->line[i]);
 	return (TEXTURE_NONE);
 }
