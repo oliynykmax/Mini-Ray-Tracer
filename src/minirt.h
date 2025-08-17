@@ -198,14 +198,14 @@ struct s_render
 	t_vec3			jitter;					// Subpixel jitter
 	pthread_t		threads[THREAD_COUNT];	// Array of rendering threads
 	int				threads_started;		// How many threads were initialized
-	bool			threads_stop;			// Set to stop the render threads
-	size_t			jobs_available;			// Available render jobs
-	size_t			jobs_finished;			// Finished render jobs
-	_Atomic size_t	job_counter;
+	_Atomic bool	threads_stop;			// Set to stop the render threads
+	_Atomic bool	threads_pause;			// Set to pause the render threads
+	_Atomic size_t	jobs_started;
+	_Atomic size_t	jobs_finished;
 	_Atomic size_t	last_reset;
-	pthread_cond_t	available_cond;			// Tells when jobs become available
-	pthread_cond_t	finished_cond;			// Tells when all jobs are finished
-	pthread_mutex_t	mutex;					// Protects common render state
+	int				tiles_x;				// Width of the frame in tiles
+	int				tiles_y;				// Height of the frame in tiles
+	int				tiles_per_frame;		// Total number of tiles per frame
 	bool			fancy;					// Use "fancy" lighting
 	t_object		*selection;				// The currently selected object
 	t_vec3			mouse_pos;				// Current mouse position
