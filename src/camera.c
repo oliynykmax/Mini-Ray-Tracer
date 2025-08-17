@@ -78,8 +78,8 @@ static void	camera_update_viewport(t_render *r)
 void	camera_update(t_render *r)
 {
 	if (camera_mouse_movement(r))
-		r->last_reset = r->job_counter;
+		r->last_reset = r->jobs_started;
 	camera_update_viewport(r);
 	if (camera_keyboard_movement(r))
-		r->last_reset = r->job_counter;
+		r->last_reset = r->jobs_started;
 }

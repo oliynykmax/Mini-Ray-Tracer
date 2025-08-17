@@ -24,7 +24,7 @@ static void	key_hook(mlx_key_data_t data, void *param)
 	if (data.key == MLX_KEY_F)
 	{
 		r->fancy = !r->fancy;
-		r->last_reset = r->job_counter;
+		r->last_reset = r->jobs_started;
 	}
 }
 
@@ -62,11 +62,16 @@ static void	mouse_hook(mouse_key_t b, action_t a, modifier_key_t m, void *param)
 static void	resize_hook(int32_t width, int32_t height, void *param)
 {
 	t_render *const	r = (t_render*) param;
-	const size_t	tiles_x = (width + TILE_SIZE - 1) / TILE_SIZE * TILE_SIZE;
-	const size_t	tiles_y = (height + TILE_SIZE - 1) / TILE_SIZE * TILE_SIZE;
-	const size_t	min_size = tiles_x * tiles_y * sizeof(t_vec3);
+	size_t			min_size;
 
+	r->threads_pause = true;
+	while (r->jobs_finished < r->jobs_started)
+		usleep(100);
 	mlx_resize_image(r->image, width, height);
+	r->tiles_x = (width + TILE_SIZE - 1) / TILE_SIZE;
+	r->tiles_y = (height + TILE_SIZE - 1) / TILE_SIZE;
+	r->tiles_per_frame = r->tiles_x * r->tiles_y;
+	min_size = r->tiles_per_frame * TILE_SIZE * TILE_SIZE * sizeof(t_vec3);
 	if (min_size > r->frame_size)
 	{
 		r->frame_size = min_size;
@@ -75,7 +80,8 @@ static void	resize_hook(int32_t width, int32_t height, void *param)
 		if (r->frame == NULL)
 			mlx_close_window(r->mlx);
 	}
-	r->last_reset = r->job_counter;
+	r->last_reset = r->jobs_started;
+	r->threads_pause = false;
 }
 
 // Renderer entry point. Sets up the MLX state and installs all event hooks.
@@ -90,8 +96,7 @@ void	render_scene(t_render *r)
 		r->image = mlx_new_image(r->mlx, r->mlx->width, r->mlx->height);
 		if (r->image && mlx_image_to_window(r->mlx, r->image, 0, 0) != -1)
 		{
-			r->frame_size = r->mlx->width * r->mlx->height * sizeof(t_vec3);
-			r->frame = malloc(r->frame_size);
+			resize_hook(r->mlx->width, r->mlx->height, r);
 			if (r->frame != NULL)
 			{
 				mlx_key_hook(r->mlx, key_hook, r);
