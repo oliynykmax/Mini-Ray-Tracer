@@ -12,74 +12,58 @@ static t_vec3	dither(float x, float y)
 	return (vec3(x, x, x));
 }
 
-// Render one thread's region of the frame. The region extends from y_min to
-// y_max. During this function, it's important that the thread only reads from
-// common render and scene data, to avoid data races. The only memory the thread
-// should write to is the color/pixel data of its own region of the frame.
-
-static void	threads_render(t_render *r, uint32_t y_min, uint32_t y_max)
+static void	render_sub_tile(t_render *r, uint32_t x0, uint32_t y0, uint32_t frame)
 {
-	uint32_t		x;
-	uint32_t		y;
-	t_vec3			color;
-	size_t			index;
-	const size_t	pitch = sizeof(t_vec3) * r->image->width * (y_max - y_min);
-
-	if (r->frame_samples == 1)
-		memset(r->frame + y_min * r->image->width, 0, pitch);
-	y = y_min - 1;
-	while (++y < y_max)
-	{
-		x = -1;
-		while (++x < r->image->width)
-		{
-			index = x + y * r->image->width;
-			color = trace_pixel(r, x, y);
-			color = tonemap3(color);
-			r->frame[index] = add3(r->frame[index], color);
-			color = scale3(r->frame[index], 1.0f / r->frame_samples);
-			color = to_srgb3(color);
-			color = add3(color, dither(x, y));
-			mlx_put_pixel(r->image, x, y, to_color3(color));
-		}
+	uint32_t frame2 = frame > 4 ? 4 : frame;
+	uint32_t d = TILE_SIZE >> frame2;
+	t_vec3	color = trace_pixel(r, x0, y0, frame);
+	color = tonemap3(color);
+	size_t index = x0 + y0 * r->image->width;
+	if (frame == 4)
+		r->frame[index] = vec3(0.0f, 0.0f, 0.0f);
+	if (frame >= 4) {
+		r->frame[index] = add3(r->frame[index], color);
+		color = scale3(r->frame[index], 1.0f / (frame - 3));
+	}
+	color = to_srgb3(color);
+	color = add3(color, dither(x0, y0));
+	uint32_t color_u32 = to_color3(color);
+	d += !d;
+	uint32_t x_max = x0 + d < r->image->width  ? x0 + d : r->image->width;
+	uint32_t y_max = y0 + d < r->image->height ? y0 + d : r->image->height;
+	for (uint32_t y = y0; y < y_max; y++)
+	for (uint32_t x = x0; x < x_max; x++) {
+		mlx_put_pixel(r->image, x, y, color_u32);
 	}
 }
 
-// Render thread entry point. The frame is divided between threads into regions
-// of equal size. When the MLX loop hook is called, the main thread increments
-// the jobs_available counter to indicate that there is rendering work to be
-// done. The render threads wait for work to become available, using a condition
-// variable to avoid busy waiting. After rendering its region of the frame, each
-// render thread increments the jobs_finished counter to indicate completion.
-// When all jobs for one frame have finished, the main thread is signaled, after
-// which it returns from the MLX loop hook, and the cycle repeats.
+static void	threads_render(t_render *r, uint32_t x0, uint32_t y0, uint32_t frame)
+{
+	uint32_t frame2 = frame > 4 ? 4 : frame;
+	uint32_t d = (TILE_SIZE >> frame2) + !(TILE_SIZE >> frame2);
+	for (uint32_t y = y0; y < y0 + TILE_SIZE; y += d)
+	for (uint32_t x = x0; x < x0 + TILE_SIZE; x += d) {
+		render_sub_tile(r, x, y, frame);
+	}
+}
 
 static void	*threads_main(void *arg)
 {
-	static _Atomic size_t	thread_id_counter;
-	t_render *const			r = (t_render*) arg;
-	t_thread				thread;
+	t_render *const	r = (t_render*) arg;
+	uint64_t tiles_x = (r->image->width  + TILE_SIZE - 1) / TILE_SIZE;
+	uint64_t tiles_y = (r->image->height + TILE_SIZE - 1) / TILE_SIZE;
+	uint64_t tiles_per_frame = tiles_x * tiles_y;
+	r->fancy = true;
 
-	thread.id = thread_id_counter++;
-	thread.job = thread.id;
-	while (true)
+	while (!r->threads_stop)
 	{
-		pthread_mutex_lock(&r->mutex);
-		while (thread.job >= r->jobs_available && !r->threads_stop)
-			pthread_cond_wait(&r->available_cond, &r->mutex);
-		if (r->threads_stop)
-			break ;
-		pthread_mutex_unlock(&r->mutex);
-		thread.y_min = r->image->height * (thread.id + 0) / THREAD_COUNT;
-		thread.y_max = r->image->height * (thread.id + 1) / THREAD_COUNT;
-		threads_render(r, thread.y_min, thread.y_max);
-		pthread_mutex_lock(&r->mutex);
-		if (++r->jobs_finished == r->jobs_available)
-			pthread_cond_signal(&r->finished_cond);
-		pthread_mutex_unlock(&r->mutex);
-		thread.job += THREAD_COUNT;
+		uint64_t job = r->job_counter++;
+		uint64_t frame_tile = (job - r->last_reset) % tiles_per_frame;
+		uint32_t x0 = TILE_SIZE * (frame_tile % tiles_x);
+		uint32_t y0 = TILE_SIZE * (frame_tile / tiles_x);
+		uint32_t frame = (job - r->last_reset) / tiles_per_frame;
+		threads_render(r, x0, y0, frame);
 	}
-	pthread_mutex_unlock(&r->mutex);
 	return (NULL);
 }
 
