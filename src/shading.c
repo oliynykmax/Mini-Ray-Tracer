@@ -87,6 +87,32 @@ void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
 	s->normal = norm3(s->normal);
 }
 
+/* Image-based bump map (height map) using central differences in texture space.
+ * Reduced to <=5 locals by packing floats in an array.
+ */
+void	apply_image_bumpmap(t_shading *s, t_object *object)
+{
+	float	d[8];
+	t_vec3	m;
+
+	if (!object || object->bump != TEXTURE_IMAGE || !object->bump_img)
+		return ;
+	d[0] = 1.0f / (float)object->bump_img->width;
+	d[1] = 1.0f / (float)object->bump_img->height;
+	d[2] = sample_lumin(object->bump_img, s->texcoord.x + d[0], s->texcoord.y);
+	d[3] = sample_lumin(object->bump_img, s->texcoord.x - d[0], s->texcoord.y);
+	d[4] = sample_lumin(object->bump_img, s->texcoord.x, s->texcoord.y + d[1]);
+	d[5] = sample_lumin(object->bump_img, s->texcoord.x, s->texcoord.y - d[1]);
+	d[6] = (d[2] - d[3]) * 0.5f / d[0];
+	d[7] = (d[4] - d[5]) * 0.5f / d[1];
+	m = norm3(vec3(d[6], d[7], 1.0f / BUMP_MAP_STRENGTH));
+	s->bitangent = cross3(s->normal, s->tangent);
+	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
+	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
+	s->normal.z = dot3(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
+	s->normal = norm3(s->normal);
+}
+
 t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 {
 	t_vec3		color;

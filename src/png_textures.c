@@ -69,25 +69,48 @@ bool	load_png_texture(t_parse *map, const char *filename,
  * Returns linear RGB in [0,1].
  */
 // Nearest-neighbor, repeat-wrapped RGB sample (very short version).
+static inline t_vec3	png_fetch(const mlx_texture_t *t, int x, int y)
+{
+	size_t	i;
+
+	x = (x % (int)t->width + (int)t->width) % (int)t->width;
+	y = (y % (int)t->height + (int)t->height) % (int)t->height;
+	i = ((size_t)y * t->width + (uint32_t)x) * t->bytes_per_pixel;
+	return (vec3(t->pixels[i] / 255.0f, t->pixels[i + 1] / 255.0f,
+			t->pixels[i + 2] / 255.0f));
+}
+
 t_vec3	sample_png_color(const mlx_texture_t *t, float u, float v)
 {
-	size_t		i;
-	uint32_t	x;
-	uint32_t	y;
+	int		w;
+	float	uu;
+	float	vv;
+	int		a[4];
+	t_vec3	c;
 
 	if (!t || t->width == 0 || t->height == 0)
 		return (vec3(1, 1, 1));
 	u -= floorf(u);
 	v -= floorf(v);
-	x = (uint32_t)(u * t->width) % t->width;
-	y = (uint32_t)(v * t->height) % t->height;
-	i = ((size_t)y * t->width + x) * t->bytes_per_pixel;
-	return (vec3(t->pixels[i + 0] / 255.0f, t->pixels[i + 1] / 255.0f,
-			t->pixels[i + 2] / 255.0f));
+	w = (int)t->width;
+	uu = u * w;
+	vv = v * (int)t->height;
+	a[0] = (int)floorf(uu);
+	a[2] = (int)floorf(vv);
+	a[1] = (a[0] + 1) % w;
+	a[3] = (a[2] + 1) % (int)t->height;
+	uu -= a[0];
+	vv -= a[2];
+	c = add3(
+			add3(scale3(png_fetch(t, a[0], a[2]), (1.0f - uu) * (1.0f - vv)),
+				scale3(png_fetch(t, a[1], a[2]), uu * (1.0f - vv))),
+			add3(scale3(png_fetch(t, a[0], a[3]), (1.0f - uu) * vv),
+				scale3(png_fetch(t, a[1], a[3]), uu * vv)));
+	return (c);
 }
 
 // Scalar luminance (optional; keep only if you still use it for bump).
-float	sample_png_luminance(const mlx_texture_t *t, float u, float v)
+float	sample_lumin(const mlx_texture_t *t, float u, float v)
 {
 	t_vec3	c;
 
