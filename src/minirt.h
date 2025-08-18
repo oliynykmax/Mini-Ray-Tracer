@@ -32,12 +32,8 @@
 
 // Default roughness and metallicness values. These are used for objects that
 // don't set these values in the map file.
-# define DEFAULT_ROUGH 0.1
-# define DEFAULT_METALLIC 0.5
-
-// How much bump mapping affects surface normals. Higher values produce a
-// bumpier, less subtle effect.
-# define BUMP_MAP_STRENGTH 0.05
+# define DEFAULT_ROUGH 0.5
+# define DEFAULT_METALLIC 0.0
 
 // Maximum number of ray bounces used when reflecting rays off surfaces. Higher
 // values make indirect light and mirror reflections more convincing, but come
@@ -52,7 +48,6 @@
 // Typedefs for enum/structure/union types.
 typedef enum e_mode			t_mode;
 typedef enum e_object_type	t_object_type;
-typedef enum e_texture		t_texture;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
 typedef struct s_parse		t_parse;
@@ -70,7 +65,6 @@ typedef mlx_texture_t		t_tex;
 // Typedefs for function types.
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
 typedef void				(*t_params_function)(t_object*, t_shading*);
-typedef float				(*t_texture_function)(float, float);
 
 // 3D coordinate vector type (also used for colors).
 union	u_vec3
@@ -143,8 +137,6 @@ struct s_object
 	float			radius;		// Radius (sphere/cylinder/para/light)
 	float			height;		// Height (cylinder/para)
 	t_vec3			size;		// Full dimensions (box)
-	t_texture		texture;
-	t_texture		bump;
 	mlx_texture_t	*texture_img;
 	mlx_texture_t	*bump_img;
 	float			rough;			// Surface roughness
@@ -317,16 +309,12 @@ t_vec3		random_point_in_disk(uint16_t rng);
 t_vec3		random_point_on_sphere(uint16_t rng);
 
 // shading.c
-void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);
-void		apply_image_bumpmap(t_shading *s, t_object *object);
+void		apply_bumpmap(t_shading *s, t_object *object);
 t_vec3		shade_point(t_shading *s, t_ray *r, t_object *object);
 
 // sphere.c
 float		sphere_distance(t_object *o, t_vec3 ro, t_vec3 rd);
 void		sphere_params(t_object *o, t_shading *s);
-
-// texturing.c
-float		get_texture(t_texture texture, float u, float v);
 
 // utility.c
 t_vec3		dither(float x, float y);
@@ -397,7 +385,6 @@ void		debug_print_scene(t_scene *scene);
 
 /* parse_utils.c */
 float		parse_float(bool exists, t_parse *map, float std, int i);
-t_texture	parse_texture(bool exists, t_parse *map, int i,
-				mlx_texture_t **img_slot);
+t_tex		*parse_texture(bool exists, t_parse *map, int i);
 void		parse_optionals(t_parse *m, int texture_index);
 #endif

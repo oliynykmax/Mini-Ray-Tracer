@@ -57,3 +57,17 @@ void	free_object_textures(t_object *obj)
 		obj->bump_img = NULL;
 	}
 }
+
+void	apply_bumpmap(t_shading *s, t_object *object)
+{
+	t_vec3	m;
+
+	m = sample_png_color(object->bump_img, s->texcoord.x, s->texcoord.y);
+	m = norm3(add3(mul3(m, vec3(2.0f, 2.0f, 2.0f)), vec3(-1.0f, -1.0f, -1.0f)));
+	s->bitangent = cross3(s->normal, s->tangent);
+	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
+	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
+	s->normal.z = dot3(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
+	s->normal = norm3(s->normal);
+	s->normal = scale3(s->normal, -1.0f);
+}

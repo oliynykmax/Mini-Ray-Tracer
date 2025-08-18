@@ -3,8 +3,9 @@
 /* Inline fatal_if implementation (previously mrt_assert) */
 static void	cleanup_parsing(t_parse *ctx)
 {
-	size_t	i = 0;
+	size_t	i;
 
+	i = 0;
 	get_next_line(-1);
 	if (ctx->fd >= 0)
 		close(ctx->fd);
@@ -22,8 +23,6 @@ static void	cleanup_parsing(t_parse *ctx)
 			++i;
 		}
 		free(ctx->sc->objects);
-		ctx->sc->objects = NULL;
-		ctx->sc->object_count = 0;
 	}
 }
 

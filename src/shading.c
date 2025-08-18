@@ -72,44 +72,14 @@ static t_vec3	one_light(t_ray *r, t_object *light, t_shading *s)
 	return (scale3(mul3(add3(diffuse, specular), radiance), s->ndotl));
 }
 
-void	apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc)
-{
-	const float		delta = 1e-5f;
-	const float		h = get_texture(bumpmap, tc.x, tc.y);
-	const float		du = (get_texture(bumpmap, tc.x + delta, tc.y) - h) / delta;
-	const float		dv = (get_texture(bumpmap, tc.x, tc.y + delta) - h) / delta;
-	const t_vec3	m = norm3(vec3(du, dv, 1.0f / BUMP_MAP_STRENGTH));
-
-	s->bitangent = cross3(s->normal, s->tangent);
-	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
-	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
-	s->normal.z = dot3(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
-	s->normal = norm3(s->normal);
-}
-
-void	apply_image_bumpmap(t_shading *s, t_object *object)
-{
-	t_vec3	m;
-
-	m = sample_png_color(object->bump_img, s->texcoord.x, s->texcoord.y);
-	m = norm3(add3(mul3(m, vec3(2.0f, 2.0f, 2.0f)), vec3(-1.0f, -1.0f, -1.0f)));
-	s->bitangent = cross3(s->normal, s->tangent);
-	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
-	s->normal.y = dot3(m, vec3(s->tangent.y, s->bitangent.y, s->normal.y));
-	s->normal.z = dot3(m, vec3(s->tangent.z, s->bitangent.z, s->normal.z));
-	s->normal = norm3(s->normal);
-	s->normal = scale3(s->normal, -1.0f);
-}
-
 t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 {
 	t_vec3		color;
 	t_object	*light;
 	size_t		i;
 
-	s->albedo.r = get_texture(object->texture, s->texcoord.x, s->texcoord.y);
-	s->albedo = scale3(object->color, s->albedo.r);
-	if (object->texture == TEXTURE_IMAGE && object->texture_img)
+	s->albedo = object->color;
+	if (object->texture_img)
 		s->albedo = mul3(object->color, sample_png_color(object->texture_img,
 					s->texcoord.x, s->texcoord.y));
 	s->metallic = object->metallic;

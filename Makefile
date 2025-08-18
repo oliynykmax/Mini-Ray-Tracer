@@ -32,7 +32,6 @@ SRCS := \
 	src/random.c \
 	src/shading.c \
 	src/sphere.c \
-	src/texturing.c \
 	src/threads.c \
 	src/title.c \
 	src/trace.c \
