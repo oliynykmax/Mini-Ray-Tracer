@@ -15,7 +15,7 @@ static void	render_sub_tile(t_render *r, int x0, int y0, uint32_t frame)
 	{
 		r->frame[index] = scale3(r->frame[index], d == 0);
 		r->frame[index] = add3(r->frame[index], color);
-		color = scale3(r->frame[index], 1.0f / (frame - 3));
+		color = scale3(r->frame[index], 1.0f / (frame - 4));
 	}
 	color = add3(to_srgb3(color), dither(x0, y0));
 	y = y0;

@@ -43,7 +43,7 @@
 // The number of rendering threads to use.
 # define THREAD_COUNT 6
 
-# define TILE_SIZE 16
+# define TILE_SIZE 32
 
 // Typedefs for enum/structure/union types.
 typedef enum e_mode			t_mode;
