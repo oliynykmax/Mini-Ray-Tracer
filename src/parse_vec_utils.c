@@ -110,8 +110,6 @@ void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
 				split[2]));
 	m->temp_split = NULL;
 	free_array(split);
-	fatal_if(m, fabs(out->x) == HUGE_VAL || fabs(out->y) == HUGE_VAL
-		|| fabs(out->z) == HUGE_VAL, "Vector component is too large\n");
 	if (limits[0] != limits[1])
 		fatal_if(m, !in_range3(*out, limits[0], limits[1]),
 			"Vector values must be between %d and %d\n", (int)limits[0],
