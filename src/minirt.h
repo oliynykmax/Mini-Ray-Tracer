@@ -313,8 +313,8 @@ t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 // random.c
 float		random_float(uint16_t rng);
 t_vec3		random_point_in_square(uint16_t rng);
-t_vec3		random_point_in_disk(uint16_t rng, float radius);
-t_vec3		random_point_on_sphere(uint16_t rng, float radius);
+t_vec3		random_point_in_disk(uint16_t rng);
+t_vec3		random_point_on_sphere(uint16_t rng);
 
 // shading.c
 void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);

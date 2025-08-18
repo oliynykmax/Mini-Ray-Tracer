@@ -24,7 +24,7 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 
 t_vec3	scatter(t_ray r, t_vec3 p, t_vec3 n, t_object *o)
 {
-	const t_vec3	random = random_point_on_sphere(r.rng, 1.0f);
+	const t_vec3	random = random_point_on_sphere(r.rng);
 
 	if (random_float(r.rng) > o->metallic)
 		r.rd = random;
@@ -77,7 +77,7 @@ t_vec3	trace_pixel(t_render *r, float x, float y, int frame)
 
 	ray.scene = r->scene;
 	ray.rng = frame + (int)x + (int)y * r->image->width;
-	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
+	disk = scale3(random_point_in_disk(ray.rng), r->scene->aperture_size);
 	ray.ro = r->scene->pos;
 	ray.ro = add3(ray.ro, scale3(r->camera_x, disk.x));
 	ray.ro = add3(ray.ro, scale3(r->camera_y, disk.y));
