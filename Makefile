@@ -24,8 +24,9 @@ SRCS := \
 	src/object.c \
 	src/paraboloid.c \
 	src/parse_light_camera.c \
+	src/parse_objects.c \
 	src/parse_utils.c \
-	src/parsing_objects.c \
+	src/parse_vec_utils.c \
 	src/plane.c \
 	src/png_textures.c \
 	src/quaternion.c \
@@ -39,7 +40,6 @@ SRCS := \
 	src/vec3_arithmetic.c \
 	src/vec3_geometric.c \
 	src/vec3_utility.c \
-	src/vec_parse_utils.c \
 
 OBJ    := $(SRCS:src/%.c=.build/%.o)
 
