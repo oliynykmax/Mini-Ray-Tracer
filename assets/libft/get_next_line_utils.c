@@ -6,7 +6,7 @@
 /*   By: maoliiny <maoliiny@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 15:09:11 by maoliiny          #+#    #+#             */
-/*   Updated: 2025/08/15 14:04:10 by maoliiny         ###   ########.fr       */
+/*   Updated: 2025/08/18 15:49:12 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,25 +52,6 @@ int	ft_strcat(char **res, int fd)
 		free(*res);
 	*res = temp_join;
 	return (read_bytes);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	len1;
-	size_t	len2;
-	size_t	total_len;
-	char	*result;
-
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	total_len = len1 + len2 + 1;
-	result = malloc(total_len * sizeof(char));
-	if (!result)
-		return (NULL);
-	ft_memcpy_gnl(result, s1, len1);
-	ft_memcpy_gnl(result + len1, s2, len2);
-	result[total_len - 1] = '\0';
-	return (result);
 }
 
 void	*ft_memcpy_gnl(void *dest, const void *src, size_t n)
