@@ -11,6 +11,11 @@ static void	free_scene_objects(t_scene *scene)
 		++i;
 	}
 	free(scene->objects);
+	if (scene->amb_texture)
+	{
+		mlx_delete_texture(scene->amb_texture);
+		scene->amb_texture = NULL;
+	}
 }
 
 static void	init_structs(t_scene *scene, t_render *render, t_parse *map)

@@ -22,6 +22,11 @@ static void	cleanup_parsing(t_parse *ctx)
 		}
 		free(ctx->sc->objects);
 	}
+	if (ctx->sc->amb_texture)
+	{
+		mlx_delete_texture(ctx->sc->amb_texture);
+		ctx->sc->amb_texture = NULL;
+	}
 }
 
 void	fatal_if(t_parse *ctx, bool condition, char *format, ...)
