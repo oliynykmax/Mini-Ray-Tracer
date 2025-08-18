@@ -35,6 +35,20 @@ t_vec3	scatter(t_ray r, t_vec3 p, t_vec3 n, t_object *o)
 	return (trace_scene(&r));
 }
 
+static t_vec3	ambient_color(t_scene *s, t_vec3 rd)
+{
+	t_vec3	color;
+	float	u;
+	float	v;
+
+	color = lerp3(s->ambient, s->ambient2, fabsf(rd.y));
+	if (s->amb_texture == NULL)
+		return (color);
+	u = fmaxf(0.0f, atan2f(rd.x, rd.z) / M_PI * 0.5f + 0.5f);
+	v = fmaxf(0.0f, 1.0f - asinf(rd.y) / M_PI + 0.5f);
+	return (mul3(color, sample_png_color(s->amb_texture, u, v, true)));
+}
+
 t_vec3	trace_scene(t_ray *r)
 {
 	t_shading	s;
@@ -42,7 +56,7 @@ t_vec3	trace_scene(t_ray *r)
 	const float	t = scene_distance(r->scene, r->ro, r->rd, &object);
 
 	if (object == NULL)
-		return (lerp3(r->scene->ambient, r->scene->ambient2, fabsf(r->rd.y)));
+		return (ambient_color(r->scene, r->rd));
 	if (object->type == OBJECT_LIGHT)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
@@ -53,17 +67,6 @@ t_vec3	trace_scene(t_ray *r)
 	if (r->bounce-- > 0)
 		s.ambient = scatter(*r, s.point, s.normal, object);
 	return (shade_point(&s, r, object));
-}
-
-t_vec3	get_viewport_ray(t_render *r, t_vec3 coord, uint16_t rng, int frame)
-{
-	const t_vec3	jitter = random_point_in_square(rng);
-	const float		u = (coord.x + jitter.x * !!frame) / r->image->width;
-	const float		v = (coord.y + jitter.y * !!frame) / r->image->height;
-	const t_vec3	v0 = lerp3(r->viewport[0], r->viewport[1], u);
-	const t_vec3	v1 = lerp3(r->viewport[2], r->viewport[3], u);
-
-	return (norm3(lerp3(v0, v1, v)));
 }
 
 // Trace the color of the pixel at (x, y) in the image.

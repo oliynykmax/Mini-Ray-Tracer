@@ -81,7 +81,7 @@ t_vec3	shade_point(t_shading *s, t_ray *r, t_object *object)
 	s->albedo = object->color;
 	if (object->texture_img)
 		s->albedo = mul3(object->color, sample_png_color(object->texture_img,
-					s->texcoord.x, s->texcoord.y));
+					s->texcoord.x, s->texcoord.y, true));
 	s->metallic = object->metallic;
 	s->rough = fmaxf(MIN_ROUGHNESS, object->rough);
 	s->f0 = lerp3(vec3(0.04f, 0.04f, 0.04f), s->albedo, s->metallic);
