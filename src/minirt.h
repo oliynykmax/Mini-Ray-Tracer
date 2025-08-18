@@ -50,19 +50,22 @@
 # define TILE_SIZE 16
 
 // Typedefs for enum/structure/union types.
+typedef enum e_mode			t_mode;
 typedef enum e_object_type	t_object_type;
 typedef enum e_texture		t_texture;
-typedef enum e_mode			t_mode;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
-typedef struct s_shading	t_shading;
+typedef struct s_parse		t_parse;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
+typedef struct s_shading	t_shading;
 typedef struct s_thread		t_thread;
-typedef struct s_parse		t_parse;
 typedef union u_quat		t_quat;
 typedef union u_vec3		t_vec3;
+
+// Type aliases for MLX objects.
+typedef mlx_texture_t		t_tex;
 
 // Typedefs for function types.
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
@@ -326,10 +329,8 @@ void		sphere_params(t_object *o, t_shading *s);
 float		get_texture(t_texture texture, float u, float v);
 
 // png_textures.c (image texture support)
-bool		load_png_texture(t_parse *map, const char *filename,
-				mlx_texture_t **out);
-float		sample_lumin(const mlx_texture_t *tex, float u, float v);
-t_vec3		sample_png_color(const mlx_texture_t *tex, float u, float v);
+t_tex		*load_png_texture(t_parse *map, char *filename);
+t_vec3		sample_png_color(mlx_texture_t *tex, float u, float v);
 void		free_object_textures(t_object *obj);
 
 // threads.c

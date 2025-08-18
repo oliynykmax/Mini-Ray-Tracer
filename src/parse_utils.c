@@ -11,7 +11,7 @@ t_texture	parse_texture(bool exists, t_parse *map, int i,
 	if (len >= 4 && ft_strcmp(map->line[i] + len - 4, ".png") == 0)
 	{
 		if (img_slot)
-			load_png_texture(map, map->line[i], img_slot);
+			*img_slot = load_png_texture(map, map->line[i]);
 		return (TEXTURE_IMAGE);
 	}
 	if (ft_strcmp(map->line[i], "checked") == 0)
