@@ -137,8 +137,8 @@ struct s_object
 	float			radius;		// Radius (sphere/cylinder/para/light)
 	float			height;		// Height (cylinder/para)
 	t_vec3			size;		// Full dimensions (box)
-	mlx_texture_t	*texture_img;
-	mlx_texture_t	*bump_img;
+	t_tex			*texture_img;
+	t_tex			*bump_img;
 	float			rough;			// Surface roughness
 	float			metallic;		// Surface metalness
 };
@@ -164,6 +164,7 @@ struct s_scene
 	float		aperture_size;	// Camera aperture size
 	t_vec3		ambient;		// Ambient color (multiplied by ratio)
 	t_vec3		ambient2;		// Secondary ambient color (for color gradients)
+	t_tex		*amb_texture;
 };
 
 // Data for the current keyboard state.

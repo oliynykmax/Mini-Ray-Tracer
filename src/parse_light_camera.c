@@ -6,20 +6,20 @@ void	parse_amb_light(t_parse *m)
 
 	m->arrlen = array_len(m->line);
 	fatal_if(m, m->ambient_exists, "Ambient light already exists\n");
-	fatal_if(m, m->arrlen != 3 && m->arrlen != 4,
+	fatal_if(m, m->arrlen < 3 || m->arrlen > 5,
 		"Invalid ambient light format\n");
 	ratio = ft_atof(m, m->line[1]);
 	fatal_if(m, ratio < 0.0f || ratio > 1.0f,
 		"Ambient light ratio must be between 0.0 and 1.0\n");
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	m->sc->ambient = scale3(m->sc->ambient, ratio / 255.0);
+	m->sc->ambient2 = m->sc->ambient;
 	if (m->arrlen == 4)
 	{
 		parse3(m, m->line[3], &m->sc->ambient2, (float []){0, 255});
 		m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
 	}
-	else
-		m->sc->ambient2 = m->sc->ambient;
+	m->sc->amb_texture = parse_texture(m->arrlen == 5, m, 4);
 	m->ambient_exists = true;
 }
 
