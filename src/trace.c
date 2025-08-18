@@ -47,10 +47,8 @@ t_vec3	trace_scene(t_ray *r)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
-	if (object->bump == TEXTURE_IMAGE && object->bump_img)
-		apply_image_bumpmap(&s, object);
-	else if (object->bump != TEXTURE_NONE && object->bump != TEXTURE_IMAGE)
-		apply_bumpmap(&s, object->bump, s.texcoord);
+	if (object->bump_img)
+		apply_bumpmap(&s, object);
 	s.ambient = vec3(0.0f, 0.0f, 0.0f);
 	if (r->bounce-- > 0)
 		s.ambient = scatter(*r, s.point, s.normal, object);
