@@ -67,8 +67,7 @@ void	parse_camera(t_parse *m)
 	parse3(m, m->line[1], &m->sc->pos, (float []){0, 0});
 	parse3(m, m->line[2], &m->sc->dir, (float []){-1, 1});
 	m->camera_exists = true;
-	fatal_if(m, fabsf(len3(m->sc->dir) - 1.0f) >= 0.001f,
-		"Camera direction components must be between -1 and 1\n");
+	m->sc->dir = norm3(m->sc->dir);
 	if (fabsf(m->sc->dir.y) > 0.999f)
 		m->sc->dir = norm3(vec3(m->sc->dir.x, m->sc->dir.y,
 					m->sc->dir.z - 0.01f));

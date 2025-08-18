@@ -249,7 +249,6 @@ struct s_parse
 	t_scene		*sc;
 	char		*buff;
 	char		**line;
-	char		**temp_split;	// holds transient split vectors
 	int			fd;
 	t_object	*obj;
 	t_vec3		normal;

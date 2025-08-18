@@ -24,9 +24,9 @@ static double	parse_number_part(t_parse *m, const char **str,
 
 double	ft_atof(t_parse *m, const char *str)
 {
-	double			result;
-	int				sign;
-	const char		*start = str;
+	double		result;
+	int			sign;
+	const char	*start = str;
 
 	result = 0.0;
 	sign = 1;
@@ -48,70 +48,39 @@ double	ft_atof(t_parse *m, const char *str)
 	return (result * sign);
 }
 
-/*
- * Checks if all components of a vector are within given boundaries
- * @param v The vector to check
- * @param lower Lower boundary (inclusive)
- * @param upper Upper boundary (inclusive)
- * @return true if all components are within boundaries, false otherwise
- */
 bool	in_range3(t_vec3 v, float lower, float upper)
 {
-	return ((v.x >= lower - 0.001f) && (v.x <= upper + 0.001f)
-		&& (v.y >= lower - 0.001f) && (v.y <= upper + 0.001f) && (v.z >= lower
-			- 0.001f) && (v.z <= upper + 0.001f));
+	return ((v.x >= lower - 0.001f) && (v.x <= upper + 0.001f) && (v.y >= lower
+			- 0.001f) && (v.y <= upper + 0.001f) && (v.z >= lower - 0.001f)
+		&& (v.z <= upper + 0.001f));
 }
 
-/*
-** Splits a string by a comma, strictly for 3 components.
-** Calls fatal_if on error.
-*/
-static char	**ft_split_vec(t_parse *m, const char *str)
+/* parse3 using ft_atof with fixed internal buffer (no malloc, no mutation) */
+void	parse3(t_parse *m, const char *s, t_vec3 *out, float limits[2])
 {
-	char		**result;
-	const char	*p1 = ft_strchr(str, ',');
-	const char	*p2;
+	char	buf[32];
+	int		ip[2];
+	float	vals[3];
 
-	p2 = NULL;
-	if (p1)
-		p2 = ft_strchr(p1 + 1, ',');
-	fatal_if(m, p1 == NULL || p2 == NULL || ft_strchr(p2 + 1, ','),
-		"Vector format must be 'x,y,z' with exactly 2 commas\n");
-	result = malloc(sizeof(char *) * 4);
-	fatal_if(m, result == NULL, "Memory allocation failure\n");
-	m->temp_split = result;
-	result[0] = ft_substr(str, 0, p1 - str);
-	result[1] = ft_substr(str, p1 - str + 1, p2 - (p1 + 1));
-	result[2] = ft_substr(p2 + 1, 0, ft_strlen(p2 + 1));
-	result[3] = NULL;
-	fatal_if(m, (p1 - str) == 0 || (p2 - (p1 + 1)) == 0
-		|| ft_strlen(p2 + 1) == 0,
-		"Vector components must not be empty\n");
-	fatal_if(m, result[0] == NULL || result[1] == NULL
-		|| result[2] == NULL, "Memory allocation failure in substr\n");
-	return (result);
-}
-
-/*
-* Parses a string "x,y,z" into a vec3 and (optionally) validates component range.
- * Exits on failure using fatal_if (no return value).
- * @param m       Parsing context (for unified cleanup on error)
- * @param str     Input string in the form "x,y,z"
- * @param out     Destination vector
- * @param limits  Two-element array {min, max}; if limits[0] == limits[1],
-	range check is skipped
- */
-void	parse3(t_parse *m, const char *str, t_vec3 *out, float limits[2])
-{
-	char	**split;
-
-	split = ft_split_vec(m, str);
-	*out = vec3(ft_atof(m, split[0]), ft_atof(m, split[1]), ft_atof(m,
-				split[2]));
-	m->temp_split = NULL;
-	free_array(split);
-	if (limits[0] != limits[1])
-		fatal_if(m, !in_range3(*out, limits[0], limits[1]),
-			"Vector values must be between %d and %d\n", (int)limits[0],
-			(int)limits[1]);
+	ft_memset(ip, 0, 8);
+	while (ip[0] < (int) sizeof(buf) - 1)
+	{
+		if (*s && *s != ',')
+		{
+			buf[ip[0]++] = *s++;
+			continue ;
+		}
+		buf[ip[0]] = '\0';
+		fatal_if(m, ip[0] == 0, "Empty vector component\n");
+		vals[ip[1]++] = ft_atof(m, buf);
+		ip[0] = 0;
+		if (*s++ == '\0')
+			break ;
+		fatal_if(m, ip[1] > 3, "Vector format must be x,y,z\n");
+	}
+	fatal_if(m, ip[1] != 3, "Vector format must be x,y,z\n");
+	*out = vec3(vals[0], vals[1], vals[2]);
+	fatal_if(m, !in_range3(*out, limits[0], limits[1]) * (limits[0] != limits[1]
+			), "Vector values must be between %d and %d\n",
+		(int)limits[0], (int)limits[1]);
 }
