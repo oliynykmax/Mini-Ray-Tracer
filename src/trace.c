@@ -24,14 +24,14 @@ float	scene_distance(t_scene *s, t_vec3 ro, t_vec3 rd, t_object **object)
 
 t_vec3	scatter(t_ray r, t_vec3 p, t_vec3 n, t_object *o)
 {
-	const t_vec3	random = random_point_on_sphere(r.rng, 1.0f);
+	const t_vec3	random = random_point_on_sphere(r.rng);
 
 	if (random_float(r.rng) > o->metallic)
 		r.rd = random;
 	else
 		r.rd = norm3(add3(reflect3(r.rd, n), scale3(random, o->rough)));
+	r.ro = add3(p, scale3(n, 1e-4f));
 	r.rd = scale3(r.rd, copysignf(1.0f, dot3(r.rd, n)));
-	r.ro = p;
 	return (trace_scene(&r));
 }
 
@@ -43,7 +43,7 @@ t_vec3	trace_scene(t_ray *r)
 
 	if (object == NULL)
 		return (lerp3(r->scene->ambient, r->scene->ambient2, fabsf(r->rd.y)));
-	if (object->type == OBJECT_LIGHT || !r->fancy)
+	if (object->type == OBJECT_LIGHT)
 		return (object->color);
 	s.point = add3(r->ro, scale3(r->rd, t));
 	object_params(object, &s);
@@ -75,10 +75,9 @@ t_vec3	trace_pixel(t_render *r, float x, float y, int frame)
 	t_vec3	disk;
 	t_ray	ray;
 
-	ray.fancy = r->fancy;
 	ray.scene = r->scene;
 	ray.rng = frame + (int)x + (int)y * r->image->width;
-	disk = random_point_in_disk(ray.rng, r->scene->aperture_size);
+	disk = scale3(random_point_in_disk(ray.rng), r->scene->aperture_size);
 	ray.ro = r->scene->pos;
 	ray.ro = add3(ray.ro, scale3(r->camera_x, disk.x));
 	ray.ro = add3(ray.ro, scale3(r->camera_y, disk.y));

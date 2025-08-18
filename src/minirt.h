@@ -50,19 +50,22 @@
 # define TILE_SIZE 16
 
 // Typedefs for enum/structure/union types.
+typedef enum e_mode			t_mode;
 typedef enum e_object_type	t_object_type;
 typedef enum e_texture		t_texture;
-typedef enum e_mode			t_mode;
 typedef struct s_keys		t_keys;
 typedef struct s_object		t_object;
-typedef struct s_shading	t_shading;
+typedef struct s_parse		t_parse;
 typedef struct s_ray		t_ray;
 typedef struct s_render		t_render;
 typedef struct s_scene		t_scene;
+typedef struct s_shading	t_shading;
 typedef struct s_thread		t_thread;
-typedef struct s_parse		t_parse;
 typedef union u_quat		t_quat;
 typedef union u_vec3		t_vec3;
+
+// Type aliases for MLX objects.
+typedef mlx_texture_t		t_tex;
 
 // Typedefs for function types.
 typedef float				(*t_distance_function)(t_object*, t_vec3, t_vec3);
@@ -155,7 +158,6 @@ struct s_ray
 	t_vec3		ro;		// Ray origin
 	t_vec3		rd;		// Ray direction
 	int			bounce;	// Remaining ray bounces
-	bool		fancy;	// Use "fancy" shading
 };
 
 // Data describing the objects in the scene.
@@ -209,7 +211,6 @@ struct s_render
 	int				tiles_x;				// Width of the frame in tiles
 	int				tiles_y;				// Height of the frame in tiles
 	int				tiles_per_frame;		// Total number of tiles per frame
-	bool			fancy;					// Use "fancy" lighting
 	t_object		*selection;				// The currently selected object
 	t_vec3			mouse_pos;				// Current mouse position
 	t_vec3			mouse_delta;			// Mouse delta since last frame
@@ -284,11 +285,11 @@ void		box_params(t_object *o, t_shading *s);
 void		render_scene(t_render *r);
 
 // math.c
+int			min(int a, int b);
+int			max(int a, int b);
 float		clamp(float value, float lower, float upper);
 float		saturate(float value);
-float		radians(float degrees);
 float		fract(float x);
-float		solve_quadratic(float a, float b, float c);
 
 // object.c
 float		object_distance(t_object *object, t_vec3 ro, t_vec3 rd);
@@ -312,8 +313,8 @@ t_vec3		quat_rotate_vec3(t_quat q, t_vec3 v);
 // random.c
 float		random_float(uint16_t rng);
 t_vec3		random_point_in_square(uint16_t rng);
-t_vec3		random_point_in_disk(uint16_t rng, float radius);
-t_vec3		random_point_on_sphere(uint16_t rng, float radius);
+t_vec3		random_point_in_disk(uint16_t rng);
+t_vec3		random_point_on_sphere(uint16_t rng);
 
 // shading.c
 void		apply_bumpmap(t_shading *s, t_texture bumpmap, t_vec3 tc);
@@ -327,11 +328,14 @@ void		sphere_params(t_object *o, t_shading *s);
 // texturing.c
 float		get_texture(t_texture texture, float u, float v);
 
+// utility.c
+t_vec3		dither(float x, float y);
+float		radians(float degrees);
+float		solve_quadratic(float a, float b, float c);
+
 // png_textures.c (image texture support)
-bool		load_png_texture(t_parse *map, const char *filename,
-				mlx_texture_t **out);
-float		sample_lumin(const mlx_texture_t *tex, float u, float v);
-t_vec3		sample_png_color(const mlx_texture_t *tex, float u, float v);
+t_tex		*load_png_texture(t_parse *map, char *filename);
+t_vec3		sample_png_color(mlx_texture_t *tex, float u, float v);
 void		free_object_textures(t_object *obj);
 
 // threads.c
