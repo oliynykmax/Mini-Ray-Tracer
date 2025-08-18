@@ -30,8 +30,8 @@ static t_vec3	brdf_fresnel(t_shading *s)
 
 static bool	light_visible(t_ray *r, t_object *light, t_vec3 ro)
 {
-	const t_vec3	rand = random_point_on_sphere(r->rng, light->radius);
-	const t_vec3	light_pos = add3(light->pos, rand);
+	const t_vec3	rnd = scale3(random_point_on_sphere(r->rng), light->radius);
+	const t_vec3	light_pos = add3(light->pos, rnd);
 	const t_vec3	rd = sub3(light_pos, ro);
 	float			t;
 	size_t			i;
