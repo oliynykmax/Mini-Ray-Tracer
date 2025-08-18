@@ -6,7 +6,7 @@ HEADERS := src/minirt.h assets/libft/libft.h assets/MLX42/include/MLX42/MLX42.h
 
 CC      := clang
 CFLAGS  := -Wall -Wextra -Werror -MMD -MP -O3 -flto -march=native -ffast-math
-CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include -Iassets/MLX42/include/lodepng -g
+CFLAGS  += -Iincl -Iassets/libft -Iassets/MLX42/include -Iassets/MLX42/include/lodepng
 LDFLAGS := -ldl -lglfw -pthread -lm -flto
 
 INCLUDES := -Iassets/libft -Iassets/MLX42/include
