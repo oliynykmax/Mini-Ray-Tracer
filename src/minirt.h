@@ -324,7 +324,7 @@ float		solve_quadratic(float a, float b, float c);
 
 // png_textures.c (image texture support)
 t_tex		*load_png_texture(t_parse *map, char *filename);
-t_vec3		sample_png_color(mlx_texture_t *tex, float u, float v);
+t_vec3		sample_png_color(mlx_texture_t *tex, float u, float v, bool srgb);
 void		free_object_textures(t_object *obj);
 
 // threads.c

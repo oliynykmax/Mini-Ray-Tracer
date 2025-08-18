@@ -46,7 +46,7 @@ static t_vec3	ambient_color(t_scene *s, t_vec3 rd)
 		return (color);
 	u = fmaxf(0.0f, atan2f(rd.x, rd.z) / M_PI * 0.5f + 0.5f);
 	v = fmaxf(0.0f, 1.0f - asinf(rd.y) / M_PI + 0.5f);
-	return (mul3(color, sample_png_color(s->amb_texture, u, v)));
+	return (mul3(color, sample_png_color(s->amb_texture, u, v, true)));
 }
 
 t_vec3	trace_scene(t_ray *r)
