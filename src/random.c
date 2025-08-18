@@ -23,27 +23,25 @@ t_vec3	random_point_in_square(uint16_t rng)
 	return (vec3(x, y, 0.0f));
 }
 
-// Generate a random point in a disk centered at the origin with the given
-// radius.
+// Generate a random point inside a disk centered at the origin with radius 1.
 
-t_vec3	random_point_in_disk(uint16_t rng, float radius)
+t_vec3	random_point_in_disk(uint16_t rng)
 {
 	const t_vec3	p = random_point_in_square(rng);
-	const float		x = sqrtf(p.x) * cosf(p.y * (2.0f * M_PI)) * radius;
-	const float		y = sqrtf(p.x) * sinf(p.y * (2.0f * M_PI)) * radius;
+	const float		x = sqrtf(p.x) * cosf(p.y * (2.0f * M_PI));
+	const float		y = sqrtf(p.x) * sinf(p.y * (2.0f * M_PI));
 
 	return (vec3(x, y, 0.0f));
 }
 
-// Generate a random point on a sphere centered at the origin with the given
-// radius.
+// Generate a random point on a sphere centered at the origin with radius 1.
 
-t_vec3	random_point_on_sphere(uint16_t rng, float radius)
+t_vec3	random_point_on_sphere(uint16_t rng)
 {
 	const t_vec3	p = random_point_in_square(rng);
 	const float		x = sinf(p.x * M_PI) * cosf(p.y * (2.0f * M_PI));
 	const float		y = sinf(p.x * M_PI) * sinf(p.y * (2.0f * M_PI));
 	const float		z = cosf(p.x * M_PI);
 
-	return (scale3(vec3(x, y, z), radius));
+	return (vec3(x, y, z));
 }

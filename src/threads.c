@@ -1,27 +1,5 @@
 #include "minirt.h"
 
-// Dithering function for masking color banding artifacts. The specific method
-// is called Interleaved Gradient Noise; there are some good articles on it on
-// the web.
-
-static t_vec3	dither(float x, float y)
-{
-	x *= 0.06711056f;
-	y *= 0.00583715f;
-	x = fract(52.9829189f * fract(x + y)) / 255.0f;
-	return (vec3(x, x, x));
-}
-
-int	min(int a, int b)
-{
-	return (a * (a < b) + b * (a >= b));
-}
-
-int	max(int a, int b)
-{
-	return (a * (a > b) + b * (a <= b));
-}
-
 static void	render_sub_tile(t_render *r, int x0, int y0, uint32_t frame)
 {
 	t_vec3		color;
