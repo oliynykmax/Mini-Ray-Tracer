@@ -27,15 +27,16 @@ SRCS := \
 	src/parse_utils.c \
 	src/parsing_objects.c \
 	src/plane.c \
+	src/png_textures.c \
 	src/quaternion.c \
 	src/random.c \
 	src/shading.c \
 	src/sphere.c \
 	src/texturing.c \
-	src/png_textures.c \
 	src/threads.c \
 	src/title.c \
 	src/trace.c \
+	src/utility.c \
 	src/vec3_arithmetic.c \
 	src/vec3_geometric.c \
 	src/vec3_utility.c \

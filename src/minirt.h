@@ -285,11 +285,11 @@ void		box_params(t_object *o, t_shading *s);
 void		render_scene(t_render *r);
 
 // math.c
+int			min(int a, int b);
+int			max(int a, int b);
 float		clamp(float value, float lower, float upper);
 float		saturate(float value);
-float		radians(float degrees);
 float		fract(float x);
-float		solve_quadratic(float a, float b, float c);
 
 // object.c
 float		object_distance(t_object *object, t_vec3 ro, t_vec3 rd);
@@ -327,6 +327,11 @@ void		sphere_params(t_object *o, t_shading *s);
 
 // texturing.c
 float		get_texture(t_texture texture, float u, float v);
+
+// utility.c
+t_vec3		dither(float x, float y);
+float		radians(float degrees);
+float		solve_quadratic(float a, float b, float c);
 
 // png_textures.c (image texture support)
 t_tex		*load_png_texture(t_parse *map, char *filename);
