@@ -121,7 +121,7 @@ void	validate_input_and_parse_map(int ac, char **av, t_parse *m)
 	fatal_if(m, ac != 2, "usage: ./miniRT <path_to_the_file.rt>\n");
 	fatal_if(m, ft_strcmp(ft_strrchr(av[1], '.'), ".rt"), "Not .rt file\n");
 	m->fd = open(av[1], O_RDONLY);
-	fatal_if(m, m->fd < 0, "Error\nCould not open file %s\n", av[1]);
+	fatal_if(m, m->fd < 0, "Could not open file %s\n", av[1]);
 	read_map_into_scene(m);
 	get_next_line(-1);
 	close(m->fd);
