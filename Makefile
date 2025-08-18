@@ -92,10 +92,7 @@ norm:
 			print \
 		}'
 
-start: all
-	./$(NAME) maps/std.rt
-
 .SILENT:
-.PHONY: all clean fclean re norm start
+.PHONY: all clean fclean re norm
 
 -include $(OBJ:%.o=%.d)
