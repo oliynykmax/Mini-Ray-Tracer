@@ -14,7 +14,7 @@ void	parse_amb_light(t_parse *m)
 	parse3(m, m->line[2], &m->sc->ambient, (float []){0, 255});
 	m->sc->ambient = scale3(m->sc->ambient, ratio / 255.0);
 	m->sc->ambient2 = m->sc->ambient;
-	if (m->arrlen == 4)
+	if (m->arrlen > 3)
 	{
 		if (ft_strcmp(m->line[3], "_") != 0)
 		{
