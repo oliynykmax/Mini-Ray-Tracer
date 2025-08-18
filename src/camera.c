@@ -73,6 +73,17 @@ static void	camera_update_viewport(t_render *r)
 	r->viewport[3] = sub3(add3(vec[1], vec[3]), r->camera_z);
 }
 
+t_vec3	get_viewport_ray(t_render *r, t_vec3 coord, uint16_t rng, int frame)
+{
+	const t_vec3	jitter = random_point_in_square(rng);
+	const float		u = (coord.x + jitter.x * !!frame) / r->image->width;
+	const float		v = (coord.y + jitter.y * !!frame) / r->image->height;
+	const t_vec3	v0 = lerp3(r->viewport[0], r->viewport[1], u);
+	const t_vec3	v1 = lerp3(r->viewport[2], r->viewport[3], u);
+
+	return (norm3(lerp3(v0, v1, v)));
+}
+
 // Update all camera parameters. Called before rendering a new frame.
 
 void	camera_update(t_render *r)

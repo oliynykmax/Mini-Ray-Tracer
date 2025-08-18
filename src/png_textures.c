@@ -17,26 +17,34 @@ mlx_texture_t	*load_png_texture(t_parse *map, char *filename)
 
 // Sample an image texture without filtering (nearest neighbor).
 
-static t_vec3	texel_fetch(mlx_texture_t *tex, uint32_t x, uint32_t y)
+static t_vec3	texel_fetch(mlx_texture_t *t, uint32_t x, uint32_t y, bool srgb)
 {
 	uint8_t	*p;
+	t_vec3	c;
 
-	p = &tex->pixels[4 * (x % tex->width + y % tex->height * tex->width)];
-	return (scale3(vec3(p[0], p[1], p[2]), 1.0f / 255.0f));
+	p = &t->pixels[4 * (x % t->width + y % t->height * t->width)];
+	c = scale3(vec3(p[0], p[1], p[2]), 1.0f / 255.0f);
+	if (srgb)
+	{
+		c.r = powf(c.r, 2.3f);
+		c.g = powf(c.g, 2.3f);
+		c.b = powf(c.b, 2.3f);
+	}
+	return (c);
 }
 
 // Sample an image texture with bilinear filtering.
 
-t_vec3	sample_png_color(mlx_texture_t *tex, float u, float v)
+t_vec3	sample_png_color(mlx_texture_t *tex, float u, float v, bool srgb)
 {
 	t_vec3	c[4];
 
 	u *= tex->width;
 	v *= tex->height;
-	c[0] = texel_fetch(tex, (int) u + 0, (int) v + 0);
-	c[1] = texel_fetch(tex, (int) u + 1, (int) v + 0);
-	c[2] = texel_fetch(tex, (int) u + 0, (int) v + 1);
-	c[3] = texel_fetch(tex, (int) u + 1, (int) v + 1);
+	c[0] = texel_fetch(tex, (int) u + 0, (int) v + 0, srgb);
+	c[1] = texel_fetch(tex, (int) u + 1, (int) v + 0, srgb);
+	c[2] = texel_fetch(tex, (int) u + 0, (int) v + 1, srgb);
+	c[3] = texel_fetch(tex, (int) u + 1, (int) v + 1, srgb);
 	c[0] = lerp3(c[0], c[1], fract(u));
 	c[1] = lerp3(c[2], c[3], fract(u));
 	return (lerp3(c[0], c[1], fract(v)));
@@ -62,7 +70,7 @@ void	apply_bumpmap(t_shading *s, t_object *object)
 {
 	t_vec3	m;
 
-	m = sample_png_color(object->bump_img, s->texcoord.x, s->texcoord.y);
+	m = sample_png_color(object->bump_img, s->texcoord.x, s->texcoord.y, false);
 	m = norm3(add3(mul3(m, vec3(-2.0f, 2.0f, 2.0f)), vec3(1.0f, -1.0f, -1.0f)));
 	s->bitangent = cross3(s->normal, s->tangent);
 	s->normal.x = dot3(m, vec3(s->tangent.x, s->bitangent.x, s->normal.x));
