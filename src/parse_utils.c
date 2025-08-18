@@ -1,32 +1,22 @@
 #include "minirt.h"
 
-t_texture	parse_texture(bool exists, t_parse *map, int i,
-						mlx_texture_t **img_slot)
+mlx_texture_t	*parse_texture(bool exists, t_parse *map, int i)
 {
-	size_t		len;
+	size_t			len;
+	mlx_texture_t	*tex;
 
-	if (!exists || map->line[i] == NULL || ft_strcmp(map->line[i], "_") == 0)
-		return (TEXTURE_NONE);
+	if (!exists || ft_strcmp(map->line[i], "_") == 0)
+		return (NULL);
 	len = ft_strlen(map->line[i]);
 	if (len >= 4 && ft_strcmp(map->line[i] + len - 4, ".png") == 0)
 	{
-		if (img_slot)
-			*img_slot = load_png_texture(map, map->line[i]);
-		return (TEXTURE_IMAGE);
+		tex = load_png_texture(map, map->line[i]);
+		return (tex);
 	}
-	if (ft_strcmp(map->line[i], "checked") == 0)
-		return (TEXTURE_CHECKED);
-	if (ft_strcmp(map->line[i], "zigzag") == 0)
-		return (TEXTURE_ZIGZAG);
-	if (ft_strcmp(map->line[i], "polkadot") == 0)
-		return (TEXTURE_POLKADOT);
-	if (ft_strcmp(map->line[i], "marble") == 0)
-		return (TEXTURE_MARBLE);
 	fatal_if(map, true,
-		"Unknown texture '%s' (expected checked | zigzag | polkadot |"
-		" marble | <file>.png)\n",
+		"Unknown texture '%s' (expected <file>.png or _)\n",
 		map->line[i]);
-	return (TEXTURE_NONE);
+	return (NULL);
 }
 
 float	parse_float(bool exists, t_parse *map, float std, int i)
@@ -45,10 +35,8 @@ void	parse_optionals(t_parse *m, int i)
 			DEFAULT_METALLIC, i + 1);
 	fatal_if(m, m->obj->metallic < 0.0f || m->obj->metallic > 1.0f,
 		"Metallic must be in [0,1]\n");
-	m->obj->texture = parse_texture(m->arrlen > i + 2,
-			m, i + 2, &m->obj->texture_img);
-	m->obj->bump = parse_texture(m->arrlen > i + 3,
-			m, i + 3, &m->obj->bump_img);
+	m->obj->texture_img = parse_texture(m->arrlen > i + 2, m, i + 2);
+	m->obj->bump_img = parse_texture(m->arrlen > i + 3, m, i + 3);
 }
 
 /*
