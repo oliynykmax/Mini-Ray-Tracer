@@ -16,8 +16,11 @@ void	parse_amb_light(t_parse *m)
 	m->sc->ambient2 = m->sc->ambient;
 	if (m->arrlen == 4)
 	{
-		parse3(m, m->line[3], &m->sc->ambient2, (float []){0, 255});
-		m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
+		if (ft_strcmp(m->line[3], "_") != 0)
+		{
+			parse3(m, m->line[3], &m->sc->ambient2, (float []){0, 255});
+			m->sc->ambient2 = scale3(m->sc->ambient2, ratio / 255.0);
+		}
 	}
 	m->sc->amb_texture = parse_texture(m->arrlen == 5, m, 4);
 	m->ambient_exists = true;
