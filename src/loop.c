@@ -21,6 +21,8 @@ static void	key_hook(mlx_key_data_t data, void *param)
 		return ;
 	if (data.key == MLX_KEY_ESCAPE)
 		mlx_close_window(r->mlx);
+	else if (data.key == MLX_KEY_F5)
+		dump_scene_prompt(r);
 }
 
 // MLX mouse hook. Used for picking objects with the right mouse button.
