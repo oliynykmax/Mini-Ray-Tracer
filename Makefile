@@ -17,6 +17,7 @@ SRCS := \
 	src/camera.c \
 	src/cylinder.c \
 	src/editing.c \
+	src/dump.c \
 	src/input.c \
 	src/loop.c \
 	src/main.c \
