@@ -1,0 +1,61 @@
+# Compact ALL-BONUSES Stress Test Map
+# Features included:
+# - Full Phong model (specular via low rough + metallic params)
+# - Color disruption: procedural checkerboard plane
+# - Multiple colored point lights (multi-spot)
+# - Additional 2nd degree object: paraboloid (pa)
+# - Textures + bump maps (brick.png, cubes.png, text.png)
+# - Depth of field (focus_depth + aperture)
+# - All color channels >= 1 (no zeros)
+
+# Ambient: ratio primary_color secondary_color ambient_texture
+A 0.14 255,255,255 190,210,255
+
+# Camera: position direction FOV focus_depth aperture
+# Focus roughly around z ≈ 4
+C 0,1.6,-8 0,-0.08,1 130
+
+# Colored lights (position brightness color radius)
+L -4,5,-3 0.85 255,120,120 0.30
+L 4,4,-2 0.70 120,180,255 0.25
+L 0,6,3 0.60 255,255,190 0.50
+L -2,2,-7 0.35 140,255,160 0.20
+
+# Ground plane with checker disruption + bump (mild gloss for reflections)
+# pl pos normal color rough metallic texture bump
+pl 0,0,0 0,1,0 240,240,240 0.08 0.05 _ _
+
+# Mirror / chrome sphere (sharp specular, strong metallic)
+# sp pos diameter color rough metallic texture bump
+sp -1.8,0.9,2.5 1.8 235,235,250 0.02 0.95
+
+# Warm glossy sphere (colored specular tint)
+sp 1.9,0.9,2.2 1.8 255,180,90 0.05 0.55 check.png
+
+# Mid-gloss cool sphere (different highlight spread)
+sp 0,0.75,4.2 1.5 140,200,255 0.12 0.40 _ _
+
+# Paraboloid (second degree object) centered farther back
+# pa pos normal diameter height color rough metallic texture bump
+pa 0,0.1,6 0,1,0 3.0 4.2 200,150,255 0.06 0.50 brick.png _
+
+# Slim vertical paraboloid "spike" for silhouette + specular streak
+pa 3,0.0,5.5 0,1,0 1.0 3.2 255,150,150 0.04 0.55 moon-color.png moon-normal.png
+
+# Textured + bump-mapped box (medium roughness)
+# bx pos normal size color rough metallic texture bump
+bx -3.2,1,5 0,1,0 2.0,2.0,2.0 200,160,120 0.20 0.30
+
+# Cylinder to generate overlapping colored shadows
+# cy pos normal diameter height color rough metallic texture bump
+cy 2.8,0.3,3.8 0,1,0 1.2 2.4 255,150,150 0.10 0.35
+
+# Matte reference sphere (diffuse baseline, broad highlight)
+sp -3.2,0.6,4.5 1.2 160,180,200 0.55 0.08 _ _
+
+# Notes:
+# - Low roughness => sharper highlight; higher => broader.
+# - Metallic near 1 tints specular with object base color.
+# - checker keyword drives procedural color disruption.
+# - Bump map (cubes.png) perturbs normals for richer specular detail.
+# - Depth of field: slight blur in foreground (<2) & background (>6.5) when implemented.
