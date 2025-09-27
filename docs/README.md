@@ -5,26 +5,13 @@
 ![Moon sphere with reflections](figure1.png)  
 *A textured moon sphere with bump mapping and soft lighting. (Scene: moon.rt)*
 
-![Hallway of cylinders](figure2.png)  
-*A long corridor filled with cylinders and spheres, showcasing shadows and depth. (Scene: hall.rt)*
+![Sea](figure2.png)  
+*Sea texture demonstration (sea.rt)*
 
 ![Desert landscape](figure3.png)  
 *Paraboloids, boxes, and spheres in a sandy environment with textures. (Scene: desert.rt)*
 
-![Minecraft island](figure4.png)  
-*Blocky voxel-style scene with a tree, chest, and cactus on islands. (Scene: minecraft.rt)*
-
-![Sea scene](figure5.png)  
-*Ocean view with waves, skybox, and various objects. (Scene: sea.rt)*
-
-![Checkerboard chess](figure6.png)  
-*Chess pieces on a checkerboard plane with colored lights. (Scene: checkers.rt)*
-
-![All-bonuses showcase](figure7.png)  
-*Ultimate scene with PBR materials, multiple lights, textures, bump maps, and depth of field. (Scene: colors.rt)*
-
-![Standard complex scene](figure8.png)  
-*Mixed objects with skybox, reflections, and advanced lighting. (Scene: std.rt)*
+![Reflections](figure4.png)  
 
 ## 🚀 Intro
 
@@ -47,8 +34,8 @@ Hey there! <please add introduction or remove it completely
 - <scaling description placeholder>
 
 ### Advanced Features
-- **Physically-Based Rendering (PBR)**: Realistic lighting with Fresnel, GGX distribution, and geometry terms.
-- **Path Tracing**: Monte Carlo integration for global illumination, reflections, and ambient occlusion.
+- **Physically-Based Rendering (PBR)**:.
+- **Path Tracing**: 
 - **Quaternion Rotations**: Smooth transformations using custom quaternion math.
 - **Texture Mapping**: Bilinear-filtered PNG support with normal mapping for surface details.
 - **Anti-Aliasing & DoF**: Random sampling for camera effects and noise reduction.
