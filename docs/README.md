@@ -13,17 +13,6 @@
 
 ![Reflections](figure4.png)  
 
-## 🚀 Intro
-
-Hey there! <please add introduction or remove it completely
-
-### Key Highlights
-- **Photorealistic Rendering**: 
-- **Performance Optimized**: Multi-threaded tile-based rendering with progressive refinement, achieving smooth real-time updates.
-- **Interactive Editing**: Manipulate objects in 3D space with mouse controls during rendering—no restarts needed!
-- **Advanced Effects**: Depth of field, soft shadows, reflections, and texture mapping for cinematic results.
-- **Robust Architecture**: Clean, modular C code with custom math libraries and comprehensive error handling.
-
 ## 🛠️ Technical Details
 
 ### Core Technologies
@@ -31,19 +20,13 @@ Hey there! <please add introduction or remove it completely
 - **Graphics**: MLX42, minimal graphic library from codam.
 - **Math Libraries**: Custom vector algebra, quaternion operations, and geometric utilities.
 - **Concurrency**: POSIX threads to make rendering fly on multi-core CPUs.
-- <scaling description placeholder>
 
 ### Advanced Features
-- **Physically-Based Rendering (PBR)**:.
-- **Path Tracing**: 
 - **Quaternion Rotations**: Smooth transformations using custom quaternion math.
 - **Texture Mapping**: Bilinear-filtered PNG support with normal mapping for surface details.
 - **Anti-Aliasing & DoF**: Random sampling for camera effects and noise reduction.
 - **Real-Time Editing**: Mouse-based object manipulation with intuitive controls.
 - **Multi-Threading**: Scalable parallel processing with job queues and synchronization.
-
-### Code Quality
-Modular design with clear separation of concerns (parsing, rendering, math). Extensive validation, optimized algorithms, and memory-safe operations.
 
 ## 🎮 Controls
 
@@ -68,14 +51,6 @@ Scenes are defined in .rt files with the following elements:
 
 All values are floats, colors in 0-255 range, positions/normals in world coordinates.
 
-## 🏗️ Supported Objects
-
-- **Spheres**: Perfect for balls, planets, or simple shapes.
-- **Planes**: Infinite surfaces like floors or walls.
-- **Cylinders**: Tubes, pillars, or rounded columns.
-- **Paraboloids**: Cone-like shapes for advanced geometry.
-- **Boxes**: Cuboids for buildings, crates, or voxel-style objects.
-
 ## 📦 Getting Started
 
 Ready to try it?
@@ -94,17 +69,5 @@ Ready to try it?
 
 ## 👥 Team Responsibilities
 
-- **[oliynykmax](https://github.com/oliynykmax)**: Handled all the parsing, validation, and file stuff—keeping data solid.
+- **[oliynykmax](https://github.com/oliynykmax)**: Handled all the parsing, validation, and file stuff.
 - **[datagore](https://github.com/datagore)**: Focused on the rendering core, math libs, and making it fast.
-
-## 🏗️ Architecture Overview
-
-- **Vector Math**: Custom 3D ops for quick calculations.
-- **Scene Parser**: Reads and validates .rt files.
-- **Ray Tracing Core**: Handles intersections, shading, and path tracing.
-- **Object Library**: Spheres, planes, cylinders, paraboloids, boxes.
-- **Rendering Pipeline**: Multi-threaded tiles that refine over time.
-
----
-
-*Let's render some magic!* ✨
